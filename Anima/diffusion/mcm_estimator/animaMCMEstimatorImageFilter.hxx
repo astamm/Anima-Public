@@ -744,6 +744,7 @@ MCMEstimatorImageFilter<InputPixelType, OutputPixelType>::CreateCostFunction(std
         baseCost = internalCost;
     }
 
+    baseCost->SetMAPEstimationMode(m_UseMAPEstimation);
     baseCost->SetObservedSignals(observedSignals);
     baseCost->SetGradients(m_GradientDirections);
     baseCost->SetSmallDelta(m_SmallDelta);
