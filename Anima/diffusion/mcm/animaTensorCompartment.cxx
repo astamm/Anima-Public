@@ -32,7 +32,7 @@ double TensorCompartment::GetLogPriorValue()
     if (m_EstimateDiffusivities)
     {
         double faCompartment = this->GetFractionalAnisotropy();
-        logPriorValue = anima::GetBetaLogPDF(faCompartment,m_PriorAlpha,m_PriorBeta);
+        logPriorValue = anima::GetBetaLogPDF(faCompartment,anima::MCMPriorAlpha,anima::MCMPriorBeta);
     }
 
     return logPriorValue;
@@ -65,7 +65,7 @@ TensorCompartment::ListType &TensorCompartment::GetPriorDerivativeVector()
 
         // Multiply by Beta derivative of FA
         double faValue = this->GetFractionalAnisotropy();
-        double betaPDFDerivative = anima::GetBetaPDFDerivative(faValue,m_PriorAlpha,m_PriorBeta);
+        double betaPDFDerivative = anima::GetBetaPDFDerivative(faValue,anima::MCMPriorAlpha,anima::MCMPriorBeta);
         m_PriorDerivativeVector[3] *= betaPDFDerivative;
 
         // Now other derivatives
@@ -78,7 +78,7 @@ TensorCompartment::ListType &TensorCompartment::GetPriorDerivativeVector()
         if (this->GetUseBoundedOptimization())
         {
             m_PriorDerivativeVector[3] *= levenberg::BoundedDerivativeAddOn(diffHighLambdas, this->GetBoundedSignVectorValue(3),
-                                                                            anima::MCMAxialDiffusivityAddonLowerBound, anima::MCMDiffusivityUpperBound);
+                                                                            anima::MCMZeroLowerBound, anima::MCMDiffusivityUpperBound);
 
             m_PriorDerivativeVector[4] *= levenberg::BoundedDerivativeAddOn(diffLowLambdas, this->GetBoundedSignVectorValue(4),
                                                                             anima::MCMZeroLowerBound, anima::MCMDiffusivityUpperBound);
@@ -290,10 +290,7 @@ TensorCompartment::ListType &TensorCompartment::GetParameterLowerBounds()
     std::fill(m_ParametersLowerBoundsVector.begin(),m_ParametersLowerBoundsVector.end(),anima::MCMZeroLowerBound);
     
     if (m_EstimateDiffusivities)
-    {
-        m_ParametersLowerBoundsVector[3] = anima::MCMAxialDiffusivityAddonLowerBound;
         m_ParametersLowerBoundsVector[5] = anima::MCMDiffusivityLowerBound;
-    }
     
     return m_ParametersLowerBoundsVector;
 }
