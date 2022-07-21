@@ -98,10 +98,17 @@ MultiCompartmentModelCreator::MCMPointer MultiCompartmentModelCreator::GetNewMul
         restComp->SetEstimateTissueRadius(!m_UseConstrainedStaniszRadius);
         restComp->SetAxialDiffusivity(m_StaniszDiffusivity);
 
-        restComp->SetAxialDiffusivityPriorShapeValue(m_StaniszAxialDiffusivityPriorShape);
-        restComp->SetAxialDiffusivityPriorScaleValue(m_StaniszAxialDiffusivityPriorScale);
-        restComp->SetTissueRadiusPriorShapeValue(m_StaniszTissueRadiusPriorShape);
-        restComp->SetTissueRadiusPriorScaleValue(m_StaniszTissueRadiusPriorScale);
+        if (!m_UseConstrainedStaniszDiffusivity)
+        {
+            restComp->SetAxialDiffusivityPriorShapeValue(m_StaniszAxialDiffusivityPriorShape);
+            restComp->SetAxialDiffusivityPriorScaleValue(m_StaniszAxialDiffusivityPriorScale);
+        }
+
+        if (!m_UseConstrainedStaniszRadius)
+        {
+            restComp->SetTissueRadiusPriorShapeValue(m_StaniszTissueRadiusPriorShape);
+            restComp->SetTissueRadiusPriorScaleValue(m_StaniszTissueRadiusPriorScale);
+        }
 
         outputMCM->AddCompartment(defaultWeight,restComp);
     }

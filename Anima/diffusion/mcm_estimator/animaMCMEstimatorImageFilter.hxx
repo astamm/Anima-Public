@@ -443,6 +443,22 @@ MCMEstimatorImageFilter<InputPixelType, OutputPixelType>
     typedef itk::ImageRegionIterator <MoseImageType> MoseIteratorType;
     MoseIteratorType moseIterator(m_MoseVolume, outputRegionForThread);
 
+    typedef itk::ImageRegionConstIterator <OutputScalarImageType> PriorParametersIteratorType;
+    PriorParametersIteratorType axialDiffShapeItr, axialDiffScaleItr;
+    PriorParametersIteratorType tissueRadiusShapeItr, tissueRadiusScaleItr;
+
+    if (m_StaniszAxialDiffPriorShape.IsNotNull())
+        axialDiffShapeItr = PriorParametersIteratorType(m_StaniszAxialDiffPriorShape, outputRegionForThread);
+
+    if (m_StaniszAxialDiffPriorScale.IsNotNull())
+        axialDiffScaleItr = PriorParametersIteratorType(m_StaniszAxialDiffPriorScale, outputRegionForThread);
+
+    if (m_StaniszTissueRadiusPriorShape.IsNotNull())
+        tissueRadiusShapeItr = PriorParametersIteratorType(m_StaniszTissueRadiusPriorShape, outputRegionForThread);
+
+    if (m_StaniszTissueRadiusPriorScale.IsNotNull())
+        tissueRadiusScaleItr = PriorParametersIteratorType(m_StaniszTissueRadiusPriorScale, outputRegionForThread);
+
     std::vector <double> observedSignals(m_NumberOfImages,0);
 
     typename OutputImageType::PixelType resVec(this->GetOutput()->GetNumberOfComponentsPerPixel());
@@ -483,12 +499,37 @@ MCMEstimatorImageFilter<InputPixelType, OutputPixelType>
             ++sigmaIterator;
             ++moseIterator;
 
+            if (m_StaniszAxialDiffPriorShape.IsNotNull())
+                ++axialDiffShapeItr;
+
+            if (m_StaniszAxialDiffPriorScale.IsNotNull())
+                ++axialDiffScaleItr;
+
+            if (m_StaniszTissueRadiusPriorShape.IsNotNull())
+                ++tissueRadiusShapeItr;
+
+            if (m_StaniszTissueRadiusPriorScale.IsNotNull())
+                ++tissueRadiusScaleItr;
+
             continue;
         }
 
         // Load DWI
         for (unsigned int i = 0;i < m_NumberOfImages;++i)
             observedSignals[i] = inIterators[i].Get();
+
+        // Prepare setting prior info before we get in specific methods, easier and cleaner
+        if (m_StaniszAxialDiffPriorShape.IsNotNull())
+            m_MCMCreators[threadId]->SetStaniszAxialDiffusivityPriorShape(axialDiffShapeItr.Get());
+
+        if (m_StaniszAxialDiffPriorScale.IsNotNull())
+            m_MCMCreators[threadId]->SetStaniszAxialDiffusivityPriorScale(axialDiffScaleItr.Get());
+
+        if (m_StaniszTissueRadiusPriorShape.IsNotNull())
+            m_MCMCreators[threadId]->SetStaniszTissueRadiusPriorShape(tissueRadiusShapeItr.Get());
+
+        if (m_StaniszTissueRadiusPriorScale.IsNotNull())
+            m_MCMCreators[threadId]->SetStaniszTissueRadiusPriorScale(tissueRadiusScaleItr.Get());
 
         int moseValue = -1;
         bool estimateNonIsoCompartments = false;
@@ -579,6 +620,18 @@ MCMEstimatorImageFilter<InputPixelType, OutputPixelType>
         ++b0Iterator;
         ++sigmaIterator;
         ++moseIterator;
+
+        if (m_StaniszAxialDiffPriorShape.IsNotNull())
+            ++axialDiffShapeItr;
+
+        if (m_StaniszAxialDiffPriorScale.IsNotNull())
+            ++axialDiffScaleItr;
+
+        if (m_StaniszTissueRadiusPriorShape.IsNotNull())
+            ++tissueRadiusShapeItr;
+
+        if (m_StaniszTissueRadiusPriorScale.IsNotNull())
+            ++tissueRadiusScaleItr;
     }
 
     this->SafeReleaseThreadId(threadId);

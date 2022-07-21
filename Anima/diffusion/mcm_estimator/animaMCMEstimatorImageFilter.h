@@ -104,6 +104,11 @@ public:
     itkSetMacro(MLEstimationStrategy, MaximumLikelihoodEstimationMode)
     itkGetMacro(MLEstimationStrategy, MaximumLikelihoodEstimationMode)
 
+    itkSetObjectMacro(StaniszAxialDiffPriorShape, OutputScalarImageType)
+    itkSetObjectMacro(StaniszAxialDiffPriorScale, OutputScalarImageType)
+    itkSetObjectMacro(StaniszTissueRadiusPriorShape, OutputScalarImageType)
+    itkSetObjectMacro(StaniszTissueRadiusPriorScale, OutputScalarImageType)
+
     // Model-related parameters
     itkSetMacro(ModelWithFreeWaterComponent, bool)
     itkSetMacro(ModelWithStationaryWaterComponent, bool)
@@ -307,6 +312,11 @@ private:
     OutputScalarImagePointer m_SigmaSquareVolume;
     OutputScalarImagePointer m_AICcVolume;
     MoseImagePointer m_MoseVolume;
+
+    OutputScalarImagePointer m_StaniszAxialDiffPriorShape;
+    OutputScalarImagePointer m_StaniszAxialDiffPriorScale;
+    OutputScalarImagePointer m_StaniszTissueRadiusPriorShape;
+    OutputScalarImagePointer m_StaniszTissueRadiusPriorScale;
 
     std::vector <MCMCreatorType *> m_MCMCreators;
 

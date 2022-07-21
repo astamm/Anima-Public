@@ -61,6 +61,12 @@ int main(int argc,  char **argv)
     TCLAP::SwitchArg commonKappaArg("", "common-kappa", "Share orientation concentration values among compartments", cmd, false);
     TCLAP::SwitchArg commonEAFArg("", "common-eaf", "Share extra axonal fraction values among compartments", cmd, false);
 
+    //Prior parameters maps for Stanisz compartment
+    TCLAP::ValueArg<std::string> staniszAxialDiffusivityPriorShapeArg("", "prior-ax-diff-shape", "Stanisz axial diffusivity prior shape parameters map", false, "", "Stanisz axial diffusivity prior shape", cmd);
+    TCLAP::ValueArg<std::string> staniszAxialDiffusivityPriorScaleArg("", "prior-ax-diff-scale", "Stanisz axial diffusivity prior scale parameters map", false, "", "Stanisz axial diffusivity prior scale", cmd);
+    TCLAP::ValueArg<std::string> staniszTissueRadiusPriorShapeArg("", "prior-tr-shape", "Stanisz tissue radius prior shape parameters map", false, "", "Stanisz tissue radius prior shape", cmd);
+    TCLAP::ValueArg<std::string> staniszTissueRadiusPriorScaleArg("", "prior-tr-scale", "Stanisz tissue radius prior scale parameters map", false, "", "Stanisz tissue radius prior scale", cmd);
+
     //Initial values for diffusivities
     TCLAP::ValueArg<double> initAxialDiffArg("", "init-axial-diff", "Initial axial diffusivity (default: 1.71e-3)", false, 1.71e-3, "initial axial diffusivity", cmd);
     TCLAP::ValueArg<double> initRadialDiff1Arg("", "init-radial-diff1", "Initial first radial diffusivity (default: 1.9e-4)", false, 1.9e-4, "initial first radial diffusivity", cmd);
@@ -199,6 +205,18 @@ int main(int argc,  char **argv)
     filter->SetUseConstrainedIRWDiffusivity(!optIRWDiffArg.isSet());
     filter->SetUseConstrainedStaniszDiffusivity(!optStaniszDiffArg.isSet());
     filter->SetUseConstrainedStaniszRadius(!optStaniszRadiusArg.isSet());
+
+    if (optStaniszDiffArg.isSet() && (staniszAxialDiffusivityPriorShapeArg.getValue() != ""))
+        filter->SetStaniszAxialDiffPriorShape(anima::readImage <InputImageType> (staniszAxialDiffusivityPriorShapeArg.getValue()));
+
+    if (optStaniszDiffArg.isSet() && (staniszAxialDiffusivityPriorScaleArg.getValue() != ""))
+        filter->SetStaniszAxialDiffPriorScale(anima::readImage <InputImageType> (staniszAxialDiffusivityPriorScaleArg.getValue()));
+
+    if (optStaniszRadiusArg.isSet() && (staniszTissueRadiusPriorShapeArg.getValue() != ""))
+        filter->SetStaniszTissueRadiusPriorShape(anima::readImage <InputImageType> (staniszTissueRadiusPriorShapeArg.getValue()));
+
+    if (optStaniszRadiusArg.isSet() && (staniszTissueRadiusPriorScaleArg.getValue() != ""))
+        filter->SetStaniszTissueRadiusPriorScale(anima::readImage <InputImageType> (staniszTissueRadiusPriorScaleArg.getValue()));
 
     if (!fixDiffArg.isSet())
         filter->SetUseCommonDiffusivities(commonDiffusivitiesArg.isSet());
