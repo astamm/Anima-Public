@@ -59,6 +59,11 @@ public:
     void SetRadialDiffusivity1Value(double arg) {m_RadialDiffusivity1 = arg;}
     void SetRadialDiffusivity2Value(double arg) {m_RadialDiffusivity2 = arg;}
 
+    void SetStaniszAxialDiffusivityPriorShape(double arg) {m_StaniszAxialDiffusivityPriorShape = arg;}
+    void SetStaniszAxialDiffusivityPriorScale(double arg) {m_StaniszAxialDiffusivityPriorScale = arg;}
+    void SetStaniszTissueRadiusPriorShape(double arg) {m_StaniszTissueRadiusPriorShape = arg;}
+    void SetStaniszTissueRadiusPriorScale(double arg) {m_StaniszTissueRadiusPriorScale = arg;}
+
     double GetOrientationConcentration() {return m_OrientationConcentration;}
     double GetAxialDiffusivity() {return m_AxialDiffusivity;}
     double GetRadialDiffusivity1() {return m_RadialDiffusivity1;}
@@ -91,6 +96,11 @@ private:
     bool m_UseCommonDiffusivities;
     bool m_UseCommonConcentrations;
     bool m_UseCommonExtraAxonalFractions;
+
+    double m_StaniszAxialDiffusivityPriorShape;
+    double m_StaniszAxialDiffusivityPriorScale;
+    double m_StaniszTissueRadiusPriorShape;
+    double m_StaniszTissueRadiusPriorScale;
 
     double m_FreeWaterDiffusivity, m_IRWDiffusivity, m_StaniszDiffusivity;
     double m_OrientationConcentration, m_ExtraAxonalFraction;

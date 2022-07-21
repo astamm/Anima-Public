@@ -35,6 +35,11 @@ MultiCompartmentModelCreator::MultiCompartmentModelCreator()
     m_UseCommonConcentrations = false;
     m_UseCommonExtraAxonalFractions = false;
 
+    m_StaniszAxialDiffusivityPriorShape = 0;
+    m_StaniszAxialDiffusivityPriorScale = 0;
+    m_StaniszTissueRadiusPriorShape = 0;
+    m_StaniszTissueRadiusPriorScale = 0;
+
     m_AxialDiffusivity = 1.71e-3;
     m_FreeWaterDiffusivity = 3.0e-3;
     m_IRWDiffusivity = 7.5e-4;
@@ -92,6 +97,11 @@ MultiCompartmentModelCreator::MCMPointer MultiCompartmentModelCreator::GetNewMul
         restComp->SetEstimateAxialDiffusivity(!m_UseConstrainedStaniszDiffusivity);
         restComp->SetEstimateTissueRadius(!m_UseConstrainedStaniszRadius);
         restComp->SetAxialDiffusivity(m_StaniszDiffusivity);
+
+        restComp->SetAxialDiffusivityPriorShapeValue(m_StaniszAxialDiffusivityPriorShape);
+        restComp->SetAxialDiffusivityPriorScaleValue(m_StaniszAxialDiffusivityPriorScale);
+        restComp->SetTissueRadiusPriorShapeValue(m_StaniszTissueRadiusPriorShape);
+        restComp->SetTissueRadiusPriorScaleValue(m_StaniszTissueRadiusPriorScale);
 
         outputMCM->AddCompartment(defaultWeight,restComp);
     }

@@ -59,10 +59,10 @@ public:
     bool GetTensorCompatible() ITK_OVERRIDE {return false;}
     double GetApparentFractionalAnisotropy() ITK_OVERRIDE;
 
-    void SetAxialDiffusivityPriorShapeValue();
-    void SetAxialDiffusivityPriorScaleValue();
-    void SetTissueRadiusPriorShapeValue();
-    void SetTissueRadiusPriorScaleValue();
+    void SetAxialDiffusivityPriorShapeValue(double val) {m_AxialDiffusivityPriorShapeValue = val;}
+    void SetAxialDiffusivityPriorScaleValue(double val) {m_AxialDiffusivityPriorScaleValue = val;}
+    void SetTissueRadiusPriorShapeValue(double val) {m_TissueRadiusPriorShapeValue = val;}
+    void SetTissueRadiusPriorScaleValue(double val) {m_TissueRadiusPriorScaleValue = val;}
 
 protected:
     StaniszCompartment() : Superclass()
