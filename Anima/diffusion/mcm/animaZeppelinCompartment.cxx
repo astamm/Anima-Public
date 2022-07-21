@@ -23,7 +23,8 @@ double ZeppelinCompartment::GetFourierTransformedDiffusionProfile(double smallDe
 
 double ZeppelinCompartment::GetLogPriorValue()
 {
-    double logPriorValue = 0.0;
+    // Sphere uniform prior on directions (theta \in [0,pi])
+    double logPriorValue = std::log(std::sin(this->GetOrientationTheta())) - std::log(4 * M_PI);
 
     if (m_EstimateDiffusivities)
     {
@@ -41,9 +42,10 @@ ZeppelinCompartment::ListType &ZeppelinCompartment::GetPriorDerivativeVector()
 {
     m_PriorDerivativeVector.resize(this->GetNumberOfParameters());
 
-    // No priors on directions
-    m_PriorDerivativeVector[0] = 0.0;
-    m_PriorDerivativeVector[1] = 0.0;
+    double uniformSpherePrior = std::sin(this->GetOrientationTheta()) / (4 * M_PI);
+    // Sphere uniform prior on directions
+    m_PriorDerivativeVector[0] = std::cos(this->GetOrientationTheta()) / (4 * M_PI);
+    m_PriorDerivativeVector[1] = 0.0; // Doesn't depend on phi so null
 
     if (m_EstimateDiffusivities)
     {
@@ -53,6 +55,9 @@ ZeppelinCompartment::ListType &ZeppelinCompartment::GetPriorDerivativeVector()
 
         double priorBeta = std::exp(anima::GetBetaLogPDF(faValue,anima::MCMPriorAlpha,anima::MCMPriorBeta));
         double priorLambda = std::exp(anima::GetGammaLogPDF(mdValue,anima::MCMGammaPriorKDiffusivity,anima::MCMGammaPriorThetaDiffusivity));
+
+        m_PriorDerivativeVector[0] *= priorBeta;
+        m_PriorDerivativeVector[0] *= priorLambda;
 
         // Compute lambda prior derivative
         double lambdaPriorDerivative = anima::GetGammaPDFDerivative(mdValue,anima::MCMGammaPriorKDiffusivity,anima::MCMGammaPriorThetaDiffusivity);
@@ -75,11 +80,13 @@ ZeppelinCompartment::ListType &ZeppelinCompartment::GetPriorDerivativeVector()
         double betaPDFDerivative = anima::GetBetaPDFDerivative(faValue,anima::MCMPriorAlpha,anima::MCMPriorBeta);
         betaPriorDerivative *= betaPDFDerivative;
         m_PriorDerivativeVector[2] = betaPriorDerivative * priorLambda + priorBeta * lambdaPriorDerivative / 3.0;
+        m_PriorDerivativeVector[2] *= uniformSpherePrior;
 
         // Now derivative with respect to smaller lambda
         betaPriorDerivative = - diffLambdas * (3.0 * radialDiff + diffLambdas);
         betaPriorDerivative *= betaPDFDerivative * denomValue;
         m_PriorDerivativeVector[3] = betaPriorDerivative * priorLambda + 2.0 * priorBeta * lambdaPriorDerivative / 3.0;
+        m_PriorDerivativeVector[3] *= uniformSpherePrior;
     }
 
     return m_PriorDerivativeVector;
