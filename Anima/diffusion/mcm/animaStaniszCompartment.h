@@ -34,6 +34,10 @@ public:
     virtual ListType &GetSignalAttenuationJacobian(double smallDelta, double bigDelta, double gradientStrength, const Vector3DType &gradient) ITK_OVERRIDE;
     virtual double GetLogDiffusionProfile(const Vector3DType &sample) ITK_OVERRIDE;
 
+    virtual double GetLogPriorValue() ITK_OVERRIDE;
+    virtual ListType &GetPriorDerivativeVector() ITK_OVERRIDE;
+
+
     virtual void SetParametersFromVector(const ListType &params) ITK_OVERRIDE;
     virtual ListType &GetParametersAsVector() ITK_OVERRIDE;
 
@@ -55,6 +59,11 @@ public:
     bool GetTensorCompatible() ITK_OVERRIDE {return false;}
     double GetApparentFractionalAnisotropy() ITK_OVERRIDE;
 
+    void SetAxialDiffusivityPriorShapeValue();
+    void SetAxialDiffusivityPriorScaleValue();
+    void SetTissueRadiusPriorShapeValue();
+    void SetTissueRadiusPriorScaleValue();
+
 protected:
     StaniszCompartment() : Superclass()
     {
@@ -63,6 +72,11 @@ protected:
         m_ChangedConstraints = true;
 
         m_SignalSummationTolerance = 1.0e-4;
+
+        m_AxialDiffusivityPriorShapeValue = 0;
+        m_AxialDiffusivityPriorScaleValue = 0;
+        m_TissueRadiusPriorShapeValue = 0;
+        m_TissueRadiusPriorScaleValue = 0;
     }
 
     virtual ~StaniszCompartment() {}
@@ -83,6 +97,11 @@ private:
     MapType m_ThirdSummations, m_FourthSummations;
 
     double m_SignalSummationTolerance;
+
+    double m_AxialDiffusivityPriorShapeValue;
+    double m_AxialDiffusivityPriorScaleValue;
+    double m_TissueRadiusPriorShapeValue;
+    double m_TissueRadiusPriorScaleValue;
 
     const unsigned int m_MaximumNumberOfSumElements = 2000;
 };
