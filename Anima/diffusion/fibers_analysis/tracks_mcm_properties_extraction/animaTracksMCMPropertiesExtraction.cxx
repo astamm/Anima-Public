@@ -147,6 +147,10 @@ void ComputePropertiesOnOneCell(vtkCell *cell, anima::MCMLinearInterpolateImageF
         myParameterValues[1] = outputCompartment->GetApparentPerpendicularDiffusivity();
         myParameterValues[2] = outputCompartment->GetApparentMeanDiffusivity();
         myParameterValues[3] = outputCompartment->GetApparentFractionalAnisotropy();
+
+        itk::VariableLengthVector <double> diffTensor(6);
+        anima::GetVectorRepresentation(outputCompartment->GetDiffusionTensor().GetVnlMatrix().as_matrix(),diffTensor);
+
         unsigned int pos = 4;
         if (fwCompartmentIndex != -1)
         {
@@ -160,17 +164,18 @@ void ComputePropertiesOnOneCell(vtkCell *cell, anima::MCMLinearInterpolateImageF
             ++pos;
         }
 
-        for (int k = 0; k < nbOfComponents; ++k)
+        for (int k = 0; k < pos; ++k) // Do not test for tensor value
         {
             if (std::isnan(myParameterValues[k]))
             {
                 std::cerr << "Output Nan for " << myParameters[k]->GetName() << " array" << std::endl;
                 exit(-1);
             }
+
+            myParameters[k]->SetValue(ptId, myParameterValues[k]);
         }
 
-        for (unsigned int i = 0;i < pos;++i)
-            myParameters[i]->SetValue(ptId, myParameterValues[i]);
+        myParameters[pos]->SetTuple(ptId,diffTensor.GetDataPointer());
     }
 }
 
@@ -272,7 +277,7 @@ int main(int argc,  char **argv)
     mcmInterpolator->SetInputImage(inputImage);
     mcmInterpolator->SetReferenceOutputModel(mcm);
 
-    int nbOfComponents = 4;
+    int nbOfComponents = 5;
     bool hasFW = false;
     bool hasIRW = false;
     for (unsigned int i = 0;i < mcm->GetNumberOfIsotropicCompartments();++i)
@@ -302,6 +307,7 @@ int main(int argc,  char **argv)
     myParameters[1]->SetName("Perpendicular diffusivity");
     myParameters[2]->SetName("Mean diffusivity");
     myParameters[3]->SetName("Fractional anisotropy");
+
     unsigned int pos = 4;
     if (hasFW)
     {
@@ -310,7 +316,13 @@ int main(int argc,  char **argv)
     }
 
     if (hasIRW)
+    {
         myParameters[pos]->SetName("Isotropic restricted water fraction");
+        ++pos;
+    }
+
+    myParameters[pos]->SetNumberOfComponents(6);
+    myParameters[pos]->SetName("Closest tensor");
 
     ThreaderArguments tmpStr;
     tmpStr.mcm = mcm;
