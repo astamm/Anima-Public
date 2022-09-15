@@ -8,10 +8,12 @@
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkGenericCell.h>
+#include <vtkDoubleArray.h>
 
 #include <itkPoolMultiThreader.h>
 
-void OrientTracks(vtkPolyData *tracks, vtkPolyData *refTracts, unsigned int startIndex, unsigned int endIndex)
+void OrientTracks(vtkPolyData *tracks, vtkPolyData *refTracts, vtkDoubleArray *pointsOrderArray,
+                  unsigned int startIndex, unsigned int endIndex)
 {
     double firstPointPosition[3];
     double secondPointPosition[3];
@@ -34,7 +36,6 @@ void OrientTracks(vtkPolyData *tracks, vtkPolyData *refTracts, unsigned int star
 
         for (unsigned int j = 0;j < minNumPts;++j)
         {
-            vtkIdType firstId = refCell->GetPointIds()->GetId(j);
             refCellPts->GetPoint(j, firstPointPosition);
 
             double dist = 0;
@@ -48,7 +49,6 @@ void OrientTracks(vtkPolyData *tracks, vtkPolyData *refTracts, unsigned int star
 
         for (unsigned int j = 0;j < minNumPts;++j)
         {
-            vtkIdType firstId = refCell->GetPointIds()->GetId(j);
             refCellPts->GetPoint(j, firstPointPosition);
 
             double dist = 0;
@@ -73,6 +73,15 @@ void OrientTracks(vtkPolyData *tracks, vtkPolyData *refTracts, unsigned int star
                 cellPts->SetPoint(numCellPts - j - 1, firstPointPosition);
             }
         }
+
+        if (pointsOrderArray)
+        {
+            for (unsigned int j = 0;j < numCellPts;++j)
+            {
+                vtkIdType ptId = cell->GetPointIds()->GetId(j);
+                pointsOrderArray->SetValue(ptId, j + 1);
+            }
+        }
     }
 }
 
@@ -80,6 +89,7 @@ typedef struct
 {
     vtkPolyData *tracks;
     vtkPolyData *refTracts;
+    vtkDoubleArray *pointsOrderArray;
 } ThreaderArguments;
 
 ITK_THREAD_RETURN_FUNCTION_CALL_CONVENTION ThreadFilterer(void *arg)
@@ -98,7 +108,7 @@ ITK_THREAD_RETURN_FUNCTION_CALL_CONVENTION ThreadFilterer(void *arg)
     if (nbThread == numTotalThread - 1)
         endIndex = nbTotalCells;
 
-    OrientTracks(tmpArg->tracks, tmpArg->refTracts, startIndex, endIndex);
+    OrientTracks(tmpArg->tracks, tmpArg->refTracts, tmpArg->pointsOrderArray, startIndex, endIndex);
 
     return ITK_THREAD_RETURN_DEFAULT_VALUE;
 }
@@ -110,6 +120,8 @@ int main(int argc, char **argv)
     TCLAP::ValueArg<std::string> inArg("i","input","input tracks file",true,"","input tracks",cmd);
     TCLAP::ValueArg<std::string> refArg("r","ref","reference tracks name (first fiber will be used)",true,"","reference tracks",cmd);
     TCLAP::ValueArg<std::string> outArg("o","output","output tracks name",true,"","output tracks",cmd);
+
+    TCLAP::SwitchArg pointsOrderArg("O","points-order","Output a scalar field showing points order",cmd);
 
     TCLAP::ValueArg<unsigned int> nbThreadsArg("T","nb-threads","Number of threads to run on (default: all available)",false,itk::MultiThreaderBase::GetGlobalDefaultNumberOfThreads(),"number of threads",cmd);
     try
@@ -138,17 +150,28 @@ int main(int argc, char **argv)
 
     vtkSmartPointer <vtkPolyData> refTracks = refTrackReader.GetOutput();
 
+    vtkSmartPointer <vtkDoubleArray> pointsOrderArray = nullptr;
+    if (pointsOrderArg.isSet())
+    {
+        vtkIdType nbTotalPts = tracks->GetNumberOfPoints();
+        pointsOrderArray = vtkDoubleArray::New();
+        pointsOrderArray->SetNumberOfComponents(1);
+        pointsOrderArray->SetNumberOfValues(nbTotalPts);
+        pointsOrderArray->SetName("Points order");
+    }
+
     ThreaderArguments tmpStr;
     tmpStr.tracks = tracks;
     tmpStr.refTracts = refTracks;
+    tmpStr.pointsOrderArray = pointsOrderArray;
 
     itk::PoolMultiThreader::Pointer mThreader = itk::PoolMultiThreader::New();
     mThreader->SetNumberOfWorkUnits(nbThreadsArg.getValue());
     mThreader->SetSingleMethod(ThreadFilterer,&tmpStr);
     mThreader->SingleMethodExecute();
 
-    // Final pruning of removed cells
-    tracks->RemoveDeletedCells();
+    if (pointsOrderArg.isSet())
+        tracks->GetPointData()->AddArray(pointsOrderArray);
 
     anima::ShapesWriter writer;
     writer.SetInputData(tracks);
