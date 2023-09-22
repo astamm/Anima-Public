@@ -2,7 +2,6 @@
 
 #include <animaVectorOperations.h>
 #include <animaBetaDistribution.h>
-#include <animaGammaDistribution.h>
 #include <itkSymmetricEigenAnalysis.h>
 #include <animaMCMConstants.h>
 
@@ -30,7 +29,7 @@ double StickCompartment::GetLogPriorValue()
         logPriorValue = anima::GetBetaLogPDF(faCompartment,anima::MCMPriorAlpha,anima::MCMPriorBeta);
 
         double mdCompartment = this->GetApparentMeanDiffusivity();
-        logPriorValue += anima::GetGammaLogPDF(mdCompartment, anima::MCMGammaPriorKDiffusivity, anima::MCMGammaPriorThetaDiffusivity);
+        logPriorValue += m_MeanDiffusivityPrior.GetLogDensity(mdCompartment);
     }
 
     return logPriorValue;
@@ -67,10 +66,10 @@ StickCompartment::ListType &StickCompartment::GetPriorDerivativeVector()
 
         // Compute individual prior values
         double priorBeta = std::exp(anima::GetBetaLogPDF(faValue,anima::MCMPriorAlpha,anima::MCMPriorBeta));
-        double priorLambda = std::exp(anima::GetGammaLogPDF(mdValue,anima::MCMGammaPriorKDiffusivity,anima::MCMGammaPriorThetaDiffusivity));
+        double priorLambda = m_MeanDiffusivityPrior.GetDensity(mdValue);
 
         // Compute lambda prior derivative
-        double lambdaPriorDerivative = anima::GetGammaPDFDerivative(mdValue,anima::MCMGammaPriorKDiffusivity,anima::MCMGammaPriorThetaDiffusivity) / 3.0;
+        double lambdaPriorDerivative = m_MeanDiffusivityPrior.GetDensityDerivative(mdValue) / 3.0;
 
         m_PriorDerivativeVector[2] = betaPriorDerivative * priorLambda + priorBeta * lambdaPriorDerivative;
     }

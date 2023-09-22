@@ -1,4 +1,4 @@
-project(AnimaMCM)
+project(AnimaStatisticalDistributions)
 
 ## #############################################################################
 ## List Sources
@@ -22,12 +22,7 @@ add_library(${PROJECT_NAME}
 ## #############################################################################
 
 target_link_libraries(${PROJECT_NAME}
-  AnimaMCMBase
-  AnimaSpecialFunctions
-  AnimaOptimizers
-  AnimaStatisticalDistributions
   ITKCommon
-  ${TinyXML2_LIBRARY}
   )
 
 

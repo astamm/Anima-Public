@@ -1,8 +1,6 @@
 #include <animaStaniszCompartment.h>
-
-#include <animaVectorOperations.h>
 #include <animaMCMConstants.h>
-#include <animaGammaDistribution.h>
+#include <animaVectorOperations.h>
 
 #include <limits>
 
@@ -124,11 +122,11 @@ double StaniszCompartment::GetLogPriorValue()
     double logPriorValue = 0.0;
 
     if (m_EstimateTissueRadius && ((m_TissueRadiusPriorShapeValue != 0)||(m_TissueRadiusPriorScaleValue != 0)))
-        logPriorValue += anima::GetGammaLogPDF(this->GetTissueRadius(), m_TissueRadiusPriorShapeValue, m_TissueRadiusPriorScaleValue);
+        logPriorValue += m_TissueRadiusPrior.GetLogDensity(this->GetTissueRadius());
 
     if (m_EstimateAxialDiffusivity && ((m_AxialDiffusivityPriorShapeValue != 0)||(m_AxialDiffusivityPriorScaleValue != 0)))
-        logPriorValue += anima::GetGammaLogPDF(this->GetAxialDiffusivity(), m_AxialDiffusivityPriorShapeValue, m_AxialDiffusivityPriorScaleValue);
-
+        logPriorValue += m_AxialDiffusivityPrior.GetLogDensity(this->GetAxialDiffusivity());
+    
     return logPriorValue;
 }
 
@@ -142,16 +140,16 @@ StaniszCompartment::ListType &StaniszCompartment::GetPriorDerivativeVector()
     double priorAxialDiffusivity = 1;
 
     if (m_EstimateAxialDiffusivity && ((m_AxialDiffusivityPriorShapeValue != 0)||(m_AxialDiffusivityPriorScaleValue != 0)))
-        priorAxialDiffusivity = std::exp(anima::GetGammaLogPDF(this->GetAxialDiffusivity(), m_AxialDiffusivityPriorShapeValue, m_AxialDiffusivityPriorScaleValue));
+        priorAxialDiffusivity = m_AxialDiffusivityPrior.GetDensity(this->GetAxialDiffusivity());
 
     if (m_EstimateTissueRadius && ((m_TissueRadiusPriorShapeValue != 0)||(m_TissueRadiusPriorScaleValue != 0)))
-        priorTissueRadius = std::exp(anima::GetGammaLogPDF(this->GetTissueRadius(), m_TissueRadiusPriorShapeValue, m_TissueRadiusPriorScaleValue));
+        priorTissueRadius = m_TissueRadiusPrior.GetDensity(this->GetTissueRadius());
 
     if (m_EstimateTissueRadius && ((m_TissueRadiusPriorShapeValue != 0)||(m_TissueRadiusPriorScaleValue != 0)))
     {
         m_PriorDerivativeVector[pos] = priorAxialDiffusivity;
 
-        double tissueRadiusDerivative = anima::GetGammaPDFDerivative(this->GetTissueRadius(), m_TissueRadiusPriorShapeValue, m_TissueRadiusPriorScaleValue);
+        double tissueRadiusDerivative = m_TissueRadiusPrior.GetDensityDerivative(this->GetTissueRadius());
 
         m_PriorDerivativeVector[pos] *= tissueRadiusDerivative;
         ++pos;
@@ -161,7 +159,7 @@ StaniszCompartment::ListType &StaniszCompartment::GetPriorDerivativeVector()
     {
         m_PriorDerivativeVector[pos] = priorTissueRadius;
 
-        double axialDiffDerivative = anima::GetGammaPDFDerivative(this->GetAxialDiffusivity(), m_AxialDiffusivityPriorShapeValue, m_AxialDiffusivityPriorScaleValue);
+        double axialDiffDerivative = m_AxialDiffusivityPrior.GetDensityDerivative(this->GetAxialDiffusivity());
 
         m_PriorDerivativeVector[pos] *= axialDiffDerivative;
     }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <animaBaseCompartment.h>
+#include <animaGammaDistribution.h>
 #include <AnimaMCMExport.h>
 
 #include <tuple>
@@ -59,10 +60,26 @@ public:
     bool GetTensorCompatible() ITK_OVERRIDE {return false;}
     double GetApparentFractionalAnisotropy() ITK_OVERRIDE;
 
-    void SetAxialDiffusivityPriorShapeValue(double val) {m_AxialDiffusivityPriorShapeValue = val;}
-    void SetAxialDiffusivityPriorScaleValue(double val) {m_AxialDiffusivityPriorScaleValue = val;}
-    void SetTissueRadiusPriorShapeValue(double val) {m_TissueRadiusPriorShapeValue = val;}
-    void SetTissueRadiusPriorScaleValue(double val) {m_TissueRadiusPriorScaleValue = val;}
+    void SetAxialDiffusivityPriorShapeValue(double val)
+    {
+        m_AxialDiffusivityPriorShapeValue = val;
+        m_AxialDiffusivityPrior.SetShapeParameter(val);
+    }
+    void SetAxialDiffusivityPriorScaleValue(double val)
+    {
+        m_AxialDiffusivityPriorScaleValue = val;
+        m_AxialDiffusivityPrior.SetScaleParameter(val);
+    }
+    void SetTissueRadiusPriorShapeValue(double val)
+    {
+        m_TissueRadiusPriorShapeValue = val;
+        m_TissueRadiusPrior.SetShapeParameter(val);
+    }
+    void SetTissueRadiusPriorScaleValue(double val)
+    {
+        m_TissueRadiusPriorScaleValue = val;
+        m_TissueRadiusPrior.SetScaleParameter(val);
+    }
 
 protected:
     StaniszCompartment() : Superclass()
@@ -102,6 +119,9 @@ private:
     double m_AxialDiffusivityPriorScaleValue;
     double m_TissueRadiusPriorShapeValue;
     double m_TissueRadiusPriorScaleValue;
+
+    anima::GammaDistribution m_AxialDiffusivityPrior;
+    anima::GammaDistribution m_TissueRadiusPrior;
 
     const unsigned int m_MaximumNumberOfSumElements = 2000;
 };
