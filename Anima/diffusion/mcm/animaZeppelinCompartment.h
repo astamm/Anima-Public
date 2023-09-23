@@ -3,7 +3,6 @@
 #include <animaBaseCompartment.h>
 #include <animaMatrixOperations.h>
 #include <AnimaMCMExport.h>
-#include <animaGammaDistribution.h>
 
 namespace anima
 {
@@ -64,8 +63,6 @@ protected:
         m_EstimateDiffusivities = true;
         m_ChangedConstraints = true;
         m_GradientEigenvector1 = 0;
-        m_MeanDiffusivityPrior.SetShapeParameter(anima::MCMGammaPriorKDiffusivity);
-        m_MeanDiffusivityPrior.SetScaleParameter(anima::MCMGammaPriorThetaDiffusivity);
     }
 
     virtual ~ZeppelinCompartment() {}
@@ -75,7 +72,6 @@ private:
     bool m_ChangedConstraints;
     unsigned int m_NumberOfParameters;
     double m_GradientEigenvector1;
-    anima::GammaDistribution m_MeanDiffusivityPrior;
 };
 
 } //end namespace anima

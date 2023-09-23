@@ -9,6 +9,7 @@
 
 #include <AnimaMCMBaseExport.h>
 #include <animaMCMConstants.h>
+#include <animaGammaDistribution.h>
 
 namespace anima
 {
@@ -136,6 +137,9 @@ protected:
         m_TissueRadius = 0.01;
 
         m_DiffusionTensor.SetIdentity();
+
+        m_MeanDiffusivityPrior.SetShapeParameter(anima::MCMGammaPriorShapeDiffusivity);
+        m_MeanDiffusivityPrior.SetScaleParameter(anima::MCMGammaPriorScaleDiffusivity);
     }
 
     virtual ~BaseCompartment() {}
@@ -162,6 +166,8 @@ protected:
 
     //! Vector to hold working value of compartment vector
     ModelOutputVectorType m_CompartmentVector;
+
+    anima::GammaDistribution m_MeanDiffusivityPrior;
 
 private:
     double m_OrientationTheta, m_OrientationPhi;

@@ -45,10 +45,10 @@ const double MCMPriorAlpha = 15.0;
 const double MCMPriorBeta = 8.0;
 
 //! Gamma distribution prior k value (to match mean 0.7e-3, std 0.2e-3)
-const double MCMGammaPriorKDiffusivity = 49.0 / 4.0;
+const double MCMGammaPriorShapeDiffusivity = 49.0 / 4.0;
 
 //! Gamma distribution prior theta value (to match mean 0.7e-3, std 0.2e-3)
-const double MCMGammaPriorThetaDiffusivity = 4.0e-4 / 7;
+const double MCMGammaPriorScaleDiffusivity = 4.0e-4 / 7;
 
 //! Diffusivity lower bound for estimation
 const double MCMDiffusivityLowerBound = 1.0e-6;

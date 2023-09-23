@@ -4,7 +4,6 @@
 #include <animaMatrixOperations.h>
 #include <animaBaseTensorTools.h>
 #include <AnimaMCMExport.h>
-#include <animaGammaDistribution.h>
 
 namespace anima
 {
@@ -90,9 +89,6 @@ protected:
         m_TensorDeterminant = 0;
 
         m_leCalculator = LEcalculatorType::New();
-
-        m_MeanDiffusivityPrior.SetShapeParameter(anima::MCMGammaPriorKDiffusivity);
-        m_MeanDiffusivityPrior.SetScaleParameter(anima::MCMGammaPriorThetaDiffusivity);
     }
 
     virtual ~TensorCompartment() {}
@@ -133,8 +129,6 @@ private:
     double m_TensorDeterminant;
 
     LEcalculatorPointer m_leCalculator;
-
-    anima::GammaDistribution m_MeanDiffusivityPrior;
 };
 
 } //end namespace anima
