@@ -29,7 +29,7 @@ double GammaDistribution::GetLogDensity(const double &x)
 double GammaDistribution::GetDensityDerivative(const double &x)
 {
     if (x < std::numeric_limits<double>::epsilon())
-        throw itk::ExceptionObject(__FILE__, __LINE__, "The log-density of the Gamma distribution is not defined for negative or null arguments.", ITK_LOCATION);
+        return 0.0;
     double shapeParameter = this->GetShapeParameter();
     double scaleParameter = this->GetScaleParameter();
     double resValue = (shapeParameter - 2.0) * std::log(x);

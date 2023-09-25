@@ -10,6 +10,7 @@
 #include <AnimaMCMBaseExport.h>
 #include <animaMCMConstants.h>
 #include <animaGammaDistribution.h>
+#include <animaBetaDistribution.h>
 
 namespace anima
 {
@@ -140,6 +141,9 @@ protected:
 
         m_MeanDiffusivityPrior.SetShapeParameter(anima::MCMGammaPriorShapeDiffusivity);
         m_MeanDiffusivityPrior.SetScaleParameter(anima::MCMGammaPriorScaleDiffusivity);
+        
+        m_FractionalAnisotropyPrior.SetAlphaParameter(anima::MCMPriorAlpha);
+        m_FractionalAnisotropyPrior.SetBetaParameter(anima::MCMPriorBeta);
     }
 
     virtual ~BaseCompartment() {}
@@ -168,6 +172,7 @@ protected:
     ModelOutputVectorType m_CompartmentVector;
 
     anima::GammaDistribution m_MeanDiffusivityPrior;
+    anima::BetaDistribution m_FractionalAnisotropyPrior;
 
 private:
     double m_OrientationTheta, m_OrientationPhi;

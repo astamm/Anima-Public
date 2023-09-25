@@ -60,26 +60,10 @@ public:
     bool GetTensorCompatible() ITK_OVERRIDE {return false;}
     double GetApparentFractionalAnisotropy() ITK_OVERRIDE;
 
-    void SetAxialDiffusivityPriorShapeValue(double val)
-    {
-        m_AxialDiffusivityPriorShapeValue = val;
-        m_AxialDiffusivityPrior.SetShapeParameter(val);
-    }
-    void SetAxialDiffusivityPriorScaleValue(double val)
-    {
-        m_AxialDiffusivityPriorScaleValue = val;
-        m_AxialDiffusivityPrior.SetScaleParameter(val);
-    }
-    void SetTissueRadiusPriorShapeValue(double val)
-    {
-        m_TissueRadiusPriorShapeValue = val;
-        m_TissueRadiusPrior.SetShapeParameter(val);
-    }
-    void SetTissueRadiusPriorScaleValue(double val)
-    {
-        m_TissueRadiusPriorScaleValue = val;
-        m_TissueRadiusPrior.SetScaleParameter(val);
-    }
+    void SetAxialDiffusivityPriorShapeValue(double val) {m_AxialDiffusivityPrior.SetShapeParameter(val);}
+    void SetAxialDiffusivityPriorScaleValue(double val) {m_AxialDiffusivityPrior.SetScaleParameter(val);}
+    void SetTissueRadiusPriorShapeValue(double val) {m_TissueRadiusPrior.SetShapeParameter(val);}
+    void SetTissueRadiusPriorScaleValue(double val) {m_TissueRadiusPrior.SetScaleParameter(val);}
 
 protected:
     StaniszCompartment() : Superclass()
@@ -89,11 +73,6 @@ protected:
         m_ChangedConstraints = true;
 
         m_SignalSummationTolerance = 1.0e-4;
-
-        m_AxialDiffusivityPriorShapeValue = 0;
-        m_AxialDiffusivityPriorScaleValue = 0;
-        m_TissueRadiusPriorShapeValue = 0;
-        m_TissueRadiusPriorScaleValue = 0;
     }
 
     virtual ~StaniszCompartment() {}
@@ -114,11 +93,6 @@ private:
     MapType m_ThirdSummations, m_FourthSummations;
 
     double m_SignalSummationTolerance;
-
-    double m_AxialDiffusivityPriorShapeValue;
-    double m_AxialDiffusivityPriorScaleValue;
-    double m_TissueRadiusPriorShapeValue;
-    double m_TissueRadiusPriorScaleValue;
 
     anima::GammaDistribution m_AxialDiffusivityPrior;
     anima::GammaDistribution m_TissueRadiusPrior;

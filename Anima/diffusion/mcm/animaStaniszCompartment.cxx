@@ -121,10 +121,10 @@ double StaniszCompartment::GetLogPriorValue()
 {
     double logPriorValue = 0.0;
 
-    if (m_EstimateTissueRadius && ((m_TissueRadiusPriorShapeValue != 0)||(m_TissueRadiusPriorScaleValue != 0)))
+    if (m_EstimateTissueRadius)
         logPriorValue += m_TissueRadiusPrior.GetLogDensity(this->GetTissueRadius());
 
-    if (m_EstimateAxialDiffusivity && ((m_AxialDiffusivityPriorShapeValue != 0)||(m_AxialDiffusivityPriorScaleValue != 0)))
+    if (m_EstimateAxialDiffusivity)
         logPriorValue += m_AxialDiffusivityPrior.GetLogDensity(this->GetAxialDiffusivity());
     
     return logPriorValue;
@@ -139,13 +139,13 @@ StaniszCompartment::ListType &StaniszCompartment::GetPriorDerivativeVector()
     double priorTissueRadius = 1;
     double priorAxialDiffusivity = 1;
 
-    if (m_EstimateAxialDiffusivity && ((m_AxialDiffusivityPriorShapeValue != 0)||(m_AxialDiffusivityPriorScaleValue != 0)))
+    if (m_EstimateAxialDiffusivity)
         priorAxialDiffusivity = m_AxialDiffusivityPrior.GetDensity(this->GetAxialDiffusivity());
 
-    if (m_EstimateTissueRadius && ((m_TissueRadiusPriorShapeValue != 0)||(m_TissueRadiusPriorScaleValue != 0)))
+    if (m_EstimateTissueRadius)
         priorTissueRadius = m_TissueRadiusPrior.GetDensity(this->GetTissueRadius());
 
-    if (m_EstimateTissueRadius && ((m_TissueRadiusPriorShapeValue != 0)||(m_TissueRadiusPriorScaleValue != 0)))
+    if (m_EstimateTissueRadius)
     {
         m_PriorDerivativeVector[pos] = priorAxialDiffusivity;
 
@@ -155,7 +155,7 @@ StaniszCompartment::ListType &StaniszCompartment::GetPriorDerivativeVector()
         ++pos;
     }
 
-    if (m_EstimateAxialDiffusivity && ((m_AxialDiffusivityPriorShapeValue != 0)||(m_AxialDiffusivityPriorScaleValue != 0)))
+    if (m_EstimateAxialDiffusivity)
     {
         m_PriorDerivativeVector[pos] = priorTissueRadius;
 

@@ -32,7 +32,7 @@ double TensorCompartment::GetLogPriorValue()
     if (m_EstimateDiffusivities)
     {
         double faCompartment = this->GetApparentFractionalAnisotropy();
-        logPriorValue = anima::GetBetaLogPDF(faCompartment,anima::MCMPriorAlpha,anima::MCMPriorBeta);
+        logPriorValue = m_FractionalAnisotropyPrior.GetLogDensity(faCompartment);
 
         double mdCompartment = this->GetApparentMeanDiffusivity();
         logPriorValue += m_MeanDiffusivityPrior.GetLogDensity(mdCompartment);
@@ -56,7 +56,7 @@ TensorCompartment::ListType &TensorCompartment::GetPriorDerivativeVector()
         double faValue = this->GetApparentFractionalAnisotropy();
         double mdValue = this->GetApparentMeanDiffusivity();
 
-        double priorBeta = std::exp(anima::GetBetaLogPDF(faValue,anima::MCMPriorAlpha,anima::MCMPriorBeta));
+        double priorBeta = m_FractionalAnisotropyPrior.GetDensity(faValue);
         double priorLambda = m_MeanDiffusivityPrior.GetDensity(mdValue);
 
         // Compute lambda prior derivative
@@ -85,7 +85,7 @@ TensorCompartment::ListType &TensorCompartment::GetPriorDerivativeVector()
 
 
         // Multiply by Beta derivative of FA
-        double betaPDFDerivative = anima::GetBetaPDFDerivative(faValue,anima::MCMPriorAlpha,anima::MCMPriorBeta);
+        double betaPDFDerivative = m_FractionalAnisotropyPrior.GetDensityDerivative(faValue);
         betaPriorDerivative *= betaPDFDerivative;
         m_PriorDerivativeVector[3] = betaPriorDerivative * priorLambda + priorBeta * lambdaPriorDerivative / 3.0;
 

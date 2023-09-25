@@ -18,6 +18,8 @@ namespace anima
 		{
 			m_ShapeParameter = 1.0;
 			m_ScaleParameter = 1.0;
+			m_AlphaParameter = 1.0;
+			m_BetaParameter = 1.0;
 		}
 
 		void SetShapeParameter(const double val);
@@ -25,6 +27,12 @@ namespace anima
 
 		void SetScaleParameter(const double val);
 		double GetScaleParameter() {return m_ScaleParameter;}
+
+		void SetAlphaParameter(const double val);
+		double GetAlphaParameter() {return m_AlphaParameter;}
+
+		void SetBetaParameter(const double val);
+		double GetBetaParameter() {return m_BetaParameter;}
 
 		virtual double GetDensity(const double &x) = 0;
 		virtual double GetLogDensity(const double &x) = 0;
@@ -35,5 +43,7 @@ namespace anima
 	private:
 		double m_ShapeParameter;
 		double m_ScaleParameter;
+		double m_AlphaParameter;
+		double m_BetaParameter;
 	};
 } // end of namespace

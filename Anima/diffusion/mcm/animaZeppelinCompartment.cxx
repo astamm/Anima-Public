@@ -28,7 +28,7 @@ double ZeppelinCompartment::GetLogPriorValue()
     if (m_EstimateDiffusivities)
     {
         double faCompartment = this->GetApparentFractionalAnisotropy();
-        logPriorValue = anima::GetBetaLogPDF(faCompartment,anima::MCMPriorAlpha,anima::MCMPriorBeta);
+        logPriorValue = m_FractionalAnisotropyPrior.GetLogDensity(faCompartment);
 
         double mdCompartment = this->GetApparentMeanDiffusivity();
         logPriorValue += m_MeanDiffusivityPrior.GetLogDensity(mdCompartment);
@@ -52,7 +52,7 @@ ZeppelinCompartment::ListType &ZeppelinCompartment::GetPriorDerivativeVector()
         double faValue = this->GetApparentFractionalAnisotropy();
         double mdValue = this->GetApparentMeanDiffusivity();
 
-        double priorBeta = std::exp(anima::GetBetaLogPDF(faValue,anima::MCMPriorAlpha,anima::MCMPriorBeta));
+        double priorBeta = m_FractionalAnisotropyPrior.GetDensity(faValue);
         double priorLambda = m_MeanDiffusivityPrior.GetDensity(mdValue);
 
         m_PriorDerivativeVector[0] *= priorBeta;
@@ -76,7 +76,7 @@ ZeppelinCompartment::ListType &ZeppelinCompartment::GetPriorDerivativeVector()
             betaPriorDerivative = 1.0;
 
         // Multiply by Beta derivative of FA
-        double betaPDFDerivative = anima::GetBetaPDFDerivative(faValue,anima::MCMPriorAlpha,anima::MCMPriorBeta);
+        double betaPDFDerivative = m_FractionalAnisotropyPrior.GetDensityDerivative(faValue);
         betaPriorDerivative *= betaPDFDerivative;
         m_PriorDerivativeVector[2] = betaPriorDerivative * priorLambda + priorBeta * lambdaPriorDerivative / 3.0;
         m_PriorDerivativeVector[2] *= uniformSpherePrior;
