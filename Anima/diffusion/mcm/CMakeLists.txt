@@ -26,6 +26,7 @@ target_link_libraries(${PROJECT_NAME}
   AnimaSpecialFunctions
   AnimaOptimizers
   AnimaStatisticalDistributions
+  ITKOptimizers
   ITKCommon
   ${TinyXML2_LIBRARY}
   )

@@ -1,2 +1,3 @@
 add_subdirectory(non_local_means)
 add_subdirectory(non_local_means_temporal)
+add_subdirectory(pseudo_residuals_noise_estimation)
