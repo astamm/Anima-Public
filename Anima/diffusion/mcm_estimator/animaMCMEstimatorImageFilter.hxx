@@ -657,6 +657,7 @@ MCMEstimatorImageFilter<InputPixelType, OutputPixelType>
 
     if (b0Value == 0.0)
     {
+        std::cout << "Relaxing positivity constraint on compartment weights..." << std::endl;
         this->InitialOrientationsEstimation(mcmValue,true,currentNumberOfCompartments,observedSignals,threadId,
                                             aiccValue,b0Value,sigmaSqValue);
 
@@ -736,6 +737,7 @@ MCMEstimatorImageFilter<InputPixelType, OutputPixelType>
     if (b0Value == 0.0)
     {
         // Try with negative bounds
+        std::cout << "Relaxing positivity constraint on compartment weights..." << std::endl;
         mcmValue->SetNegativeWeightBounds(true);
         costValue = this->GetCostValue(cost,p);
 
