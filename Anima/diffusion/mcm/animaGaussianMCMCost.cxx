@@ -94,7 +94,7 @@ GaussianMCMCost::GetDerivativeMatrix(const ParametersType &parameters, Derivativ
                                                                m_GradientStrengths[i],m_Gradients[i]);
 
         for (unsigned int j = 0;j < nbParams;++j)
-            derivative.put(i,j,signalJacobians[i][j]);
+            derivative.put(i, j, -1.0 * signalJacobians[i][j]);
     }
 
     if (m_MAPEstimationMode)
@@ -107,8 +107,8 @@ GaussianMCMCost::GetDerivativeMatrix(const ParametersType &parameters, Derivativ
         {
             for (unsigned int j = 0;j < nbParams;++j)
             {
-                derivative(j,i) *= priorValue;
-                derivative(j,i) -= (m_ObservedSignals[i] - m_PredictedSignals[i]) * priorDerivatives[j] * diffPriorValue / nbValues;
+                derivative(i, j) *= priorValue;
+                derivative(i, j) -= (m_ObservedSignals[i] - m_PredictedSignals[i]) * priorDerivatives[j] * diffPriorValue / nbValues;
             }
         }
     }
@@ -124,17 +124,16 @@ GaussianMCMCost::GetCurrentDerivative(DerivativeMatrixType &derivativeMatrix, De
 
     // Has to be computed since even in MAP, sigma square is 1/n (y-Falpha)^2
     // We thus miss P^-2/N
-    double priorSquared = std::exp(- 2.0 * m_LogPriorValue /nbValues);
+    double priorSquared = std::exp(- 2.0 * m_LogPriorValue / nbValues);
 
     for (unsigned int j = 0;j < nbParams;++j)
     {
         double residualJacobianResidualProduct = 0;
         for (unsigned int i = 0;i < nbValues;++i)
-            residualJacobianResidualProduct += derivativeMatrix(i,j) * m_Residuals[i];
+            residualJacobianResidualProduct += derivativeMatrix.get(i, j) * m_Residuals[i];
 
         if (!m_MarginalEstimation)
-            // Derivative is 2N derivative / sigma^2
-            derivative[j] = 2.0 * nbValues * residualJacobianResidualProduct / (m_SigmaSquare * priorSquared);
+            derivative[j] = 2.0 * residualJacobianResidualProduct / (m_SigmaSquare * priorSquared);
         else
             derivative[j] = 2.0 * (nbValues + 2.0) * residualJacobianResidualProduct / (nbValues * m_SigmaSquare * priorSquared);
     }
