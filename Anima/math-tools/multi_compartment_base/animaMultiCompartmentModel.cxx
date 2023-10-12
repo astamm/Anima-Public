@@ -302,7 +302,7 @@ MultiCompartmentModel::ListType &MultiCompartmentModel::GetSignalJacobian(double
     // Not accounting for optimize weights with common compartment weights, and no free water
     // In that case, weights are not optimized
     for (unsigned int i = 0;i < numWeightsToOptimize;++i)
-        m_JacobianVector[i] = - m_Compartments[i]->GetFourierTransformedDiffusionProfile(smallDelta, bigDelta, gradientStrength, gradient);
+        m_JacobianVector[i] = m_Compartments[i]->GetFourierTransformedDiffusionProfile(smallDelta, bigDelta, gradientStrength, gradient);
 
     pos += numWeightsToOptimize;
     
@@ -311,7 +311,7 @@ MultiCompartmentModel::ListType &MultiCompartmentModel::GetSignalJacobian(double
         m_WorkVector = m_Compartments[i]->GetSignalAttenuationJacobian(smallDelta, bigDelta, gradientStrength, gradient);
 
         for (unsigned int j = 0;j < m_WorkVector.size();++j)
-            m_JacobianVector[pos + j] -= m_CompartmentWeights[i] * m_WorkVector[j];
+            m_JacobianVector[pos + j] += m_CompartmentWeights[i] * m_WorkVector[j];
 
         pos += m_WorkVector.size();
     }
