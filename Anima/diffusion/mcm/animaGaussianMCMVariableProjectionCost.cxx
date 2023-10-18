@@ -131,7 +131,7 @@ GaussianMCMVariableProjectionCost::PrepareDataForLLS()
         {
             double cholValue = 0.0;
             for (unsigned int k = 0;k < nbValues;++k)
-                cholValue += m_PredictedSignalAttenuations.get(k,i) * m_PredictedSignalAttenuations.get(k, j);
+                cholValue += m_PredictedSignalAttenuations.get(k, i) * m_PredictedSignalAttenuations.get(k, j);
 
             m_CholeskyMatrix.put(i, j, cholValue);
             if (i != j)
@@ -389,7 +389,7 @@ GaussianMCMVariableProjectionCost::GetDerivativeMatrix(const ParametersType &par
             tmpVec[pos] = 0.0;
 
             for (unsigned int i = 0;i < nbValues;++i)
-                tmpVec[pos] += m_PredictedSignalAttenuations.get(i,j) * DFw[i] - m_SignalAttenuationsJacobian[k].get(i, j) * m_Residuals[i];
+                tmpVec[pos] += m_PredictedSignalAttenuations.get(i, j) * DFw[i] - m_SignalAttenuationsJacobian[k].get(i, j) * m_Residuals[i];
 
             ++pos;
         }
@@ -462,7 +462,7 @@ GaussianMCMVariableProjectionCost::GetCurrentDerivative(DerivativeMatrixType &de
             derivative[j] += m_Residuals[i] * derivativeMatrix.get(i, j);
 
         // Derivative is 2N derivative / sigma^2
-        derivative[j] *= 2.0 * nbValues / (m_SigmaSquare * priorSquared);
+        derivative[j] *= 2.0 / (m_SigmaSquare * priorSquared);
     }
 }
 
