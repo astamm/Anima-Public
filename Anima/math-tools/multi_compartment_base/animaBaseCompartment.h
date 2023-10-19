@@ -171,7 +171,10 @@ protected:
     //! Vector to hold working value of compartment vector
     ModelOutputVectorType m_CompartmentVector;
 
+    //! Statistical distribution class holding the prior on MD
     anima::GammaDistribution m_MeanDiffusivityPrior;
+
+    //! Statistical distribution class holding the prior on FA
     anima::BetaDistribution m_FractionalAnisotropyPrior;
 
 private:
