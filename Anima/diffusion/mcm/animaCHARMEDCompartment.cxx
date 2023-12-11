@@ -1,4 +1,5 @@
 #include "animaCHARMEDCompartment.h"
+
 #include <animaMCMConstants.h>
 #include <animaVectorOperations.h>
 
@@ -19,7 +20,7 @@ namespace anima
         double axialDiff = this->GetAxialDiffusivity();
         double radialDiff = this->GetRadialDiffusivity1();
         m_OrthogonalGradient = gradient - m_InnerProd * carCoords;
-        double orthogonalGradientNorm = m_OrthogonalGradient.magnitude();
+        double orthogonalGradientNorm = std::sqrt(1.0 - m_InnerProd * m_InnerProd);
         m_OrthogonalGradientStrength = gradientStrength * orthogonalGradientNorm;
         m_OrthogonalGradient.normalize();
 
@@ -195,7 +196,7 @@ namespace anima
         double densityValue = this->GetExtraAxonalFraction() * hinderedDensity;
         densityValue += (1.0 - this->GetExtraAxonalFraction()) * restrictedDensity;
 
-        return densityValue;
+        return std::log(densityValue);
     }
 
     void CHARMEDCompartment::SetTissueRadius(double num)
@@ -279,24 +280,24 @@ namespace anima
 
         unsigned int pos = 0;
 
-        m_ParametersUpperBoundsVector[pos] = anima::MCMZeroLowerBound;
+        m_ParametersLowerBoundsVector[pos] = anima::MCMZeroLowerBound;
         ++pos;
 
-        m_ParametersUpperBoundsVector[pos] = anima::MCMZeroLowerBound;
+        m_ParametersLowerBoundsVector[pos] = anima::MCMZeroLowerBound;
         ++pos;
 
-        m_ParametersUpperBoundsVector[pos] = anima::MCMZeroLowerBound;
+        m_ParametersLowerBoundsVector[pos] = anima::MCMZeroLowerBound;
         ++pos;
 
-        m_ParametersUpperBoundsVector[pos] = anima::MCMTissueRadiusLowerBound;
+        m_ParametersLowerBoundsVector[pos] = anima::MCMTissueRadiusLowerBound;
         ++pos;
 
         if (m_EstimateDiffusivities)
         {
-            m_ParametersUpperBoundsVector[pos] = anima::MCMZeroLowerBound;
+            m_ParametersLowerBoundsVector[pos] = anima::MCMZeroLowerBound;
             ++pos;
 
-            m_ParametersUpperBoundsVector[pos] = anima::MCMDiffusivityLowerBound;
+            m_ParametersLowerBoundsVector[pos] = anima::MCMDiffusivityLowerBound;
         }
 
         return m_ParametersLowerBoundsVector;

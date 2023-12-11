@@ -4,8 +4,9 @@
 #include <AnimaMCMExport.h>
 #include <animaStaniszCompartment.h>
 
-#include <tuple>
 #include <map>
+#include <tuple>
+
 
 namespace anima
 {
@@ -75,7 +76,7 @@ namespace anima
         bool m_EstimateDiffusivities;
         bool m_ChangedConstraints;
         unsigned int m_NumberOfParameters;
-        
+
         // Parameters for data perparation
         anima::StaniszCompartment::Pointer m_StaniszCompartment;
         double m_AxialSignal, m_RadialHinderedSignal, m_RadialRestrictedSignal;

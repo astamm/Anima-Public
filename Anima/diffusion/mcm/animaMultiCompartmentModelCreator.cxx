@@ -1,11 +1,12 @@
-#include <animaMultiCompartmentModelCreator.h>
+#include "animaMultiCompartmentModelCreator.h"
 
+#include <animaCHARMEDCompartment.h>
 #include <animaDDICompartment.h>
 #include <animaFreeWaterCompartment.h>
 #include <animaIsotropicRestrictedWaterCompartment.h>
 #include <animaNODDICompartment.h>
-#include <animaStationaryWaterCompartment.h>
 #include <animaStaniszCompartment.h>
+#include <animaStationaryWaterCompartment.h>
 #include <animaStickCompartment.h>
 #include <animaTensorCompartment.h>
 #include <animaZeppelinCompartment.h>
@@ -13,242 +14,264 @@
 namespace anima
 {
 
-MultiCompartmentModelCreator::MultiCompartmentModelCreator()
-{
-    m_CompartmentType = Tensor;
-    m_ModelWithFreeWaterComponent = false;
-    m_ModelWithStationaryWaterComponent = false;
-    m_ModelWithRestrictedWaterComponent = false;
-    m_ModelWithStaniszComponent = false;
-
-    m_NumberOfCompartments = 1;
-    m_VariableProjectionEstimationMode = true;
-
-    m_UseConstrainedDiffusivity = false;
-    m_UseConstrainedFreeWaterDiffusivity = true;
-    m_UseConstrainedIRWDiffusivity = true;
-    m_UseConstrainedStaniszDiffusivity = true;
-    m_UseConstrainedStaniszRadius = true;
-    m_UseConstrainedOrientationConcentration = false;
-    m_UseConstrainedExtraAxonalFraction = false;
-
-    m_UseCommonDiffusivities = false;
-    m_UseCommonConcentrations = false;
-    m_UseCommonExtraAxonalFractions = false;
-
-    m_AxialDiffusivity = 1.71e-3;
-    m_FreeWaterDiffusivity = 3.0e-3;
-    m_IRWDiffusivity = 7.5e-4;
-    m_StaniszDiffusivity = 1.71e-3;
-    m_RadialDiffusivity1 = 1.9e-4;
-    m_RadialDiffusivity2 = 1.5e-4;
-    m_ExtraAxonalFraction = 0.1;
-    m_OrientationConcentration = 10.0;
-}
-
-MultiCompartmentModelCreator::MCMPointer MultiCompartmentModelCreator::GetNewMultiCompartmentModel()
-{
-    MCMPointer outputMCM = MCMType::New();
-    outputMCM->SetOptimizeWeights(!m_VariableProjectionEstimationMode);
-    outputMCM->SetCommonDiffusivityParameters(m_UseCommonDiffusivities);
-    outputMCM->SetCommonConcentrationParameters(m_UseCommonConcentrations);
-    outputMCM->SetCommonExtraAxonalFractionParameters(m_UseCommonExtraAxonalFractions);
-
-    double numCompartments = m_ModelWithFreeWaterComponent + m_ModelWithRestrictedWaterComponent +
-            m_ModelWithStaniszComponent + m_ModelWithStationaryWaterComponent + m_NumberOfCompartments;
-    double defaultWeight = 1.0 / numCompartments;
-
-    if (m_ModelWithFreeWaterComponent)
+    MultiCompartmentModelCreator::MultiCompartmentModelCreator()
     {
-        typedef anima::FreeWaterCompartment FreeWaterType;
-        FreeWaterType::Pointer fwComp = FreeWaterType::New();
-        fwComp->SetEstimateAxialDiffusivity(!m_UseConstrainedFreeWaterDiffusivity);
-        fwComp->SetAxialDiffusivity(m_FreeWaterDiffusivity);
+        m_CompartmentType = Tensor;
+        m_ModelWithFreeWaterComponent = false;
+        m_ModelWithStationaryWaterComponent = false;
+        m_ModelWithRestrictedWaterComponent = false;
+        m_ModelWithStaniszComponent = false;
 
-        outputMCM->AddCompartment(defaultWeight,fwComp);
+        m_NumberOfCompartments = 1;
+        m_VariableProjectionEstimationMode = true;
+
+        m_UseConstrainedDiffusivity = false;
+        m_UseConstrainedFreeWaterDiffusivity = true;
+        m_UseConstrainedIRWDiffusivity = true;
+        m_UseConstrainedStaniszDiffusivity = true;
+        m_UseConstrainedStaniszRadius = true;
+        m_UseConstrainedOrientationConcentration = false;
+        m_UseConstrainedExtraAxonalFraction = false;
+
+        m_UseCommonDiffusivities = false;
+        m_UseCommonConcentrations = false;
+        m_UseCommonExtraAxonalFractions = false;
+
+        m_AxialDiffusivity = 1.71e-3;
+        m_FreeWaterDiffusivity = 3.0e-3;
+        m_IRWDiffusivity = 7.5e-4;
+        m_StaniszDiffusivity = 1.71e-3;
+        m_RadialDiffusivity1 = 1.9e-4;
+        m_RadialDiffusivity2 = 1.5e-4;
+        m_ExtraAxonalFraction = 0.1;
+        m_OrientationConcentration = 10.0;
     }
 
-    if (m_ModelWithStationaryWaterComponent)
+    MultiCompartmentModelCreator::MCMPointer MultiCompartmentModelCreator::GetNewMultiCompartmentModel()
     {
-        typedef anima::StationaryWaterCompartment SWType;
-        SWType::Pointer swComp = SWType::New();
+        MCMPointer outputMCM = MCMType::New();
+        outputMCM->SetOptimizeWeights(!m_VariableProjectionEstimationMode);
+        outputMCM->SetCommonDiffusivityParameters(m_UseCommonDiffusivities);
+        outputMCM->SetCommonConcentrationParameters(m_UseCommonConcentrations);
+        outputMCM->SetCommonExtraAxonalFractionParameters(m_UseCommonExtraAxonalFractions);
 
-        outputMCM->AddCompartment(defaultWeight,swComp);
-    }
+        double numCompartments = m_ModelWithFreeWaterComponent + m_ModelWithRestrictedWaterComponent +
+                                 m_ModelWithStaniszComponent + m_ModelWithStationaryWaterComponent + m_NumberOfCompartments;
+        double defaultWeight = 1.0 / numCompartments;
 
-    if (m_ModelWithRestrictedWaterComponent)
-    {
-        typedef anima::IsotropicRestrictedWaterCompartment IRWType;
-        IRWType::Pointer restComp = IRWType::New();
-        restComp->SetEstimateAxialDiffusivity(!m_UseConstrainedIRWDiffusivity);
-        restComp->SetAxialDiffusivity(m_IRWDiffusivity);
-
-        outputMCM->AddCompartment(defaultWeight,restComp);
-    }
-
-    if (m_ModelWithStaniszComponent)
-    {
-        typedef anima::StaniszCompartment StaniszType;
-        StaniszType::Pointer restComp = StaniszType::New();
-        restComp->SetEstimateAxialDiffusivity(!m_UseConstrainedStaniszDiffusivity);
-        restComp->SetEstimateTissueRadius(!m_UseConstrainedStaniszRadius);
-        restComp->SetAxialDiffusivity(m_StaniszDiffusivity);
-
-        outputMCM->AddCompartment(defaultWeight,restComp);
-    }
-
-    for (unsigned int i = 0;i < m_NumberOfCompartments;++i)
-    {
-        anima::BaseCompartment::Pointer tmpPointer;
-        bool applyCommonConstraints = (i > 0);
-
-        switch (m_CompartmentType)
+        if (m_ModelWithFreeWaterComponent)
         {
+            typedef anima::FreeWaterCompartment FreeWaterType;
+            FreeWaterType::Pointer fwComp = FreeWaterType::New();
+            fwComp->SetEstimateAxialDiffusivity(!m_UseConstrainedFreeWaterDiffusivity);
+            fwComp->SetAxialDiffusivity(m_FreeWaterDiffusivity);
+
+            outputMCM->AddCompartment(defaultWeight, fwComp);
+        }
+
+        if (m_ModelWithStationaryWaterComponent)
+        {
+            typedef anima::StationaryWaterCompartment SWType;
+            SWType::Pointer swComp = SWType::New();
+
+            outputMCM->AddCompartment(defaultWeight, swComp);
+        }
+
+        if (m_ModelWithRestrictedWaterComponent)
+        {
+            typedef anima::IsotropicRestrictedWaterCompartment IRWType;
+            IRWType::Pointer restComp = IRWType::New();
+            restComp->SetEstimateAxialDiffusivity(!m_UseConstrainedIRWDiffusivity);
+            restComp->SetAxialDiffusivity(m_IRWDiffusivity);
+
+            outputMCM->AddCompartment(defaultWeight, restComp);
+        }
+
+        if (m_ModelWithStaniszComponent)
+        {
+            typedef anima::StaniszCompartment StaniszType;
+            StaniszType::Pointer restComp = StaniszType::New();
+            restComp->SetEstimateAxialDiffusivity(!m_UseConstrainedStaniszDiffusivity);
+            restComp->SetEstimateTissueRadius(!m_UseConstrainedStaniszRadius);
+            restComp->SetAxialDiffusivity(m_StaniszDiffusivity);
+
+            outputMCM->AddCompartment(defaultWeight, restComp);
+        }
+
+        for (unsigned int i = 0; i < m_NumberOfCompartments; ++i)
+        {
+            anima::BaseCompartment::Pointer tmpPointer;
+            bool applyCommonConstraints = (i > 0);
+
+            switch (m_CompartmentType)
+            {
             case Stick:
-                this->CreateStickCompartment(tmpPointer,applyCommonConstraints);
+                this->CreateStickCompartment(tmpPointer, applyCommonConstraints);
                 break;
 
             case Zeppelin:
-                this->CreateZeppelinCompartment(tmpPointer,applyCommonConstraints);
+                this->CreateZeppelinCompartment(tmpPointer, applyCommonConstraints);
                 break;
 
             case Tensor:
-                this->CreateTensorCompartment(tmpPointer,applyCommonConstraints);
+                this->CreateTensorCompartment(tmpPointer, applyCommonConstraints);
                 break;
-                
+
             case NODDI:
-                this->CreateNODDICompartment(tmpPointer,applyCommonConstraints);
+                this->CreateNODDICompartment(tmpPointer, applyCommonConstraints);
                 break;
 
             case DDI:
-                this->CreateDDICompartment(tmpPointer,applyCommonConstraints);
+                this->CreateDDICompartment(tmpPointer, applyCommonConstraints);
+                break;
+
+            case CHARMED:
+                this->CreateCHARMEDCompartment(tmpPointer, applyCommonConstraints);
                 break;
 
             default:
-                throw itk::ExceptionObject(__FILE__, __LINE__,"Creation of multiple free water compartment model not handled",ITK_LOCATION);
+                throw itk::ExceptionObject(__FILE__, __LINE__, "Creation of multiple free water compartment model not handled", ITK_LOCATION);
                 break;
+            }
+
+            // Kind of ugly but required for optimization, otherwise initialization from simplified models may fail
+            tmpPointer->SetOrientationConcentration(m_OrientationConcentration);
+
+            outputMCM->AddCompartment(defaultWeight, tmpPointer);
         }
 
-        // Kind of ugly but required for optimization, otherwise initialization from simplified models may fail
-        tmpPointer->SetOrientationConcentration(m_OrientationConcentration);
-
-        outputMCM->AddCompartment(defaultWeight,tmpPointer);
+        return outputMCM;
     }
 
-    return outputMCM;
-}
-
-void MultiCompartmentModelCreator::CreateStickCompartment(BaseCompartmentPointer &compartmentPointer, bool applyConstraints)
-{
-    typedef anima::StickCompartment StickType;
-
-    StickType::Pointer stickComp = StickType::New();
-    stickComp->SetEstimateAxialDiffusivity(!m_UseConstrainedDiffusivity);
-
-    stickComp->SetAxialDiffusivity(m_AxialDiffusivity);
-    stickComp->SetRadialDiffusivity1((m_RadialDiffusivity1 + m_RadialDiffusivity2) / 2.0);
-    
-    if (applyConstraints)
+    void MultiCompartmentModelCreator::CreateStickCompartment(BaseCompartmentPointer &compartmentPointer, bool applyConstraints)
     {
-        if (m_UseCommonDiffusivities)
-            stickComp->SetEstimateAxialDiffusivity(false);
+        using StickType = anima::StickCompartment;
+
+        StickType::Pointer stickComp = StickType::New();
+        stickComp->SetEstimateAxialDiffusivity(!m_UseConstrainedDiffusivity);
+
+        stickComp->SetAxialDiffusivity(m_AxialDiffusivity);
+        stickComp->SetRadialDiffusivity1((m_RadialDiffusivity1 + m_RadialDiffusivity2) / 2.0);
+
+        if (applyConstraints)
+        {
+            if (m_UseCommonDiffusivities)
+                stickComp->SetEstimateAxialDiffusivity(false);
+        }
+
+        compartmentPointer = stickComp;
     }
 
-    compartmentPointer = stickComp;
-}
-
-void MultiCompartmentModelCreator::CreateZeppelinCompartment(BaseCompartmentPointer &compartmentPointer, bool applyConstraints)
-{
-    typedef anima::ZeppelinCompartment ZeppelinType;
-
-    ZeppelinType::Pointer zepComp = ZeppelinType::New();
-    zepComp->SetEstimateDiffusivities(!m_UseConstrainedDiffusivity);
-
-    zepComp->SetAxialDiffusivity(m_AxialDiffusivity);
-    zepComp->SetRadialDiffusivity1((m_RadialDiffusivity1 + m_RadialDiffusivity2) / 2.0);
-
-    if (applyConstraints)
+    void MultiCompartmentModelCreator::CreateZeppelinCompartment(BaseCompartmentPointer &compartmentPointer, bool applyConstraints)
     {
-        if (m_UseCommonDiffusivities)
-            zepComp->SetEstimateDiffusivities(false);
+        using ZeppelinType = anima::ZeppelinCompartment;
+
+        ZeppelinType::Pointer zepComp = ZeppelinType::New();
+        zepComp->SetEstimateDiffusivities(!m_UseConstrainedDiffusivity);
+
+        zepComp->SetAxialDiffusivity(m_AxialDiffusivity);
+        zepComp->SetRadialDiffusivity1((m_RadialDiffusivity1 + m_RadialDiffusivity2) / 2.0);
+
+        if (applyConstraints)
+        {
+            if (m_UseCommonDiffusivities)
+                zepComp->SetEstimateDiffusivities(false);
+        }
+
+        compartmentPointer = zepComp;
     }
 
-    compartmentPointer = zepComp;
-}
-
-void MultiCompartmentModelCreator::CreateTensorCompartment(BaseCompartmentPointer &compartmentPointer, bool applyConstraints)
-{
-    typedef anima::TensorCompartment TensorType;
-
-    TensorType::Pointer tensComp = TensorType::New();
-    tensComp->SetEstimateDiffusivities(!m_UseConstrainedDiffusivity);
-
-    tensComp->SetAxialDiffusivity(m_AxialDiffusivity);
-    tensComp->SetRadialDiffusivity1(m_RadialDiffusivity1);
-    tensComp->SetRadialDiffusivity2(m_RadialDiffusivity2);
-
-    if (applyConstraints)
+    void MultiCompartmentModelCreator::CreateTensorCompartment(BaseCompartmentPointer &compartmentPointer, bool applyConstraints)
     {
-        if (m_UseCommonDiffusivities)
-            tensComp->SetEstimateDiffusivities(false);
+        using TensorType = anima::TensorCompartment;
+
+        TensorType::Pointer tensComp = TensorType::New();
+        tensComp->SetEstimateDiffusivities(!m_UseConstrainedDiffusivity);
+
+        tensComp->SetAxialDiffusivity(m_AxialDiffusivity);
+        tensComp->SetRadialDiffusivity1(m_RadialDiffusivity1);
+        tensComp->SetRadialDiffusivity2(m_RadialDiffusivity2);
+
+        if (applyConstraints)
+        {
+            if (m_UseCommonDiffusivities)
+                tensComp->SetEstimateDiffusivities(false);
+        }
+
+        compartmentPointer = tensComp;
     }
 
-    compartmentPointer = tensComp;
-}
-
-void MultiCompartmentModelCreator::CreateNODDICompartment(BaseCompartmentPointer &compartmentPointer, bool applyConstraints)
-{
-    typedef anima::NODDICompartment NODDIType;
-    
-    NODDIType::Pointer noddiComp = NODDIType::New();
-    noddiComp->SetEstimateAxialDiffusivity(!m_UseConstrainedDiffusivity);
-    
-    noddiComp->SetOrientationConcentration(m_OrientationConcentration);
-    noddiComp->SetExtraAxonalFraction(m_ExtraAxonalFraction);
-    noddiComp->SetAxialDiffusivity(m_AxialDiffusivity);
-    
-    if (applyConstraints)
+    void MultiCompartmentModelCreator::CreateNODDICompartment(BaseCompartmentPointer &compartmentPointer, bool applyConstraints)
     {
-        if (m_UseCommonDiffusivities)
-            noddiComp->SetEstimateAxialDiffusivity(false);
+        using NODDIType = anima::NODDICompartment;
 
-        if (this->GetUseCommonConcentrations())
-            noddiComp->SetEstimateOrientationConcentration(false);
+        NODDIType::Pointer noddiComp = NODDIType::New();
+        noddiComp->SetEstimateAxialDiffusivity(!m_UseConstrainedDiffusivity);
 
-        if (this->GetUseCommonExtraAxonalFractions())
-            noddiComp->SetEstimateExtraAxonalFraction(false);
+        noddiComp->SetOrientationConcentration(m_OrientationConcentration);
+        noddiComp->SetExtraAxonalFraction(m_ExtraAxonalFraction);
+        noddiComp->SetAxialDiffusivity(m_AxialDiffusivity);
+
+        if (applyConstraints)
+        {
+            if (m_UseCommonDiffusivities)
+                noddiComp->SetEstimateAxialDiffusivity(false);
+
+            if (this->GetUseCommonConcentrations())
+                noddiComp->SetEstimateOrientationConcentration(false);
+
+            if (this->GetUseCommonExtraAxonalFractions())
+                noddiComp->SetEstimateExtraAxonalFraction(false);
+        }
+
+        compartmentPointer = noddiComp;
     }
-    
-    compartmentPointer = noddiComp;
-}
 
-void MultiCompartmentModelCreator::CreateDDICompartment(BaseCompartmentPointer &compartmentPointer, bool applyConstraints)
-{
-    typedef anima::DDICompartment DDIType;
-
-    DDIType::Pointer ddiComp = DDIType::New();
-    ddiComp->SetEstimateOrientationConcentration(!this->GetUseConstrainedOrientationConcentration());
-    ddiComp->SetEstimateAxialDiffusivity(!this->GetUseConstrainedDiffusivity());
-    ddiComp->SetEstimateExtraAxonalFraction(!this->GetUseConstrainedExtraAxonalFraction());
-
-    ddiComp->SetOrientationConcentration(this->GetOrientationConcentration());
-    ddiComp->SetAxialDiffusivity(this->GetAxialDiffusivity());
-    ddiComp->SetRadialDiffusivity1((this->GetRadialDiffusivity1() + this->GetRadialDiffusivity2()) / 2.0);
-    ddiComp->SetExtraAxonalFraction(this->GetExtraAxonalFraction());
-
-    if (applyConstraints)
+    void MultiCompartmentModelCreator::CreateDDICompartment(BaseCompartmentPointer &compartmentPointer, bool applyConstraints)
     {
-        if (this->GetUseCommonDiffusivities())
-            ddiComp->SetEstimateAxialDiffusivity(false);
+        using DDIType = anima::DDICompartment;
 
-        if (this->GetUseCommonConcentrations())
-            ddiComp->SetEstimateOrientationConcentration(false);
+        DDIType::Pointer ddiComp = DDIType::New();
+        ddiComp->SetEstimateOrientationConcentration(!this->GetUseConstrainedOrientationConcentration());
+        ddiComp->SetEstimateAxialDiffusivity(!this->GetUseConstrainedDiffusivity());
+        ddiComp->SetEstimateExtraAxonalFraction(!this->GetUseConstrainedExtraAxonalFraction());
 
-        if (this->GetUseCommonExtraAxonalFractions())
-            ddiComp->SetEstimateExtraAxonalFraction(false);
+        ddiComp->SetOrientationConcentration(this->GetOrientationConcentration());
+        ddiComp->SetAxialDiffusivity(this->GetAxialDiffusivity());
+        ddiComp->SetRadialDiffusivity1((this->GetRadialDiffusivity1() + this->GetRadialDiffusivity2()) / 2.0);
+        ddiComp->SetExtraAxonalFraction(this->GetExtraAxonalFraction());
+
+        if (applyConstraints)
+        {
+            if (this->GetUseCommonDiffusivities())
+                ddiComp->SetEstimateAxialDiffusivity(false);
+
+            if (this->GetUseCommonConcentrations())
+                ddiComp->SetEstimateOrientationConcentration(false);
+
+            if (this->GetUseCommonExtraAxonalFractions())
+                ddiComp->SetEstimateExtraAxonalFraction(false);
+        }
+
+        compartmentPointer = ddiComp;
     }
 
-    compartmentPointer = ddiComp;
-}
+    void MultiCompartmentModelCreator::CreateCHARMEDCompartment(BaseCompartmentPointer &compartmentPointer, bool applyConstraints)
+    {
+        using CHARMEDType = anima::CHARMEDCompartment;
+
+        CHARMEDType::Pointer charmedComp = CHARMEDType::New();
+        charmedComp->SetEstimateDiffusivities(!m_UseConstrainedDiffusivity);
+        charmedComp->SetAxialDiffusivity(m_AxialDiffusivity);
+        charmedComp->SetRadialDiffusivity1((m_RadialDiffusivity1 + m_RadialDiffusivity2) / 2.0);
+
+        if (applyConstraints)
+        {
+            if (m_UseCommonDiffusivities)
+                charmedComp->SetEstimateDiffusivities(false);
+        }
+
+        compartmentPointer = charmedComp;
+    }
 
 } // end namespace anima
