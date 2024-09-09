@@ -2,7 +2,10 @@
 
 #include <animaBaseCompartment.h>
 #include <AnimaMCMExport.h>
-#include <animaStaniszCompartment.h>
+#include <animaNeumanCylinderCompartment.h>
+#include <animaStaniszCylinderCompartment.h>
+#include <animaVanGelderenCylinderCompartment.h>
+#include <animaZeppelinCompartment.h>
 
 #include <map>
 #include <tuple>
@@ -53,8 +56,11 @@ namespace anima
         unsigned int GetNumberOfParameters() ITK_OVERRIDE;
         ModelOutputVectorType &GetCompartmentVector() ITK_OVERRIDE;
 
-        void SetTissueRadius(double num) ITK_OVERRIDE;
+        void SetOrientationTheta(double num) ITK_OVERRIDE;
+        void SetOrientationPhi(double num) ITK_OVERRIDE;
         void SetAxialDiffusivity(double num) ITK_OVERRIDE;
+        void SetRadialDiffusivity1(double num) ITK_OVERRIDE;
+        void SetTissueRadius(double num) ITK_OVERRIDE;
 
         bool GetTensorCompatible() ITK_OVERRIDE { return false; }
         double GetApparentFractionalAnisotropy() ITK_OVERRIDE;
@@ -64,13 +70,29 @@ namespace anima
         {
             m_EstimateDiffusivities = true;
             m_ChangedConstraints = true;
-            m_StaniszCompartment = anima::StaniszCompartment::New();
-            m_StaniszCompartment->SetEstimateTissueRadius(true);
+
+            m_VanGelderenCylinderCompartment = anima::VanGelderenCylinderCompartment::New();
+            m_VanGelderenCylinderCompartment->SetEstimateTissueRadius(false);
+            m_VanGelderenCylinderCompartment->SetEstimateAxialDiffusivity(false);
+
+            m_StaniszCylinderCompartment = anima::StaniszCylinderCompartment::New();
+            m_StaniszCylinderCompartment->SetEstimateTissueRadius(false);
+            m_StaniszCylinderCompartment->SetEstimateAxialDiffusivity(false);
+
+            m_NeumanCylinderCompartment = anima::NeumanCylinderCompartment::New();
+            m_NeumanCylinderCompartment->SetEstimateTissueRadius(false);
+            m_NeumanCylinderCompartment->SetEstimateAxialDiffusivity(false);
+            m_NeumanCylinderCompartment->SetEchoTime(57e-3);
+
+            m_ZeppelinCompartment = anima::ZeppelinCompartment::New();
+            m_ZeppelinCompartment->SetEstimateDiffusivities(false);
+
+            // Genu of corpus callosum (from Aboitiz et al. 1992)
+            m_RadiusValues = {2.73e-4, 3.44e-4, 4.02e-4, 4.57e-4, 5.12e-4, 5.72e-4, 6.41e-4, 7.29e-4, 8.63e-4};
+            m_RadiusWeights = {0.0943, 0.1281, 0.1428, 0.1455, 0.1390, 0.1251, 0.1044, 0.0773, 0.0435};
         }
 
         virtual ~CHARMEDCompartment() {}
-
-        void PrepareData(double smallDelta, double bigDelta, double gradientStrength, const Vector3DType &gradient);
 
     private:
         bool m_EstimateDiffusivities;
@@ -78,11 +100,13 @@ namespace anima
         unsigned int m_NumberOfParameters;
 
         // Parameters for data perparation
-        anima::StaniszCompartment::Pointer m_StaniszCompartment;
-        double m_AxialSignal, m_RadialHinderedSignal, m_RadialRestrictedSignal;
-        double m_OrthogonalGradientStrength;
-        Vector3DType m_OrthogonalGradient;
-        double m_BValue, m_InnerProd;
+        anima::StaniszCylinderCompartment::Pointer m_StaniszCylinderCompartment;
+        anima::NeumanCylinderCompartment::Pointer m_NeumanCylinderCompartment;
+        anima::VanGelderenCylinderCompartment::Pointer m_VanGelderenCylinderCompartment;
+        anima::ZeppelinCompartment::Pointer m_ZeppelinCompartment;
+
+        std::vector<double> m_RadiusValues;
+        std::vector<double> m_RadiusWeights;
     };
 
 } // end namespace anima

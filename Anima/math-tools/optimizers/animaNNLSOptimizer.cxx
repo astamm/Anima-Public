@@ -28,7 +28,7 @@ void NNLSOptimizer::StartOptimization()
     bool continueMainLoop = true;
     double previousMaxW = -1;
     while (continueMainLoop)
-    {
+    {   
         double maxW = 0;
         int maxIndex = -1;
         for (unsigned int i = 0;i < parametersSize;++i)

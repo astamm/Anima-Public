@@ -22,7 +22,12 @@ namespace anima
         Tensor,
         NODDI,
         DDI,
-        CHARMED
+        CHARMED,
+        StaniszCylinder,
+        Neuman,
+        NeumanCylinder,
+        VanGelderen,
+        VanGelderenCylinder
     };
 
     class ANIMAMCMBASE_EXPORT BaseCompartment : public itk::LightObject

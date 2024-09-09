@@ -343,6 +343,8 @@ int main(int argc, char **argv)
     filter->SetNumberOfWorkUnits(nbThreadsArg.getValue());
     filter->AddObserver(itk::ProgressEvent(), callback);
 
+    std::cout << "Estimating MCM..." << std::endl;
+
     itk::TimeProbe tmpTimer;
     tmpTimer.Start();
 

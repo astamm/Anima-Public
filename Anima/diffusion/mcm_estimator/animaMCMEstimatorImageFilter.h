@@ -67,13 +67,13 @@ namespace anima
         };
 
         /** Method for creation through the object factory. */
-        itkNewMacro(Self)
+        itkNewMacro(Self);
 
-            /** Run-time type information (and related methods) */
-            itkTypeMacro(MCMEstimatorImageFilter, MaskedImageToImageFilter)
+        /** Run-time type information (and related methods) */
+        itkTypeMacro(MCMEstimatorImageFilter, MaskedImageToImageFilter);
 
-            /** Image typedef support */
-            typedef TInputImage InputImageType;
+        /** Image typedef support */
+        typedef TInputImage InputImageType;
         typedef TOutputImage OutputImageType;
         typedef typename InputImageType::Pointer InputImagePointer;
         typedef typename OutputImageType::PixelType VariableLengthVectorType;
@@ -88,57 +88,57 @@ namespace anima
 
         // Acquisition-related parameters
         void SetGradientStrengths(std::vector<double> &mb) { m_GradientStrengths = mb; }
-        itkSetMacro(SmallDelta, double)
-            itkSetMacro(BigDelta, double) void AddGradientDirection(unsigned int i, GradientType &grad);
-        itkSetMacro(B0Threshold, double)
+        itkSetMacro(SmallDelta, double);
+        itkSetMacro(BigDelta, double) void AddGradientDirection(unsigned int i, GradientType &grad);
+        itkSetMacro(B0Threshold, double);
 
-            // Optimizer-related parameters
-            void SetOptimizer(std::string &opt)
+        // Optimizer-related parameters
+        void SetOptimizer(std::string &opt)
         {
             m_Optimizer = opt;
         }
-        itkSetMacro(AbsoluteCostChange, double)
+        itkSetMacro(AbsoluteCostChange, double);
 
-            itkSetMacro(MLEstimationStrategy, MaximumLikelihoodEstimationMode)
-                itkGetMacro(MLEstimationStrategy, MaximumLikelihoodEstimationMode)
+        itkSetMacro(MLEstimationStrategy, MaximumLikelihoodEstimationMode);
+        itkGetMacro(MLEstimationStrategy, MaximumLikelihoodEstimationMode);
 
-            // Model-related parameters
-            itkSetMacro(ModelWithFreeWaterComponent, bool)
-                itkSetMacro(ModelWithStationaryWaterComponent, bool)
-                    itkSetMacro(ModelWithRestrictedWaterComponent, bool)
-                        itkSetMacro(ModelWithStaniszComponent, bool)
+        // Model-related parameters
+        itkSetMacro(ModelWithFreeWaterComponent, bool);
+        itkSetMacro(ModelWithStationaryWaterComponent, bool);
+        itkSetMacro(ModelWithRestrictedWaterComponent, bool);
+        itkSetMacro(ModelWithStaniszComponent, bool);
 
-                            itkSetMacro(NoiseType, SignalNoiseType)
-                                itkGetMacro(NoiseType, SignalNoiseType)
-                                    itkSetMacro(CompartmentType, CompartmentType)
+        itkSetMacro(NoiseType, SignalNoiseType);
+        itkGetMacro(NoiseType, SignalNoiseType);
+        itkSetMacro(CompartmentType, CompartmentType);
 
-                                        itkSetMacro(NumberOfCoils, unsigned int)
-                                            itkGetMacro(NumberOfCoils, unsigned int)
-                                                itkSetMacro(NumberOfCompartments, unsigned int)
-                                                    itkSetMacro(FindOptimalNumberOfCompartments, bool)
+        itkSetMacro(NumberOfCoils, unsigned int);
+        itkGetMacro(NumberOfCoils, unsigned int);
+        itkSetMacro(NumberOfCompartments, unsigned int);
+        itkSetMacro(FindOptimalNumberOfCompartments, bool);
 
-                                                        itkSetMacro(UseConstrainedDiffusivity, bool)
-                                                            itkSetMacro(UseConstrainedFreeWaterDiffusivity, bool)
-                                                                itkSetMacro(UseConstrainedIRWDiffusivity, bool)
-                                                                    itkSetMacro(UseConstrainedStaniszDiffusivity, bool)
-                                                                        itkSetMacro(UseConstrainedStaniszRadius, bool)
+        itkSetMacro(UseConstrainedDiffusivity, bool);
+        itkSetMacro(UseConstrainedFreeWaterDiffusivity, bool);
+        itkSetMacro(UseConstrainedIRWDiffusivity, bool);
+        itkSetMacro(UseConstrainedStaniszDiffusivity, bool);
+        itkSetMacro(UseConstrainedStaniszRadius, bool);
 
-                                                                            itkSetMacro(UseConstrainedOrientationConcentration, bool)
-                                                                                itkSetMacro(UseConstrainedExtraAxonalFraction, bool)
-                                                                                    itkSetMacro(UseCommonConcentrations, bool)
-                                                                                        itkSetMacro(UseCommonExtraAxonalFractions, bool)
+        itkSetMacro(UseConstrainedOrientationConcentration, bool);
+        itkSetMacro(UseConstrainedExtraAxonalFraction, bool);
+        itkSetMacro(UseCommonConcentrations, bool);
+        itkSetMacro(UseCommonExtraAxonalFractions, bool);
 
-                                                                                            itkSetMacro(UseCommonDiffusivities, bool)
+        itkSetMacro(UseCommonDiffusivities, bool);
 
-                                                                                                std::string GetOptimizer()
+        std::string GetOptimizer()
         {
             return m_Optimizer;
         }
 
         std::vector<double> &GetGradientStrengths() { return m_GradientStrengths; }
-        itkGetMacro(SmallDelta, double)
-            itkGetMacro(BigDelta, double)
-                std::vector<GradientType> &GetGradientDirections() { return m_GradientDirections; }
+        itkGetMacro(SmallDelta, double);
+        itkGetMacro(BigDelta, double);
+        std::vector<GradientType> &GetGradientDirections() { return m_GradientDirections; }
 
         MCMCreatorType *GetMCMCreator(unsigned int i) { return m_MCMCreators[i]; }
         MCMCreatorType *GetNewMCMCreatorInstance();
@@ -157,17 +157,18 @@ namespace anima
 
         void WriteMCMOutput(std::string fileName);
 
-        itkSetMacro(AxialDiffusivityValue, double)
-            itkSetMacro(StaniszDiffusivityValue, double)
-                itkSetMacro(IRWDiffusivityValue, double)
-                    itkSetMacro(RadialDiffusivity1Value, double)
-                        itkSetMacro(RadialDiffusivity2Value, double)
+        itkSetMacro(AxialDiffusivityValue, double);
+        itkSetMacro(StaniszDiffusivityValue, double);
+        itkSetMacro(IRWDiffusivityValue, double);
+        itkSetMacro(RadialDiffusivity1Value, double);
+        itkSetMacro(RadialDiffusivity2Value, double);
 
-                            itkSetMacro(XTolerance, double)
-                                itkSetMacro(FTolerance, double)
-                                    itkSetMacro(MaxEval, unsigned int)
+        itkSetMacro(XTolerance, double);
+        itkSetMacro(FTolerance, double);
+        itkSetMacro(MaxEval, unsigned int);
 
-                                        protected : MCMEstimatorImageFilter() : Superclass()
+    protected:
+        MCMEstimatorImageFilter() : Superclass()
         {
             m_AICcVolume = 0;
             m_B0Volume = 0;

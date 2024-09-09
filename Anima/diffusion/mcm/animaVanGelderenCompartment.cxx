@@ -1,4 +1,4 @@
-#include "animaStaniszCompartment.h"
+#include "animaVanGelderenCompartment.h"
 #include <animaMCMConstants.h>
 
 #include <limits>
@@ -6,7 +6,7 @@
 namespace anima
 {
 
-    StaniszCompartment::KeyType StaniszCompartment::GenerateKey(double smallDelta, double bigDelta, double gradientStrength)
+    VanGelderenCompartment::KeyType VanGelderenCompartment::GenerateKey(double smallDelta, double bigDelta, double gradientStrength)
     {
         unsigned int smallDeltaInt = std::floor(smallDelta * 1.0e6);
         unsigned int bigDeltaInt = std::floor(bigDelta * 1.0e6);
@@ -17,68 +17,26 @@ namespace anima
         return outValue;
     }
 
-    void StaniszCompartment::UpdateSignals(double smallDelta, double bigDelta, double gradientStrength)
+    void VanGelderenCompartment::UpdateSignals(double smallDelta, double bigDelta, double gradientStrength)
     {
         KeyType gradientKey = this->GenerateKey(smallDelta, bigDelta, gradientStrength);
         if (m_FirstSummations.find(gradientKey) != m_FirstSummations.end())
             return;
 
-        double alpha = anima::DiffusionGyromagneticRatio * smallDelta * gradientStrength;
-        double tissueRadius = this->GetTissueRadius();
-        double axialDiff = this->GetAxialDiffusivity();
-        double alphaRs = alpha * tissueRadius;
-        double cosAlphaRs = std::cos(alphaRs);
-        double sinAlphaRs = std::sin(alphaRs);
-        double alphaRsSquare = alphaRs * alphaRs;
-        double deltaDiff = bigDelta - smallDelta / 3.0;
-
-        double firstSummation = 0.0;
-        double secondSummation = 0.0;
-        double thirdSummation = 0.0;
-        double fourthSummation = 0.0;
-        for (unsigned int n = 1; n <= m_MaximumNumberOfSumElements; ++n)
+        double firstSummation = 0.0, secondSummation = 0.0, thirdSummation = 0.0, fourthSummation = 0.0;
+        for (unsigned int m = 0; m < m_MaximumNumberOfSumElements; ++m)
         {
-            double npiSquare = n * M_PI * n * M_PI;
-            double expInternalValue = npiSquare * deltaDiff * axialDiff / (tissueRadius * tissueRadius);
-            double denomValue = alphaRsSquare - npiSquare;
+            double sqRoot = m_BesselPrimeZeros[m] * m_BesselPrimeZeros[m];
+            double workValue = this->GetAxialDiffusivity() * sqRoot / (this->GetTissueRadius() * this->GetTissueRadius());
+            double sumElement = 2.0 * workValue * smallDelta - 2.0;
+            sumElement += 2.0 * std::exp(-workValue * smallDelta);
+            sumElement += 2.0 * std::exp(-workValue * bigDelta);
+            sumElement -= std::exp(-workValue * (bigDelta - smallDelta));
+            sumElement -= std::exp(-workValue * (bigDelta + smallDelta));
+            sumElement /= (std::pow(workValue, 3.0) * (sqRoot - 1.0));
+            firstSummation += sumElement;
 
-            double internalTermCos = std::exp(-expInternalValue);
-
-            if (internalTermCos == 0)
-                continue;
-
-            double internalTermSin = internalTermCos;
-
-            if (n % 2 == 0)
-            {
-                internalTermCos *= 1.0 - cosAlphaRs;
-                internalTermSin *= sinAlphaRs;
-            }
-            else
-            {
-                internalTermCos *= 1.0 + cosAlphaRs;
-                internalTermSin *= -sinAlphaRs;
-            }
-
-            internalTermCos /= denomValue * denomValue;
-            internalTermSin /= denomValue * denomValue;
-
-            double firstSummationIncrement = internalTermCos;
-            double secondSummationIncrement = internalTermCos * n * n;
-            double thirdSummationIncrement = internalTermSin;
-            double fourthSummationIncrement = internalTermCos / denomValue;
-
-            bool stopFirstSummation = (std::abs(firstSummationIncrement) < m_SignalSummationTolerance * std::abs(firstSummation));
-            bool stopSecondSummation = (std::abs(secondSummationIncrement) < m_SignalSummationTolerance * std::abs(secondSummation));
-            bool stopThirdSummation = (std::abs(thirdSummationIncrement) < m_SignalSummationTolerance * std::abs(thirdSummation));
-            bool stopFourthSummation = (std::abs(fourthSummationIncrement) < m_SignalSummationTolerance * std::abs(fourthSummation));
-
-            firstSummation += firstSummationIncrement;
-            secondSummation += secondSummationIncrement;
-            thirdSummation += thirdSummationIncrement;
-            fourthSummation += fourthSummationIncrement;
-
-            if (stopFirstSummation && stopSecondSummation && stopThirdSummation && stopFourthSummation)
+            if (std::abs(sumElement) < m_SignalSummationTolerance * std::abs(firstSummation))
                 break;
         }
 
@@ -97,26 +55,20 @@ namespace anima
         m_FourthSummations[gradientKey] = fourthSummation;
     }
 
-    double StaniszCompartment::GetFourierTransformedDiffusionProfile(double smallDelta, double bigDelta, double gradientStrength, const Vector3DType &gradient)
+    double VanGelderenCompartment::GetFourierTransformedDiffusionProfile(double smallDelta, double bigDelta, double gradientStrength, const Vector3DType &gradient)
     {
         this->UpdateSignals(smallDelta, bigDelta, gradientStrength);
         KeyType gradientKey = this->GenerateKey(smallDelta, bigDelta, gradientStrength);
 
-        double alpha = anima::DiffusionGyromagneticRatio * smallDelta * gradientStrength;
-        double alphaRs = alpha * this->GetTissueRadius();
-        double alphaRsSquare = alphaRs * alphaRs;
+        double logSignalValue = -2.0 * anima::DiffusionGyromagneticRatio * anima::DiffusionGyromagneticRatio;
+        logSignalValue *= this->GetAxialDiffusivity();
+        logSignalValue *= (gradientStrength * gradientStrength);
+        logSignalValue *= m_FirstSummations[gradientKey];
 
-        double signalValue = 4.0 * alphaRsSquare * m_FirstSummations[gradientKey];
-
-        if (alphaRs < 1.0e-8)
-            signalValue += 1.0 - alphaRsSquare / 12.0;
-        else
-            signalValue += 2.0 * (1.0 - std::cos(alphaRs)) / alphaRsSquare;
-
-        return signalValue;
+        return std::exp(logSignalValue);
     }
 
-    StaniszCompartment::ListType &StaniszCompartment::GetSignalAttenuationJacobian(double smallDelta, double bigDelta, double gradientStrength, const Vector3DType &gradient)
+    VanGelderenCompartment::ListType &VanGelderenCompartment::GetSignalAttenuationJacobian(double smallDelta, double bigDelta, double gradientStrength, const Vector3DType &gradient)
     {
         this->UpdateSignals(smallDelta, bigDelta, gradientStrength);
         KeyType gradientKey = this->GenerateKey(smallDelta, bigDelta, gradientStrength);
@@ -158,7 +110,7 @@ namespace anima
         return m_JacobianVector;
     }
 
-    double StaniszCompartment::GetLogDiffusionProfile(const Vector3DType &sample)
+    double VanGelderenCompartment::GetLogDiffusionProfile(const Vector3DType &sample)
     {
         // Compute equivalent isotropic term for default delta values and gradient strength
         double bValue = 1000.0;
@@ -185,7 +137,7 @@ namespace anima
         return resVal;
     }
 
-    void StaniszCompartment::SetTissueRadius(double num)
+    void VanGelderenCompartment::SetTissueRadius(double num)
     {
         if (num != this->GetTissueRadius())
         {
@@ -197,7 +149,7 @@ namespace anima
         }
     }
 
-    void StaniszCompartment::SetAxialDiffusivity(double num)
+    void VanGelderenCompartment::SetAxialDiffusivity(double num)
     {
         if (num != this->GetAxialDiffusivity())
         {
@@ -209,7 +161,7 @@ namespace anima
         }
     }
 
-    void StaniszCompartment::SetParametersFromVector(const ListType &params)
+    void VanGelderenCompartment::SetParametersFromVector(const ListType &params)
     {
         if (params.size() != this->GetNumberOfParameters())
             return;
@@ -225,7 +177,7 @@ namespace anima
             this->SetAxialDiffusivity(params[pos]);
     }
 
-    StaniszCompartment::ListType &StaniszCompartment::GetParametersAsVector()
+    VanGelderenCompartment::ListType &VanGelderenCompartment::GetParametersAsVector()
     {
         m_ParametersVector.resize(this->GetNumberOfParameters());
 
@@ -242,7 +194,7 @@ namespace anima
         return m_ParametersVector;
     }
 
-    StaniszCompartment::ListType &StaniszCompartment::GetParameterLowerBounds()
+    VanGelderenCompartment::ListType &VanGelderenCompartment::GetParameterLowerBounds()
     {
         m_ParametersLowerBoundsVector.resize(this->GetNumberOfParameters());
 
@@ -259,7 +211,7 @@ namespace anima
         return m_ParametersLowerBoundsVector;
     }
 
-    StaniszCompartment::ListType &StaniszCompartment::GetParameterUpperBounds()
+    VanGelderenCompartment::ListType &VanGelderenCompartment::GetParameterUpperBounds()
     {
         m_ParametersUpperBoundsVector.resize(this->GetNumberOfParameters());
 
@@ -276,7 +228,7 @@ namespace anima
         return m_ParametersUpperBoundsVector;
     }
 
-    void StaniszCompartment::SetEstimateAxialDiffusivity(bool arg)
+    void VanGelderenCompartment::SetEstimateAxialDiffusivity(bool arg)
     {
         if (m_EstimateAxialDiffusivity == arg)
             return;
@@ -285,7 +237,7 @@ namespace anima
         m_ChangedConstraints = true;
     }
 
-    void StaniszCompartment::SetEstimateTissueRadius(bool arg)
+    void VanGelderenCompartment::SetEstimateTissueRadius(bool arg)
     {
         if (m_EstimateTissueRadius == arg)
             return;
@@ -294,7 +246,7 @@ namespace anima
         m_ChangedConstraints = true;
     }
 
-    void StaniszCompartment::SetCompartmentVector(ModelOutputVectorType &compartmentVector)
+    void VanGelderenCompartment::SetCompartmentVector(ModelOutputVectorType &compartmentVector)
     {
         if (compartmentVector.GetSize() != this->GetCompartmentSize())
             itkExceptionMacro("The input vector size does not match the size of the compartment");
@@ -303,12 +255,12 @@ namespace anima
         this->SetAxialDiffusivity(compartmentVector[1]);
     }
 
-    unsigned int StaniszCompartment::GetCompartmentSize()
+    unsigned int VanGelderenCompartment::GetCompartmentSize()
     {
         return 2;
     }
 
-    unsigned int StaniszCompartment::GetNumberOfParameters()
+    unsigned int VanGelderenCompartment::GetNumberOfParameters()
     {
         if (!m_ChangedConstraints)
             return m_NumberOfParameters;
@@ -325,7 +277,7 @@ namespace anima
         return m_NumberOfParameters;
     }
 
-    StaniszCompartment::ModelOutputVectorType &StaniszCompartment::GetCompartmentVector()
+    VanGelderenCompartment::ModelOutputVectorType &VanGelderenCompartment::GetCompartmentVector()
     {
         if (m_CompartmentVector.GetSize() != this->GetCompartmentSize())
             m_CompartmentVector.SetSize(this->GetCompartmentSize());
@@ -336,7 +288,7 @@ namespace anima
         return m_CompartmentVector;
     }
 
-    double StaniszCompartment::GetApparentFractionalAnisotropy()
+    double VanGelderenCompartment::GetApparentFractionalAnisotropy()
     {
         return 0.0;
     }

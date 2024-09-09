@@ -499,7 +499,9 @@ namespace anima
 
             // Load DWI
             for (unsigned int i = 0; i < m_NumberOfImages; ++i)
-                observedSignals[i] = inIterators[i].Get();
+                observedSignals[i] = std::max(inIterators[i].Get(), 1.0e-4);
+            
+            // std::cout << "Done loading DWI" << std::endl;
 
             int moseValue = -1;
             bool estimateNonIsoCompartments = false;
@@ -541,7 +543,9 @@ namespace anima
                     double tmpAiccValue = 0;
                     MCMPointer mcmValue;
 
+                    // std::cout << "Starting estimation for " << i << " compartments" << std::endl;
                     this->OptimizeNonIsotropicCompartments(mcmValue, i, observedSignals, threadId, tmpAiccValue, tmpB0Value, tmpSigmaSqValue);
+                    // std::cout << "Done estimation for " << i << " compartments" << std::endl;
 
                     if ((tmpAiccValue < aiccValue) || (!m_FindOptimalNumberOfCompartments))
                     {
@@ -609,7 +613,10 @@ namespace anima
         this->InitialOrientationsEstimation(mcmValue, false, currentNumberOfCompartments, observedSignals, threadId,
                                             aiccValue, b0Value, sigmaSqValue);
 
+        // std::cout << "Initial orientations done" << std::endl;
+        // std::cout << "Starting model estimation" << std::endl;
         this->ModelEstimation(mcmValue, false, observedSignals, threadId, aiccValue, b0Value, sigmaSqValue);
+        // std::cout << "Model estimation done" << std::endl;
 
         if (b0Value == 0.0)
         {
@@ -825,9 +832,13 @@ namespace anima
         mcmUpdateValue->SetNegativeWeightBounds(authorizedNegativeB0Value);
 
         // - Now initialize sticks from dictionary
+        // std::cout << "Starting sparse initialization" << std::endl;
+        // std::cout << "Dimension (initial orientation estimation): " << mcmUpdateValue->GetNumberOfParameters() << std::endl;
         this->SparseInitializeSticks(mcmUpdateValue, authorizedNegativeB0Value, observedSignals, threadId);
+        // std::cout << "Done sparse initialization" << std::endl;
 
         unsigned int dimension = mcmUpdateValue->GetNumberOfParameters();
+        // std::cout << "Dimension (initial orientation estimation): " << mcmUpdateValue->GetNumberOfParameters() << std::endl;
         ParametersType p(dimension);
         MCMType::ListType workVec(dimension);
         itk::Array<double> lowerBounds(dimension), upperBounds(dimension);
@@ -847,7 +858,9 @@ namespace anima
         for (unsigned int j = 0; j < dimension; ++j)
             p[j] = workVec[j];
 
+        // std::cout << "Starting initial orientations estimation" << std::endl;
         double costValue = this->PerformSingleOptimization(p, cost, lowerBounds, upperBounds);
+        // std::cout << "Done initial orientations estimation" << std::endl;
 
         // - Get estimated data
         for (unsigned int j = 0; j < dimension; ++j)
@@ -887,6 +900,10 @@ namespace anima
         CostFunctionBasePointer cost = this->CreateCostFunction(observedSignals, mcmUpdateValue);
 
         unsigned int dimension = mcmUpdateValue->GetNumberOfParameters();
+        // std::cout << "Dimension: " << mcmValue->GetNumberOfParameters() << std::endl;
+        // std::cout << "Dimension: " << dimension << std::endl;
+        // exit(-1);
+
         ParametersType p(dimension);
         MCMType::ListType workVec(dimension);
         itk::Array<double> lowerBounds(dimension), upperBounds(dimension);
@@ -902,6 +919,7 @@ namespace anima
         workVec = mcmUpdateValue->GetParametersAsVector();
         for (unsigned int i = 0; i < dimension; ++i)
             p[i] = workVec[i];
+        // std::cout << p << std::endl;
 
         double costValue = this->PerformSingleOptimization(p, cost, lowerBounds, upperBounds);
         this->GetProfiledInformation(cost, mcmUpdateValue, b0Value, sigmaSqValue);
@@ -1403,6 +1421,8 @@ namespace anima
         unsigned int numNonIsotropicComponents = complexModel->GetNumberOfCompartments() - numIsotropicComponents;
         unsigned int numCompartments = complexModel->GetNumberOfCompartments();
 
+        // std::cout << "1) Number of compartments: " << numCompartments << std::endl;
+
         // First compute sparse solution as NNLS optmization
         anima::NNLSOptimizer::Pointer sparseOptimizer = anima::NNLSOptimizer::New();
         sparseOptimizer->SetDataMatrix(m_SparseSticksDictionary);
@@ -1412,16 +1432,21 @@ namespace anima
         ParametersType rightHandValues(numSignals);
         for (unsigned int i = 0; i < numSignals; ++i)
             rightHandValues[i] = observedSignals[i];
+        // std::cout << "Parameters: " << rightHandValues << std::endl;
 
         if (authorizeNegativeB0Value)
             rightHandValues *= -1;
 
         sparseOptimizer->SetPoints(rightHandValues);
         sparseOptimizer->SetSquaredProblem(false);
+
+        // std::cout << "Starting NNLS optimization" << std::endl;
         sparseOptimizer->StartOptimization();
+        // std::cout << "Done NNLS optimization" << std::endl;
 
         // Get atom weights and determine the number of non null weighted components, first quartile of their weights
         ParametersType dictionaryWeights = sparseOptimizer->GetCurrentPosition();
+        // std::cout << "Dictionary weights: " << dictionaryWeights << std::endl;
         std::vector<unsigned int> nonNullAtomIndexes;
 
         double totalWeightsSum = 0.0;
@@ -1465,6 +1490,8 @@ namespace anima
         }
 
         numRealAnisotropicCompartments = nonNullAtomIndexes.size();
+        // std::cout << "2) Number of compartments: " << numRealAnisotropicCompartments << std::endl;
+
         MCMType::ListType sparseWeights(numCompartments, 0.0);
         for (unsigned int i = 0; i < numIsotropicComponents; ++i)
         {

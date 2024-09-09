@@ -264,6 +264,7 @@ namespace anima
         charmedComp->SetEstimateDiffusivities(!m_UseConstrainedDiffusivity);
         charmedComp->SetAxialDiffusivity(m_AxialDiffusivity);
         charmedComp->SetRadialDiffusivity1((m_RadialDiffusivity1 + m_RadialDiffusivity2) / 2.0);
+        charmedComp->SetTissueRadius(0.0005);
 
         if (applyConstraints)
         {

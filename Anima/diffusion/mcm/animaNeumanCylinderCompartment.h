@@ -2,18 +2,16 @@
 
 #include <animaBaseCompartment.h>
 #include <AnimaMCMExport.h>
-
-#include <tuple>
-#include <map>
+#include <animaNeumanCompartment.h>
 
 namespace anima
 {
 
-    class ANIMAMCM_EXPORT StaniszCompartment : public BaseCompartment
+    class ANIMAMCM_EXPORT NeumanCylinderCompartment : public BaseCompartment
     {
     public:
         // Useful typedefs
-        using Self = StaniszCompartment;
+        using Self = NeumanCylinderCompartment;
         using Superclass = BaseCompartment;
         using BasePointer = Superclass::Pointer;
         using Pointer = itk::SmartPointer<Self>;
@@ -26,11 +24,11 @@ namespace anima
         itkNewMacro(Self);
 
         /** Run-time type information (and related methods) */
-        itkTypeMacro(StaniszCompartment, BaseCompartment);
+        itkTypeMacro(NeumanCylinderCompartment, BaseCompartment);
 
         DiffusionModelCompartmentType GetCompartmentType() ITK_OVERRIDE
         {
-            return Stanisz;
+            return NeumanCylinder;
         }
 
         virtual double GetFourierTransformedDiffusionProfile(double smallDelta, double bigDelta, double gradientStrength, const Vector3DType &gradient) ITK_OVERRIDE;
@@ -52,42 +50,33 @@ namespace anima
         unsigned int GetNumberOfParameters() ITK_OVERRIDE;
         ModelOutputVectorType &GetCompartmentVector() ITK_OVERRIDE;
 
-        void SetTissueRadius(double num) ITK_OVERRIDE;
-        void SetAxialDiffusivity(double num) ITK_OVERRIDE;
-
         bool GetTensorCompatible() ITK_OVERRIDE { return false; }
         double GetApparentFractionalAnisotropy() ITK_OVERRIDE;
 
+        void SetTissueRadius(double num) ITK_OVERRIDE;
+        void SetAxialDiffusivity(double num) ITK_OVERRIDE;
+
+        void SetEchoTime(double num) {m_EchoTime = num;}
+
     protected:
-        StaniszCompartment() : Superclass()
+        NeumanCylinderCompartment() : Superclass()
         {
             m_EstimateAxialDiffusivity = true;
             m_EstimateTissueRadius = true;
             m_ChangedConstraints = true;
 
-            m_SignalSummationTolerance = 1.0e-4;
+            m_NeumanCompartment = anima::NeumanCompartment::New();
         }
 
-        virtual ~StaniszCompartment() {}
-
-        typedef std::tuple<unsigned int, unsigned int, unsigned int> KeyType;
-        typedef std::map<KeyType, double> MapType;
-
-        KeyType GenerateKey(double smallDelta, double bigDelta, double gradientStrength);
-
-        void UpdateSignals(double smallDelta, double bigDelta, double gradientStrength);
+        virtual ~NeumanCylinderCompartment() {}
 
     private:
         bool m_EstimateAxialDiffusivity, m_EstimateTissueRadius;
         bool m_ChangedConstraints;
         unsigned int m_NumberOfParameters;
 
-        MapType m_FirstSummations, m_SecondSummations;
-        MapType m_ThirdSummations, m_FourthSummations;
-
-        double m_SignalSummationTolerance;
-
-        const unsigned int m_MaximumNumberOfSumElements = 2000;
+        anima::NeumanCompartment::Pointer m_NeumanCompartment;
+        double m_EchoTime;
     };
 
 } // end namespace anima
