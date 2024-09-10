@@ -15,12 +15,12 @@ namespace anima
         MultiCompartmentModelCreator();
         virtual ~MultiCompartmentModelCreator() {}
 
-        typedef anima::MultiCompartmentModel MCMType;
-        typedef MCMType::Pointer MCMPointer;
+        using MCMType = anima::MultiCompartmentModel;
+        using MCMPointer = MCMType::Pointer;
 
-        typedef anima::BaseCompartment BaseCompartmentType;
-        typedef BaseCompartmentType::Pointer BaseCompartmentPointer;
-        typedef anima::DiffusionModelCompartmentType CompartmentType;
+        using BaseCompartmentType = anima::BaseCompartment;
+        using BaseCompartmentPointer = BaseCompartmentType::Pointer;
+        using CompartmentType = anima::DiffusionModelCompartmentType;
 
         // Isotropic compartments (one free water, one stationary water, one restricted water
         void SetModelWithFreeWaterComponent(bool arg) { m_ModelWithFreeWaterComponent = arg; }

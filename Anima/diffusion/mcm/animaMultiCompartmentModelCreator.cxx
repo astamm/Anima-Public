@@ -5,6 +5,7 @@
 #include <animaFreeWaterCompartment.h>
 #include <animaIsotropicRestrictedWaterCompartment.h>
 #include <animaNODDICompartment.h>
+#include <animaSphereGPDPulsedGradientCompartment.h>
 #include <animaStaniszCompartment.h>
 #include <animaStationaryWaterCompartment.h>
 #include <animaStickCompartment.h>
@@ -61,7 +62,7 @@ namespace anima
 
         if (m_ModelWithFreeWaterComponent)
         {
-            typedef anima::FreeWaterCompartment FreeWaterType;
+            using FreeWaterType = anima::FreeWaterCompartment;
             FreeWaterType::Pointer fwComp = FreeWaterType::New();
             fwComp->SetEstimateAxialDiffusivity(!m_UseConstrainedFreeWaterDiffusivity);
             fwComp->SetAxialDiffusivity(m_FreeWaterDiffusivity);
@@ -71,7 +72,7 @@ namespace anima
 
         if (m_ModelWithStationaryWaterComponent)
         {
-            typedef anima::StationaryWaterCompartment SWType;
+            using SWType = anima::StationaryWaterCompartment;
             SWType::Pointer swComp = SWType::New();
 
             outputMCM->AddCompartment(defaultWeight, swComp);
@@ -79,7 +80,7 @@ namespace anima
 
         if (m_ModelWithRestrictedWaterComponent)
         {
-            typedef anima::IsotropicRestrictedWaterCompartment IRWType;
+            using IRWType = anima::IsotropicRestrictedWaterCompartment;
             IRWType::Pointer restComp = IRWType::New();
             restComp->SetEstimateAxialDiffusivity(!m_UseConstrainedIRWDiffusivity);
             restComp->SetAxialDiffusivity(m_IRWDiffusivity);
@@ -89,7 +90,8 @@ namespace anima
 
         if (m_ModelWithStaniszComponent)
         {
-            typedef anima::StaniszCompartment StaniszType;
+            // typedef anima::StaniszCompartment StaniszType;
+            using StaniszType = anima::SphereGPDPulsedGradientCompartment;
             StaniszType::Pointer restComp = StaniszType::New();
             restComp->SetEstimateAxialDiffusivity(!m_UseConstrainedStaniszDiffusivity);
             restComp->SetEstimateTissueRadius(!m_UseConstrainedStaniszRadius);

@@ -27,28 +27,28 @@ namespace anima
         Neuman,
         NeumanCylinder,
         VanGelderen,
-        VanGelderenCylinder
+        VanGelderenCylinder,
+        SphereGPDPulsedGradient
     };
 
     class ANIMAMCMBASE_EXPORT BaseCompartment : public itk::LightObject
     {
     public:
         // Useful typedefs
-        typedef BaseCompartment Self;
-        typedef itk::LightObject Superclass;
-        typedef itk::SmartPointer<Self> Pointer;
-        typedef itk::SmartPointer<const Self> ConstPointer;
-        typedef itk::Matrix<double, 3, 3> Matrix3DType;
+        using Self = BaseCompartment;
+        using Superclass = itk::LightObject;
+        using Pointer = itk::SmartPointer<Self>;
+        using ConstPointer = itk::SmartPointer<const Self>;
+        using Matrix3DType = itk::Matrix<double, 3, 3>;
+        using Vector3DType = vnl_vector_fixed<double, 3>;
+        using ListType = std::vector<double>;
+        using ModelOutputVectorType = itk::VariableLengthVector<double>;
 
         /** Run-time type information (and related methods) */
         itkTypeMacro(BaseCompartment, itk::LightObject);
 
         //! Utility function to return compartment type without needing dynamic casts
         virtual DiffusionModelCompartmentType GetCompartmentType() = 0;
-
-        typedef vnl_vector_fixed<double, 3> Vector3DType;
-        typedef std::vector<double> ListType;
-        typedef itk::VariableLengthVector<double> ModelOutputVectorType;
 
         virtual double GetFourierTransformedDiffusionProfile(double smallDelta, double bigDelta, double gradientStrength, const Vector3DType &gradient) = 0;
         virtual ListType &GetSignalAttenuationJacobian(double smallDelta, double bigDelta, double gradientStrength, const Vector3DType &gradient) = 0;
