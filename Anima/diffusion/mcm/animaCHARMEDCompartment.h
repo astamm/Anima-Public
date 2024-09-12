@@ -50,6 +50,7 @@ namespace anima
 
         // Set constraints
         void SetEstimateDiffusivities(bool arg);
+        void SetEstimateTissueRadius(bool arg);
         void SetCompartmentVector(ModelOutputVectorType &compartmentVector) ITK_OVERRIDE;
 
         unsigned int GetCompartmentSize() ITK_OVERRIDE;
@@ -68,7 +69,8 @@ namespace anima
     protected:
         CHARMEDCompartment() : Superclass()
         {
-            m_EstimateDiffusivities = true;
+            m_EstimateDiffusivities = false;
+            m_EstimateTissueRadius = false;
             m_ChangedConstraints = true;
 
             m_VanGelderenCylinderCompartment = anima::VanGelderenCylinderCompartment::New();
@@ -95,7 +97,7 @@ namespace anima
         virtual ~CHARMEDCompartment() {}
 
     private:
-        bool m_EstimateDiffusivities;
+        bool m_EstimateDiffusivities, m_EstimateTissueRadius;
         bool m_ChangedConstraints;
         unsigned int m_NumberOfParameters;
 

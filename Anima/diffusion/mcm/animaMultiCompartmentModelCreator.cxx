@@ -90,7 +90,7 @@ namespace anima
 
         if (m_ModelWithStaniszComponent)
         {
-            // typedef anima::StaniszCompartment StaniszType;
+            // using StaniszType = anima::StaniszCompartment;
             using StaniszType = anima::SphereGPDPulsedGradientCompartment;
             StaniszType::Pointer restComp = StaniszType::New();
             restComp->SetEstimateAxialDiffusivity(!m_UseConstrainedStaniszDiffusivity);

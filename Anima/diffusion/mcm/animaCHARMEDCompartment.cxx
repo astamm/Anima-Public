@@ -17,8 +17,6 @@ namespace anima
         //     restrictedSignal += m_RadiusWeights[i] * m_StaniszCylinderCompartment->GetFourierTransformedDiffusionProfile(smallDelta, bigDelta, gradientStrength, gradient);
         // }
         double restrictedSignal = m_VanGelderenCylinderCompartment->GetFourierTransformedDiffusionProfile(smallDelta, bigDelta, gradientStrength, gradient);
-        // double restrictedSignal = m_StaniszCylinderCompartment->GetFourierTransformedDiffusionProfile(smallDelta, bigDelta, gradientStrength, gradient);
-        // double restrictedSignal = m_NeumanCylinderCompartment->GetFourierTransformedDiffusionProfile(smallDelta, bigDelta, gradientStrength, gradient);
         double fhValue = this->GetExtraAxonalFraction();
         return fhValue * hinderedSignal + (1.0 - fhValue) * restrictedSignal;
     }
@@ -70,10 +68,8 @@ namespace anima
             m_VanGelderenCylinderCompartment->SetAxialDiffusivity(intrinsicDiffusivity);
             m_StaniszCylinderCompartment->SetAxialDiffusivity(intrinsicDiffusivity);
             m_NeumanCylinderCompartment->SetAxialDiffusivity(intrinsicDiffusivity);
-            double axialDiff = num;
-            m_ZeppelinCompartment->SetAxialDiffusivity(axialDiff);
-            this->SetRadialDiffusivity1(axialDiff);
-            this->Superclass::SetAxialDiffusivity(axialDiff);
+            m_ZeppelinCompartment->SetAxialDiffusivity(intrinsicDiffusivity);
+            this->Superclass::SetAxialDiffusivity(intrinsicDiffusivity);
         }
     }
 
@@ -118,11 +114,18 @@ namespace anima
         this->SetExtraAxonalFraction(params[pos]);
         ++pos;
 
-        this->SetTissueRadius(params[pos]);
-        ++pos;
+        if (m_EstimateTissueRadius)
+        {
+            this->SetTissueRadius(params[pos]);
+            ++pos;
+        }
 
         if (m_EstimateDiffusivities)
-            this->SetAxialDiffusivity(params[pos]);
+        {
+            this->SetAxialDiffusivity(params[pos] + params[pos + 1]);
+            ++pos;
+            this->SetRadialDiffusivity1(params[pos]);
+        }
     }
 
     CHARMEDCompartment::ListType &CHARMEDCompartment::GetParametersAsVector()
@@ -140,11 +143,18 @@ namespace anima
         m_ParametersVector[pos] = this->GetExtraAxonalFraction();
         ++pos;
 
-        m_ParametersVector[pos] = this->GetTissueRadius();
-        ++pos;
+        if (m_EstimateTissueRadius)
+        {
+            m_ParametersVector[pos] = this->GetTissueRadius();
+            ++pos;
+        }
 
         if (m_EstimateDiffusivities)
-            m_ParametersVector[pos] = this->GetAxialDiffusivity();
+        {
+            m_ParametersVector[pos] = this->GetAxialDiffusivity() - this->GetRadialDiffusivity1();
+            ++pos;
+            m_ParametersVector[pos] = this->GetRadialDiffusivity1();
+        }
 
         return m_ParametersVector;
     }
@@ -164,11 +174,18 @@ namespace anima
         m_ParametersLowerBoundsVector[pos] = anima::MCMZeroLowerBound;
         ++pos;
 
-        m_ParametersLowerBoundsVector[pos] = anima::MCMTissueRadiusLowerBound;
-        ++pos;
+        if (m_EstimateTissueRadius)
+        {
+            m_ParametersLowerBoundsVector[pos] = anima::MCMTissueRadiusLowerBound;
+            ++pos;
+        }
 
         if (m_EstimateDiffusivities)
+        {
+            m_ParametersLowerBoundsVector[pos] = anima::MCMZeroLowerBound;
+            ++pos;
             m_ParametersLowerBoundsVector[pos] = anima::MCMDiffusivityLowerBound;
+        }
 
         return m_ParametersLowerBoundsVector;
     }
@@ -188,11 +205,18 @@ namespace anima
         m_ParametersUpperBoundsVector[pos] = anima::MCMFractionUpperBound;
         ++pos;
 
-        m_ParametersUpperBoundsVector[pos] = anima::MCMTissueRadiusUpperBound;
-        ++pos;
+        if (m_EstimateTissueRadius)
+        {
+            m_ParametersUpperBoundsVector[pos] = anima::MCMTissueRadiusUpperBound;
+            ++pos;
+        }
 
         if (m_EstimateDiffusivities)
+        {
             m_ParametersUpperBoundsVector[pos] = anima::MCMDiffusivityUpperBound;
+            ++pos;
+            m_ParametersUpperBoundsVector[pos] = anima::MCMRadialDiffusivityUpperBound;
+        }
 
         return m_ParametersUpperBoundsVector;
     }
@@ -202,9 +226,22 @@ namespace anima
         if (m_EstimateDiffusivities == arg)
             return;
 
+        m_VanGelderenCylinderCompartment->SetEstimateAxialDiffusivity(arg);
         m_StaniszCylinderCompartment->SetEstimateAxialDiffusivity(arg);
         m_NeumanCylinderCompartment->SetEstimateAxialDiffusivity(arg);
         m_EstimateDiffusivities = arg;
+        m_ChangedConstraints = true;
+    }
+
+    void CHARMEDCompartment::SetEstimateTissueRadius(bool arg)
+    {
+        if (m_EstimateTissueRadius == arg)
+            return;
+
+        m_VanGelderenCylinderCompartment->SetEstimateTissueRadius(arg);
+        m_StaniszCylinderCompartment->SetEstimateTissueRadius(arg);
+        m_NeumanCylinderCompartment->SetEstimateTissueRadius(arg);
+        m_EstimateTissueRadius = arg;
         m_ChangedConstraints = true;
     }
 
@@ -218,7 +255,7 @@ namespace anima
         this->SetExtraAxonalFraction(compartmentVector[2]);
         this->SetTissueRadius(compartmentVector[3]);
         this->SetAxialDiffusivity(compartmentVector[4]);
-        this->SetRadialDiffusivity1(compartmentVector[4]);
+        this->SetRadialDiffusivity1(compartmentVector[5]);
     }
 
     unsigned int CHARMEDCompartment::GetCompartmentSize()
@@ -231,10 +268,13 @@ namespace anima
         if (!m_ChangedConstraints)
             return m_NumberOfParameters;
 
-        m_NumberOfParameters = 5;
+        m_NumberOfParameters = 6;
+
+        if (!m_EstimateTissueRadius)
+            m_NumberOfParameters -= 1;
 
         if (!m_EstimateDiffusivities)
-            m_NumberOfParameters -= 1;
+            m_NumberOfParameters -= 2;
 
         m_ChangedConstraints = false;
         return m_NumberOfParameters;

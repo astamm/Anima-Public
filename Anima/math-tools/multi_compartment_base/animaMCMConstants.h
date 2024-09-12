@@ -75,9 +75,9 @@ const double MCMConcentrationUpperBound = 128.0;
 const double MCMFractionUpperBound = 1.0;
 
 //! Tissue radius lower bound (in Stanisz for now)
-const double MCMTissueRadiusLowerBound = 1.0e-4;
+const double MCMTissueRadiusLowerBound = 1.0e-8;
 
 //! Tissue radius upper bound (in Stanisz for now)
-const double MCMTissueRadiusUpperBound = 4.01e-2;
+const double MCMTissueRadiusUpperBound = 5e-2;
 
 }

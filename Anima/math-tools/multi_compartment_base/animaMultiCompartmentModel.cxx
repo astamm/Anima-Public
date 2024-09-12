@@ -54,7 +54,8 @@ void MultiCompartmentModel::AddCompartment(double weight, BaseCompartment *compa
     DiffusionModelCompartmentType compType = compartment->GetCompartmentType();
 
     if ((compType == anima::FreeWater)||(compType == anima::StationaryWater)||
-            (compType == anima::IsotropicRestrictedWater)||(compType == anima::Stanisz))
+            (compType == anima::IsotropicRestrictedWater)||(compType == anima::Stanisz)||
+            (compType == anima::SphereGPDPulsedGradient))
         ++m_NumberOfIsotropicCompartments;
 }
 

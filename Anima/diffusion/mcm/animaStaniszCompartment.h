@@ -70,8 +70,8 @@ namespace anima
 
         virtual ~StaniszCompartment() {}
 
-        typedef std::tuple<unsigned int, unsigned int, unsigned int> KeyType;
-        typedef std::map<KeyType, double> MapType;
+        using KeyType = std::tuple<unsigned int, unsigned int, unsigned int>;
+        using MapType = std::map<KeyType, double>;
 
         KeyType GenerateKey(double smallDelta, double bigDelta, double gradientStrength);
 

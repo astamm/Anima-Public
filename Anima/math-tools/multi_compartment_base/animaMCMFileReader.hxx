@@ -3,15 +3,17 @@
 
 #include <animaReadWriteFunctions.h>
 
+#include <animaCHARMEDCompartment.h>
+#include <animaDDICompartment.h>
 #include <animaFreeWaterCompartment.h>
 #include <animaIsotropicRestrictedWaterCompartment.h>
-#include <animaStationaryWaterCompartment.h>
-#include <animaStaniszCompartment.h>
-#include <animaStickCompartment.h>
-#include <animaZeppelinCompartment.h>
-#include <animaTensorCompartment.h>
 #include <animaNODDICompartment.h>
-#include <animaDDICompartment.h>
+#include <animaSphereGPDPulsedGradientCompartment.h>
+#include <animaStaniszCompartment.h>
+#include <animaStationaryWaterCompartment.h>
+#include <animaStickCompartment.h>
+#include <animaTensorCompartment.h>
+#include <animaZeppelinCompartment.h>
 
 #include <itkImageRegionIterator.h>
 #include <tinyxml2.h>
@@ -184,6 +186,8 @@ MCMFileReader <PixelType, ImageDimension>
         additionalCompartment = anima::IsotropicRestrictedWaterCompartment::New();
     else if (compartmentType == "Stanisz")
         additionalCompartment = anima::StaniszCompartment::New();
+    else if (compartmentType == "SphereGPDPulsedGradient")
+        additionalCompartment = anima::SphereGPDPulsedGradientCompartment::New();
     else if (compartmentType == "Stick")
         additionalCompartment = anima::StickCompartment::New();
     else if (compartmentType == "Zeppelin")
@@ -194,6 +198,8 @@ MCMFileReader <PixelType, ImageDimension>
         additionalCompartment = anima::NODDICompartment::New();
 	else if (compartmentType == "DDI")
         additionalCompartment = anima::DDICompartment::New();
+    else if (compartmentType == "CHARMED")
+        additionalCompartment = anima::CHARMEDCompartment::New();
     else
     {
         std::string error("Unsupported compartment type: ");

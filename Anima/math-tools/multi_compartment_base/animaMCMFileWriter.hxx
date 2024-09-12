@@ -150,6 +150,14 @@ MCMFileWriter <PixelType, ImageDimension>
             case Stanisz:
                 outputHeaderFile << "<Type>Stanisz</Type>" << std::endl;
                 break;
+            
+            case SphereGPDPulsedGradient:
+                outputHeaderFile << "<Type>SphereGPDPulsedGradient</Type>" << std::endl;
+                break;
+            
+            case CHARMED:
+                outputHeaderFile << "<Type>CHARMED</Type>" << std::endl;
+                break;
 
             case IsotropicRestrictedWater:
             default:

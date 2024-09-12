@@ -17,6 +17,7 @@ namespace anima
         StationaryWater,
         IsotropicRestrictedWater,
         Stanisz,
+        SphereGPDPulsedGradient,
         Stick,
         Zeppelin,
         Tensor,
@@ -27,8 +28,7 @@ namespace anima
         Neuman,
         NeumanCylinder,
         VanGelderen,
-        VanGelderenCylinder,
-        SphereGPDPulsedGradient
+        VanGelderenCylinder
     };
 
     class ANIMAMCMBASE_EXPORT BaseCompartment : public itk::LightObject

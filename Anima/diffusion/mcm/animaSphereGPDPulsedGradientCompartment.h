@@ -15,10 +15,13 @@
 // - under the Gaussian Phase Distribution (GPD) approximation 
 // - for pulsed-gradient spin-echo (PGSE) sequences.
 //
-// Balinov, B., Jonsson, B., Linse, P., & Soderman, O. (1993). The NMR 
+// [1] Balinov, B., Jonsson, B., Linse, P., & Soderman, O. (1993). The NMR 
 // self-diffusion method applied to restricted diffusion. Simulation of 
 // echo attenuation from molecules in spheres and between planes. Journal 
 // of Magnetic Resonance, Series A, 104(1), 17-25.
+//
+// [2] Murday, J. S., & Cotts, R. M. (1968). Self‐diffusion coefficient of 
+// liquid lithium. The Journal of Chemical Physics, 48(11), 4938-4945.
 
 namespace anima
 {
@@ -108,18 +111,7 @@ namespace anima
 
             m_SignalSummationTolerance = 1.0e-4;
 
-            // Compute and store the zeros of first-order Bessel prime function
             double besselOrder = 1.5;
-            std::vector<double> lowerBounds(m_MaximumNumberOfSumElements, 0.0);
-            lowerBounds[0] = besselOrder;
-            std::vector<double> upperBounds(m_MaximumNumberOfSumElements, 0.0);
-            upperBounds[0] = besselOrder + M_PI;
-            for (unsigned int i = 1;i < m_MaximumNumberOfSumElements;++i)
-            {
-                lowerBounds[i] = lowerBounds[i - 1] + M_PI;
-                upperBounds[i] = upperBounds[i - 1] + M_PI;
-            }
-            
             m_FunctorZeros.resize(m_MaximumNumberOfSumElements);
             SphereGPDPulsedGradientFunctor functorObj;
             functorObj.SetBesselOrder(besselOrder);
@@ -134,18 +126,22 @@ namespace anima
             boost::math::tools::eps_tolerance<double> tol(get_digits); // Set the tolerance.
 
             std::pair<double, double> r;
+            double lowerBound = 1.5;
+            double upperBound = lowerBound + M_PI;
             for (unsigned int i = 0; i < m_MaximumNumberOfSumElements; ++i)
             {
                 std::uintmax_t it = maxit; // Initially our chosen max iterations, but updated with actual.
-                r = boost::math::tools::toms748_solve(functorObj, lowerBounds[i], upperBounds[i], tol, it);
+                r = boost::math::tools::toms748_solve(functorObj, lowerBound, upperBound, tol, it);
                 m_FunctorZeros[i] = r.first + (r.second - r.first) / 2;
+                lowerBound += M_PI;
+                upperBound += M_PI;
             }
         }
 
         virtual ~SphereGPDPulsedGradientCompartment() {}
 
-        typedef std::tuple<unsigned int, unsigned int, unsigned int> KeyType;
-        typedef std::map<KeyType, double> MapType;
+        using KeyType = std::tuple<unsigned int, unsigned int, unsigned int>;
+        using MapType = std::map<KeyType, double>;
 
         KeyType GenerateKey(double smallDelta, double bigDelta, double gradientStrength);
 
@@ -162,7 +158,7 @@ namespace anima
         double m_SignalSummationTolerance;
 
         std::vector<double> m_FunctorZeros;
-        const unsigned int m_MaximumNumberOfSumElements = 2000;
+        const unsigned int m_MaximumNumberOfSumElements = 100;
     };
 
 } // end namespace anima
