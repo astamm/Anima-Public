@@ -60,15 +60,8 @@ namespace anima
     {
         if (num != this->GetExtraAxonalFraction())
         {
-            double axialDiff = this->GetAxialDiffusivity();
-            double fr = 1.0 - num;
-            double radialDiff = axialDiff * (1.0 - 0.8 * fr);
-            if (radialDiff != this->GetRadialDiffusivity1())
-            {
-                m_ZeppelinCompartment->SetRadialDiffusivity1(radialDiff);
-                this->Superclass::SetRadialDiffusivity1(radialDiff);
-            }
             this->Superclass::SetExtraAxonalFraction(num);
+            this->SetRadialDiffusivity1(num);
         }
     }
 
@@ -89,19 +82,16 @@ namespace anima
         }
     }
 
-    // void CHARMEDCompartment::SetRadialDiffusivity1(double num)
-    // {
-    //     double axialDiff = this->GetAxialDiffusivity();
-    //     double fr = 1.0 - this->GetExtraAxonalFraction();
-    //     double radialDiff = axialDiff * (1.0 - 0.8 * fr);
-    //     // double radialDiff = num;
-    //     // double radialDiff = 2.0e-4;
-    //     if (radialDiff != this->GetRadialDiffusivity1())
-    //     {
-    //         m_ZeppelinCompartment->SetRadialDiffusivity1(radialDiff);
-    //         this->Superclass::SetRadialDiffusivity1(radialDiff);
-    //     }
-    // }
+    void CHARMEDCompartment::SetRadialDiffusivity1(double num)
+    {
+        double axialDiff = this->GetAxialDiffusivity();
+        double fr = 1.0 - this->GetExtraAxonalFraction();
+        double radialDiff = axialDiff * (1.0 - 0.8 * fr);
+        // double radialDiff = num;
+        // double radialDiff = 2.0e-4;
+        m_ZeppelinCompartment->SetRadialDiffusivity1(radialDiff);
+        this->Superclass::SetRadialDiffusivity1(radialDiff);
+    }
 
     void CHARMEDCompartment::SetTissueRadius(double num)
     {
