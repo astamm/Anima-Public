@@ -59,8 +59,9 @@ namespace anima
 
         void SetOrientationTheta(double num) ITK_OVERRIDE;
         void SetOrientationPhi(double num) ITK_OVERRIDE;
+        void SetExtraAxonalFraction(double num) ITK_OVERRIDE;
         void SetAxialDiffusivity(double num) ITK_OVERRIDE;
-        void SetRadialDiffusivity1(double num) ITK_OVERRIDE;
+        // void SetRadialDiffusivity1(double num) ITK_OVERRIDE;
         void SetTissueRadius(double num) ITK_OVERRIDE;
 
         bool GetTensorCompatible() ITK_OVERRIDE { return false; }
