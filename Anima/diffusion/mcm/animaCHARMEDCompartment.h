@@ -2,8 +2,6 @@
 
 #include <animaBaseCompartment.h>
 #include <AnimaMCMExport.h>
-#include <animaNeumanCylinderCompartment.h>
-#include <animaStaniszCylinderCompartment.h>
 #include <animaVanGelderenCylinderCompartment.h>
 #include <animaZeppelinCompartment.h>
 
@@ -80,15 +78,6 @@ namespace anima
             m_VanGelderenCylinderCompartment->SetEstimateTissueRadius(false);
             m_VanGelderenCylinderCompartment->SetEstimateAxialDiffusivity(false);
 
-            m_StaniszCylinderCompartment = anima::StaniszCylinderCompartment::New();
-            m_StaniszCylinderCompartment->SetEstimateTissueRadius(false);
-            m_StaniszCylinderCompartment->SetEstimateAxialDiffusivity(false);
-
-            m_NeumanCylinderCompartment = anima::NeumanCylinderCompartment::New();
-            m_NeumanCylinderCompartment->SetEstimateTissueRadius(false);
-            m_NeumanCylinderCompartment->SetEstimateAxialDiffusivity(false);
-            m_NeumanCylinderCompartment->SetEchoTime(57e-3);
-
             m_ZeppelinCompartment = anima::ZeppelinCompartment::New();
             m_ZeppelinCompartment->SetEstimateDiffusivities(false);
 
@@ -107,8 +96,6 @@ namespace anima
         unsigned int m_NumberOfParameters;
 
         // Parameters for data perparation
-        anima::StaniszCylinderCompartment::Pointer m_StaniszCylinderCompartment;
-        anima::NeumanCylinderCompartment::Pointer m_NeumanCylinderCompartment;
         anima::VanGelderenCylinderCompartment::Pointer m_VanGelderenCylinderCompartment;
         anima::ZeppelinCompartment::Pointer m_ZeppelinCompartment;
         bool m_UseTortuosityModel;

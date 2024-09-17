@@ -13,8 +13,8 @@ namespace anima
         // double restrictedSignal = 0.0;
         // for (unsigned int i = 0;i < m_RadiusValues.size();++i)
         // {
-        //     m_StaniszCylinderCompartment->SetTissueRadius(m_RadiusValues[i]);
-        //     restrictedSignal += m_RadiusWeights[i] * m_StaniszCylinderCompartment->GetFourierTransformedDiffusionProfile(smallDelta, bigDelta, gradientStrength, gradient);
+        //     m_VanGelderenCylinderCompartment->SetTissueRadius(m_RadiusValues[i]);
+        //     restrictedSignal += m_RadiusWeights[i] * m_VanGelderenCylinderCompartment->GetFourierTransformedDiffusionProfile(smallDelta, bigDelta, gradientStrength, gradient);
         // }
         double restrictedSignal = m_VanGelderenCylinderCompartment->GetFourierTransformedDiffusionProfile(smallDelta, bigDelta, gradientStrength, gradient);
         double fhValue = this->GetExtraAxonalFraction();
@@ -37,8 +37,6 @@ namespace anima
         if (num != this->GetOrientationTheta())
         {
             m_VanGelderenCylinderCompartment->SetOrientationTheta(num);
-            m_StaniszCylinderCompartment->SetOrientationTheta(num);
-            m_NeumanCylinderCompartment->SetOrientationTheta(num);
             m_ZeppelinCompartment->SetOrientationTheta(num);
             this->Superclass::SetOrientationTheta(num);
         }
@@ -49,8 +47,6 @@ namespace anima
         if (num != this->GetOrientationPhi())
         {
             m_VanGelderenCylinderCompartment->SetOrientationPhi(num);
-            m_StaniszCylinderCompartment->SetOrientationPhi(num);
-            m_NeumanCylinderCompartment->SetOrientationPhi(num);
             m_ZeppelinCompartment->SetOrientationPhi(num);
             this->Superclass::SetOrientationPhi(num);
         }
@@ -69,16 +65,9 @@ namespace anima
     {
         if (num != this->GetAxialDiffusivity())
         {
-            // m_StaniszCylinderCompartment->SetAxialDiffusivity(num);
-            // m_NeumanCylinderCompartment->SetAxialDiffusivity(num);
-            // m_ZeppelinCompartment->SetAxialDiffusivity(num);
-            // this->Superclass::SetAxialDiffusivity(num);
-            double intrinsicDiffusivity = 1.7e-3;
-            m_VanGelderenCylinderCompartment->SetAxialDiffusivity(intrinsicDiffusivity);
-            m_StaniszCylinderCompartment->SetAxialDiffusivity(intrinsicDiffusivity);
-            m_NeumanCylinderCompartment->SetAxialDiffusivity(intrinsicDiffusivity);
-            m_ZeppelinCompartment->SetAxialDiffusivity(intrinsicDiffusivity);
-            this->Superclass::SetAxialDiffusivity(intrinsicDiffusivity);
+            m_VanGelderenCylinderCompartment->SetAxialDiffusivity(num);
+            m_ZeppelinCompartment->SetAxialDiffusivity(num);
+            this->Superclass::SetAxialDiffusivity(num);
         }
     }
 
@@ -104,8 +93,6 @@ namespace anima
         {
             double radius = 0.0005;
             m_VanGelderenCylinderCompartment->SetTissueRadius(radius);
-            m_StaniszCylinderCompartment->SetTissueRadius(radius);
-            m_NeumanCylinderCompartment->SetTissueRadius(radius);
             this->Superclass::SetTissueRadius(radius);
         }
     }
@@ -239,8 +226,7 @@ namespace anima
             return;
 
         m_VanGelderenCylinderCompartment->SetEstimateAxialDiffusivity(arg);
-        m_StaniszCylinderCompartment->SetEstimateAxialDiffusivity(arg);
-        m_NeumanCylinderCompartment->SetEstimateAxialDiffusivity(arg);
+        m_ZeppelinCompartment->SetEstimateDiffusivities(arg);
         m_EstimateDiffusivities = arg;
         m_ChangedConstraints = true;
     }
@@ -251,8 +237,6 @@ namespace anima
             return;
 
         m_VanGelderenCylinderCompartment->SetEstimateTissueRadius(arg);
-        m_StaniszCylinderCompartment->SetEstimateTissueRadius(arg);
-        m_NeumanCylinderCompartment->SetEstimateTissueRadius(arg);
         m_EstimateTissueRadius = arg;
         m_ChangedConstraints = true;
     }
