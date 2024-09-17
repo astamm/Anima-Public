@@ -57,7 +57,8 @@ namespace anima
         if (num != this->GetExtraAxonalFraction())
         {
             this->Superclass::SetExtraAxonalFraction(num);
-            this->SetRadialDiffusivity1(num);
+            if (m_UseTortuosityModel)
+                this->SetRadialDiffusivity1(num);
         }
     }
 
@@ -68,6 +69,8 @@ namespace anima
             m_VanGelderenCylinderCompartment->SetAxialDiffusivity(num);
             m_ZeppelinCompartment->SetAxialDiffusivity(num);
             this->Superclass::SetAxialDiffusivity(num);
+            if (m_UseTortuosityModel)
+                this->SetRadialDiffusivity1(num);
         }
     }
 

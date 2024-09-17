@@ -405,7 +405,7 @@ namespace anima
         {
             double tmpVal = (i + 1.0) / (coarseGridSize + 1.0);
             m_ValuesCoarseGrid[0][i] = tmpVal;
-            m_ValuesCoarseGrid[1][i] = anima::MCMTissueRadiusLowerBound + tmpVal * (anima::MCMTissueRadiusUpperBound - anima::MCMTissueRadiusLowerBound);
+            m_ValuesCoarseGrid[1][i] = 0.0005; // anima::MCMTissueRadiusLowerBound + tmpVal * (anima::MCMTissueRadiusUpperBound - anima::MCMTissueRadiusLowerBound);
         }
     }
 
