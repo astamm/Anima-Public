@@ -84,11 +84,16 @@ namespace anima
 
     void CHARMEDCompartment::SetRadialDiffusivity1(double num)
     {
+        if (!m_UseTortuosityModel)
+        {
+            m_ZeppelinCompartment->SetRadialDiffusivity1(num);
+            this->Superclass::SetRadialDiffusivity1(num);
+            return;
+        }
+
         double axialDiff = this->GetAxialDiffusivity();
         double fr = 1.0 - this->GetExtraAxonalFraction();
         double radialDiff = axialDiff * (1.0 - 0.8 * fr);
-        // double radialDiff = num;
-        // double radialDiff = 2.0e-4;
         m_ZeppelinCompartment->SetRadialDiffusivity1(radialDiff);
         this->Superclass::SetRadialDiffusivity1(radialDiff);
     }

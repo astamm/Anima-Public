@@ -67,6 +67,8 @@ namespace anima
         bool GetTensorCompatible() ITK_OVERRIDE { return false; }
         double GetApparentFractionalAnisotropy() ITK_OVERRIDE;
 
+        void SetUseTortuosityModel(bool val) { m_UseTortuosityModel = val; }
+
     protected:
         CHARMEDCompartment() : Superclass()
         {
@@ -90,6 +92,8 @@ namespace anima
             m_ZeppelinCompartment = anima::ZeppelinCompartment::New();
             m_ZeppelinCompartment->SetEstimateDiffusivities(false);
 
+            m_UseTortuosityModel = true;
+
             // Genu of corpus callosum (from Aboitiz et al. 1992)
             m_RadiusValues = {2.73e-4, 3.44e-4, 4.02e-4, 4.57e-4, 5.12e-4, 5.72e-4, 6.41e-4, 7.29e-4, 8.63e-4};
             m_RadiusWeights = {0.0943, 0.1281, 0.1428, 0.1455, 0.1390, 0.1251, 0.1044, 0.0773, 0.0435};
@@ -107,6 +111,7 @@ namespace anima
         anima::NeumanCylinderCompartment::Pointer m_NeumanCylinderCompartment;
         anima::VanGelderenCylinderCompartment::Pointer m_VanGelderenCylinderCompartment;
         anima::ZeppelinCompartment::Pointer m_ZeppelinCompartment;
+        bool m_UseTortuosityModel;
 
         std::vector<double> m_RadiusValues;
         std::vector<double> m_RadiusWeights;

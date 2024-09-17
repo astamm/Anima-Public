@@ -6,6 +6,9 @@
 #include <itkMacro.h>
 #include <itkSymmetricEigenAnalysis.h>
 
+#include <vnl/algo/vnl_determinant.h>
+#include <vnl/algo/vnl_matrix_inverse.h>
+
 namespace anima
 {
 
@@ -328,8 +331,15 @@ namespace anima
 
             if (std::abs(resNorm - 1.0) > this->GetEpsilon())
             {
-                std::cout << "Sampled direction norm: " << resNorm << std::endl;
+                sample[i] = m_MeanAxis;
+                continue;
+                std::cout << "\nDeterminant of rotation matrix: " << vnl_determinant<double>(m_NorthToMeanAxisRotationMatrix.GetVnlMatrix()) << std::endl;
+                std::cout << "Check whether inverse matches transpose:\n" << m_NorthToMeanAxisRotationMatrix.GetInverse() - m_NorthToMeanAxisRotationMatrix.GetTranspose() << std::endl;
+                std::cout << "Value of S: " << S << std::endl;
+                std::cout << "Sampled direction norm before rotation: " << tmpVec.GetNorm() << std::endl;
+                std::cout << "Sampled direction norm after rotation: " << resNorm << std::endl;
                 std::cout << "Mean direction: " << m_MeanAxis << std::endl;
+                std::cout << "Mean direction norm: " << m_MeanAxis.GetNorm() << std::endl;
                 std::cout << "Concentration parameter: " << m_ConcentrationParameter << std::endl;
                 throw itk::ExceptionObject(__FILE__, __LINE__, "The Watson sampler should generate points on the 2-sphere.", ITK_LOCATION);
             }

@@ -362,12 +362,25 @@ itk::Point <TInput, NDimensions> computeAffineLSWFromTranslations(std::vector < 
 
 template <class TInput, class TOutput> vnl_matrix <TOutput> computeRotationFromQuaternion(vnl_vector <TInput> eigenVector)
 {
-    double normVector = 0;
+    double normVector = 0.0;
 
     for (unsigned int i = 0;i < eigenVector.size();++i)
-        normVector += eigenVector[i]*eigenVector[i];
+        normVector += eigenVector[i] * eigenVector[i];
 
-    vnl_matrix <TOutput> resVal(3,3,0);
+    vnl_matrix <TOutput> resVal(3, 3, 0);
+
+    // https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation
+    // resVal.put(0, 0, 1.0 - 2.0 / quatSquaredNorm * (eigenVector[2] * eigenVector[2] + eigenVector[3] * eigenVector[3]));
+    // resVal.put(0, 1, 2.0 / quatSquaredNorm * (eigenVector[1] * eigenVector[2] - eigenVector[3] * eigenVector[0]));
+    // resVal.put(0, 2, 2.0 / quatSquaredNorm * (eigenVector[1] * eigenVector[3] + eigenVector[2] * eigenVector[0]));
+
+    // resVal.put(1, 0, 2.0 / quatSquaredNorm * (eigenVector[1] * eigenVector[2] + eigenVector[3] * eigenVector[0]));
+    // resVal.put(1, 1, 1.0 - 2.0 / quatSquaredNorm * (eigenVector[1] * eigenVector[1] + eigenVector[3] * eigenVector[3]));
+    // resVal.put(1, 2, 2.0 / quatSquaredNorm * (eigenVector[2] * eigenVector[3] - eigenVector[1] * eigenVector[0]));
+
+    // resVal.put(2, 0, 2.0 / quatSquaredNorm * (eigenVector[1] * eigenVector[3] - eigenVector[2] * eigenVector[0]));
+    // resVal.put(2, 1, 2.0 / quatSquaredNorm * (eigenVector[2] * eigenVector[3] + eigenVector[1] * eigenVector[0]));
+    // resVal.put(2, 2, 1.0 - 2.0 / quatSquaredNorm * (eigenVector[1] * eigenVector[1] + eigenVector[2] * eigenVector[2]));
 
     resVal(0,0) = (1.0/normVector) * (eigenVector[0]*eigenVector[0] + eigenVector[1]*eigenVector[1] - eigenVector[2]*eigenVector[2] - eigenVector[3]*eigenVector[3]);
     resVal(0,1) = (2.0/normVector) * (eigenVector[1]*eigenVector[2] - eigenVector[0]*eigenVector[3]);
