@@ -22,35 +22,35 @@ namespace anima
     {
     public:
         /** Standard class typedefs. */
-        typedef MCMEstimatorImageFilter<InputPixelType, OutputPixelType> Self;
-        typedef itk::Image<InputPixelType, 3> TInputImage;
-        typedef anima::MCMImage<OutputPixelType, 3> ModelImageType;
-        typedef itk::Image<InputPixelType, 4> Image4DType;
-        typedef anima::MCMImage<OutputPixelType, 3> TOutputImage;
-        typedef itk::Image<OutputPixelType, 3> OutputScalarImageType;
-        typedef typename OutputScalarImageType::Pointer OutputScalarImagePointer;
-        typedef anima::MaskedImageToImageFilter<TInputImage, TOutputImage> Superclass;
-        typedef itk::SmartPointer<Self> Pointer;
-        typedef itk::SmartPointer<const Self> ConstPointer;
+        using Self = MCMEstimatorImageFilter<InputPixelType, OutputPixelType>;
+        using TInputImage = itk::Image<InputPixelType, 3>;
+        using ModelImageType = anima::MCMImage<OutputPixelType, 3>;
+        using Image4DType = itk::Image<InputPixelType, 4>;
+        using TOutputImage = anima::MCMImage<OutputPixelType, 3>;
+        using OutputScalarImageType = itk::Image<OutputPixelType, 3>;
+        using OutputScalarImagePointer = typename OutputScalarImageType::Pointer;
+        using Superclass = anima::MaskedImageToImageFilter<TInputImage, TOutputImage>;
+        using Pointer = itk::SmartPointer<Self>;
+        using ConstPointer = itk::SmartPointer<const Self>;
 
-        typedef itk::Image<unsigned char, 3> MoseImageType;
-        typedef typename MoseImageType::Pointer MoseImagePointer;
+        using MoseImageType = itk::Image<unsigned char, 3>;
+        using MoseImagePointer = typename MoseImageType::Pointer;
 
-        typedef itk::VectorImage<OutputPixelType, 3> VectorImageType;
-        typedef typename VectorImageType::Pointer VectorImagePointer;
+        using VectorImageType = itk::VectorImage<OutputPixelType, 3>;
+        using VectorImagePointer = typename VectorImageType::Pointer;
 
-        typedef anima::MultiCompartmentModelCreator MCMCreatorType;
-        typedef anima::MultiCompartmentModelCreator::CompartmentType CompartmentType;
-        typedef anima::BaseCompartment BaseCompartmentType;
-        typedef MCMCreatorType::MCMType MCMType;
-        typedef MCMCreatorType::MCMPointer MCMPointer;
-        typedef MCMType::ListType MCMVectorType;
+        using MCMCreatorType = anima::MultiCompartmentModelCreator;
+        using CompartmentType = anima::MultiCompartmentModelCreator::CompartmentType;
+        using BaseCompartmentType = anima::BaseCompartment;
+        using MCMType = MCMCreatorType::MCMType;
+        using MCMPointer = MCMCreatorType::MCMPointer;
+        using MCMVectorType = MCMType::ListType;
 
-        typedef itk::NonLinearOptimizer OptimizerType;
-        typedef OptimizerType::Pointer OptimizerPointer;
-        typedef OptimizerType::ParametersType ParametersType;
-        typedef itk::CostFunction CostFunctionBaseType;
-        typedef CostFunctionBaseType::Pointer CostFunctionBasePointer;
+        using OptimizerType = itk::NonLinearOptimizer;
+        using OptimizerPointer = OptimizerType::Pointer;
+        using ParametersType = OptimizerType::ParametersType;
+        using CostFunctionBaseType = itk::CostFunction;
+        using CostFunctionBasePointer = CostFunctionBaseType::Pointer;
 
         //! Denotes noise type on input signal. Based on this, a different cost function should be created
         enum SignalNoiseType
@@ -73,18 +73,18 @@ namespace anima
         itkTypeMacro(MCMEstimatorImageFilter, MaskedImageToImageFilter);
 
         /** Image typedef support */
-        typedef TInputImage InputImageType;
-        typedef TOutputImage OutputImageType;
-        typedef typename InputImageType::Pointer InputImagePointer;
-        typedef typename OutputImageType::PixelType VariableLengthVectorType;
-        typedef typename OutputImageType::Pointer OutputImagePointer;
+        using InputImageType = TInputImage;
+        using OutputImageType = TOutputImage;
+        using InputImagePointer = typename InputImageType::Pointer;
+        using VariableLengthVectorType = typename OutputImageType::PixelType;
+        using OutputImagePointer = typename OutputImageType::Pointer;
 
         /** Superclass typedefs. */
-        typedef typename Superclass::MaskImageType MaskImageType;
-        typedef typename Superclass::InputImageRegionType InputImageRegionType;
-        typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
+        using MaskImageType = typename Superclass::MaskImageType;
+        using InputImageRegionType = typename Superclass::InputImageRegionType;
+        using OutputImageRegionType = typename Superclass::OutputImageRegionType;
 
-        typedef vnl_vector_fixed<double, 3> GradientType;
+        using GradientType = vnl_vector_fixed<double, 3>;
 
         // Acquisition-related parameters
         void SetGradientStrengths(std::vector<double> &mb) { m_GradientStrengths = mb; }

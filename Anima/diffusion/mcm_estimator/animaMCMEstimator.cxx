@@ -218,10 +218,10 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    typedef anima::MCMEstimatorImageFilter<double, double> FilterType;
-    typedef FilterType::InputImageType InputImageType;
-    typedef FilterType::MaskImageType MaskImageType;
-    typedef FilterType::Pointer FilterPointer;
+    using FilterType = anima::MCMEstimatorImageFilter<double, double>;
+    using InputImageType = FilterType::InputImageType;
+    using MaskImageType = FilterType::MaskImageType;
+    using FilterPointer = FilterType::Pointer;
 
     itk::CStyleCommand::Pointer callback = itk::CStyleCommand::New();
     callback->SetCallback(eventCallback);
@@ -247,7 +247,7 @@ int main(int argc, char **argv)
     // Load gradient table and b-value list
     std::cout << "Importing gradient table and b-values..." << std::endl;
 
-    typedef anima::GradientFileReader<vnl_vector_fixed<double, 3>, double> GFReaderType;
+    using GFReaderType = anima::GradientFileReader<vnl_vector_fixed<double, 3>, double>;
     GFReaderType gfReader;
     gfReader.SetGradientFileName(gradsArg.getValue());
     gfReader.SetBValueBaseString(bvalsArg.getValue());
