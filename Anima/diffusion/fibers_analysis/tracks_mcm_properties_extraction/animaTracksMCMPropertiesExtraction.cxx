@@ -65,8 +65,6 @@ void ComputePropertiesOnOneCell(vtkCell *cell, anima::MCMLinearInterpolateImageF
     {
         if (mcm->GetCompartment(i)->GetCompartmentType() == anima::FreeWater)
             fwCompartmentIndex = i;
-        else if (mcm->GetCompartment(i)->GetCompartmentType() == anima::IsotropicRestrictedWater)
-            irwCompartmentIndex = i;
     }
 
     for (int j = 0;j < nbOfCellPts;++j)
@@ -274,19 +272,12 @@ int main(int argc,  char **argv)
 
     int nbOfComponents = 4;
     bool hasFW = false;
-    bool hasIRW = false;
     for (unsigned int i = 0;i < mcm->GetNumberOfIsotropicCompartments();++i)
     {
         if (mcm->GetCompartment(i)->GetCompartmentType() == anima::FreeWater)
         {
             ++nbOfComponents;
             hasFW = true;
-        }
-
-        if (mcm->GetCompartment(i)->GetCompartmentType() == anima::IsotropicRestrictedWater)
-        {
-            ++nbOfComponents;
-            hasIRW = true;
         }
     }
 
@@ -308,9 +299,6 @@ int main(int argc,  char **argv)
         myParameters[pos]->SetName("Free water fraction");
         ++pos;
     }
-
-    if (hasIRW)
-        myParameters[pos]->SetName("Isotropic restricted water fraction");
 
     ThreaderArguments tmpStr;
     tmpStr.mcm = mcm;

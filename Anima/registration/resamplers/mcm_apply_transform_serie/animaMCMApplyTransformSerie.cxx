@@ -110,9 +110,7 @@ int main(int ac, const char** av)
     anima::MultiCompartmentModelCreator mcmCreator;
 
     mcmCreator.SetModelWithFreeWaterComponent(false);
-    mcmCreator.SetModelWithRestrictedWaterComponent(false);
-    mcmCreator.SetModelWithStaniszComponent(false);
-    mcmCreator.SetModelWithStationaryWaterComponent(false);
+    mcmCreator.SetModelWithSphereComponent(false);
 
     for (unsigned int i = 0;i < numIsotropicCompartments;++i)
     {
@@ -121,18 +119,13 @@ int main(int ac, const char** av)
             case anima::FreeWater:
                 mcmCreator.SetModelWithFreeWaterComponent(true);
                 break;
+            
+            case anima::SphereGPDPulsedGradient:
+                mcmCreator.SetModelWithSphereComponent(true);
 
-            case anima::IsotropicRestrictedWater:
-                mcmCreator.SetModelWithRestrictedWaterComponent(true);
-                break;
-
-            case anima::Stanisz:
-                mcmCreator.SetModelWithStaniszComponent(true);
-                break;
-
-            case anima::StationaryWater:
+            case anima::PlaneSGPPulsedGradient:
             default:
-                mcmCreator.SetModelWithStationaryWaterComponent(true);
+                mcmCreator.SetModelWithSphereComponent(true);
                 break;
         }
     }

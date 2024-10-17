@@ -32,12 +32,8 @@ int main(int argc, char **argv)
     TCLAP::SwitchArg aicSelectNbCompartmentsArg("M", "opt-nb-comp", "Activate AICC-based number of compartments selection", cmd, false);
 
     TCLAP::SwitchArg freeWaterCompartmentArg("F", "free-water", "Model with free water", cmd, false);
-    TCLAP::SwitchArg stationaryWaterCompartmentArg("W", "stationary-water", "Model with stationary water", cmd, false);
-    TCLAP::SwitchArg restrictedWaterCompartmentArg("R", "restricted-water", "Model with restricted water", cmd, false);
     TCLAP::SwitchArg staniszCompartmentArg("Z", "stanisz", "Model with stanisz isotropic compartment", cmd, false);
 
-    TCLAP::SwitchArg optFWDiffArg("", "opt-free-water-diff", "Optimize free water diffusivity value", cmd, false);
-    TCLAP::SwitchArg optIRWDiffArg("", "opt-ir-water-diff", "Optimize isotropic restricted water diffusivity value", cmd, false);
     TCLAP::SwitchArg optStaniszRadiusArg("", "opt-stanisz-radius", "Optimize isotropic Stanisz radius value", cmd, false);
     TCLAP::SwitchArg optStaniszDiffArg("", "opt-stanisz-diff", "Optimize isotropic Stanisz diffusivity value", cmd, false);
 
@@ -53,7 +49,6 @@ int main(int argc, char **argv)
     TCLAP::ValueArg<double> initAxialDiffArg("", "init-axial-diff", "Initial axial diffusivity (default: 1.71e-3)", false, 1.71e-3, "initial axial diffusivity", cmd);
     TCLAP::ValueArg<double> initRadialDiff1Arg("", "init-radial-diff1", "Initial first radial diffusivity (default: 1.9e-4)", false, 1.9e-4, "initial first radial diffusivity", cmd);
     TCLAP::ValueArg<double> initRadialDiff2Arg("", "init-radial-diff2", "Initial second radial diffusivity (default: 1.5e-4)", false, 1.5e-4, "initial second radial diffusivity", cmd);
-    TCLAP::ValueArg<double> initIRWDiffArg("", "init-irw-diff", "Initial isotropic restricted diffusivity (default: 7.5e-4)", false, 7.5e-4, "initial IRW diffusivity", cmd);
     TCLAP::ValueArg<double> initStaniszDiffArg("", "init-stanisz-diff", "Initial Stanisz diffusivity (default: 1.71e-3)", false, 1.71e-3, "initial Stanisz diffusivity", cmd);
 
     // Optimization parameters
@@ -112,18 +107,13 @@ int main(int argc, char **argv)
     mainFilter->SetCompartmentType(compartmentTypeArg.getValue());
 
     mainFilter->SetFreeWaterCompartment(freeWaterCompartmentArg.isSet());
-    mainFilter->SetStationaryWaterCompartment(stationaryWaterCompartmentArg.isSet());
-    mainFilter->SetRestrictedWaterCompartment(restrictedWaterCompartmentArg.isSet());
-    mainFilter->SetStaniszCompartment(staniszCompartmentArg.isSet());
+    mainFilter->SetSphereCompartment(staniszCompartmentArg.isSet());
 
     mainFilter->SetAxialDiffusivityValue(initAxialDiffArg.getValue());
     mainFilter->SetRadialDiffusivity1Value(initRadialDiff1Arg.getValue());
     mainFilter->SetRadialDiffusivity2Value(initRadialDiff2Arg.getValue());
-    mainFilter->SetIRWDiffusivityValue(initIRWDiffArg.getValue());
-    mainFilter->SetStaniszDiffusivityValue(initStaniszDiffArg.getValue());
+    mainFilter->SetSphereDiffusivityValue(initStaniszDiffArg.getValue());
 
-    mainFilter->SetOptimizeFreeWaterDiffusivity(optFWDiffArg.isSet());
-    mainFilter->SetOptimizeIRWDiffusivity(optIRWDiffArg.isSet());
     mainFilter->SetOptimizeStaniszDiffusivity(optStaniszDiffArg.isSet());
     mainFilter->SetOptimizeStaniszRadius(optStaniszRadiusArg.isSet());
 

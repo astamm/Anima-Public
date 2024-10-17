@@ -20,8 +20,7 @@ LowMemMCMEstimatorBridge::LowMemMCMEstimatorBridge()
     m_BigDelta = anima::DiffusionBigDelta;
 
     m_AxialDiffusivityValue = 1.71e-3;
-    m_StaniszDiffusivityValue = 1.71e-3;
-    m_IRWDiffusivityValue = 7.5e-4;
+    m_SphereDiffusivityValue = 1.71e-3;
     m_RadialDiffusivity1Value = 1.9e-4;
     m_RadialDiffusivity2Value = 1.5e-4;
 }
@@ -158,30 +157,28 @@ void LowMemMCMEstimatorBridge::Update(int specificSplitToDo, bool genOutputDescr
         filter->SetB0Threshold(m_B0Threshold);
 
         filter->SetModelWithFreeWaterComponent(m_FreeWaterCompartment);
-        filter->SetModelWithStationaryWaterComponent(m_StationaryWaterCompartment);
-        filter->SetModelWithRestrictedWaterComponent(m_RestrictedWaterCompartment);
-        filter->SetModelWithStaniszComponent(m_StaniszCompartment);
+        filter->SetModelWithSphereComponent(m_SphereCompartment);
 
         switch (m_CompartmentType)
         {
             case 1:
-                filter->SetCompartmentType(anima::Stick);
+                filter->SetCylinderCompartmentType(anima::Stick);
                 break;
 
             case 2:
-                filter->SetCompartmentType(anima::Zeppelin);
+                filter->SetCylinderCompartmentType(anima::Zeppelin);
                 break;
 
             case 3:
-                filter->SetCompartmentType(anima::Tensor);
+                filter->SetCylinderCompartmentType(anima::Tensor);
                 break;
 
             case 4:
-                filter->SetCompartmentType(anima::NODDI);
+                filter->SetCylinderCompartmentType(anima::NODDI);
                 break;
 
             case 5:
-                filter->SetCompartmentType(anima::DDI);
+                filter->SetCylinderCompartmentType(anima::DDI);
                 break;
 
             default:
@@ -191,8 +188,7 @@ void LowMemMCMEstimatorBridge::Update(int specificSplitToDo, bool genOutputDescr
         filter->SetAxialDiffusivityValue(m_AxialDiffusivityValue);
         filter->SetRadialDiffusivity1Value(m_RadialDiffusivity1Value);
         filter->SetRadialDiffusivity2Value(m_RadialDiffusivity2Value);
-        filter->SetIRWDiffusivityValue(m_IRWDiffusivityValue);
-        filter->SetStaniszDiffusivityValue(m_StaniszDiffusivityValue);
+        filter->SetSphereDiffusivityValue(m_SphereDiffusivityValue);
 
         filter->SetNumberOfCompartments(m_NumberOfFascicles);
 
@@ -208,8 +204,6 @@ void LowMemMCMEstimatorBridge::Update(int specificSplitToDo, bool genOutputDescr
         filter->SetNumberOfCoils(m_NumberOfCoils);
 
         filter->SetUseConstrainedDiffusivity(m_FixDiffusivity);
-        filter->SetUseConstrainedFreeWaterDiffusivity(!m_OptimizeFreeWaterDiffusivity);
-        filter->SetUseConstrainedIRWDiffusivity(!m_OptimizeIRWDiffusivity);
         filter->SetUseConstrainedStaniszDiffusivity(!m_OptimizeStaniszDiffusivity);
         filter->SetUseConstrainedStaniszRadius(!m_OptimizeStaniszRadius);
 

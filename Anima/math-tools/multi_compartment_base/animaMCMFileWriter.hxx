@@ -142,26 +142,18 @@ MCMFileWriter <PixelType, ImageDimension>
             case FreeWater:
                 outputHeaderFile << "<Type>FreeWater</Type>" << std::endl;
                 break;
-
-            case StationaryWater:
-                outputHeaderFile << "<Type>StationaryWater</Type>" << std::endl;
-                break;
-
-            case Stanisz:
-                outputHeaderFile << "<Type>Stanisz</Type>" << std::endl;
-                break;
             
             case SphereGPDPulsedGradient:
                 outputHeaderFile << "<Type>SphereGPDPulsedGradient</Type>" << std::endl;
                 break;
             
-            case CHARMED:
-                outputHeaderFile << "<Type>CHARMED</Type>" << std::endl;
+            case PlaneSGPPulsedGradient:
+                outputHeaderFile << "<Type>PlaneSGPPulsedGradient</Type>" << std::endl;
                 break;
-
-            case IsotropicRestrictedWater:
+            
+            case CHARMED:
             default:
-                outputHeaderFile << "<Type>IRWater</Type>" << std::endl;
+                outputHeaderFile << "<Type>CHARMED</Type>" << std::endl;
                 break;
         }
 
@@ -171,9 +163,9 @@ MCMFileWriter <PixelType, ImageDimension>
         BaseOutputImagePointer compartmentImage = BaseOutputImageType::New();
         compartmentImage->Initialize();
         compartmentImage->SetRegions(m_InputImage->GetLargestPossibleRegion());
-        compartmentImage->SetSpacing (m_InputImage->GetSpacing());
-        compartmentImage->SetOrigin (m_InputImage->GetOrigin());
-        compartmentImage->SetDirection (m_InputImage->GetDirection());
+        compartmentImage->SetSpacing(m_InputImage->GetSpacing());
+        compartmentImage->SetOrigin(m_InputImage->GetOrigin());
+        compartmentImage->SetDirection(m_InputImage->GetDirection());
         compartmentImage->SetVectorLength(compartmentSize);
         compartmentImage->Allocate();
 

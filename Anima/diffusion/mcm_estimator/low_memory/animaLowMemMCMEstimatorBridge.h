@@ -57,12 +57,8 @@ public:
     void SetCompartmentType(unsigned int cType) {m_CompartmentType = cType;}
 
     void SetFreeWaterCompartment(bool fwComp) {m_FreeWaterCompartment = fwComp;}
-    void SetStationaryWaterCompartment(bool swComp) {m_StationaryWaterCompartment = swComp;}
-    void SetRestrictedWaterCompartment(bool irwComp) {m_RestrictedWaterCompartment = irwComp;}
-    void SetStaniszCompartment(bool zComp) {m_StaniszCompartment = zComp;}
+    void SetSphereCompartment(bool zComp) {m_SphereCompartment = zComp;}
 
-    void SetOptimizeFreeWaterDiffusivity(bool opt) {m_OptimizeFreeWaterDiffusivity = opt;}
-    void SetOptimizeIRWDiffusivity(bool fix) {m_OptimizeIRWDiffusivity = fix;}
     void SetOptimizeStaniszDiffusivity(bool fix) {m_OptimizeStaniszDiffusivity = fix;}
     void SetOptimizeStaniszRadius(bool fix) {m_OptimizeStaniszRadius = fix;}
 
@@ -73,8 +69,7 @@ public:
     void SetAxialDiffusivityValue(double val) {m_AxialDiffusivityValue = val;}
     void SetRadialDiffusivity1Value(double val) {m_RadialDiffusivity1Value = val;}
     void SetRadialDiffusivity2Value(double val) {m_RadialDiffusivity2Value = val;}
-    void SetIRWDiffusivityValue(double val) {m_IRWDiffusivityValue = val;}
-    void SetStaniszDiffusivityValue(double val) {m_StaniszDiffusivityValue = val;}
+    void SetSphereDiffusivityValue(double val) {m_SphereDiffusivityValue = val;}
 
     void SetCommonDiffusivities(bool common) {m_CommonDiffusivities = common;}
     void SetCommonKappa(bool common) {m_CommonKappa = common;}
@@ -152,18 +147,17 @@ private:
     double m_B0Threshold;
     unsigned int m_NumberOfFascicles, m_CompartmentType;
 
-    bool m_FreeWaterCompartment, m_StationaryWaterCompartment, m_RestrictedWaterCompartment, m_StaniszCompartment;
+    bool m_FreeWaterCompartment, m_SphereCompartment;
     MaximumLikelihoodEstimationMode m_MLEstimationStrategy;
     bool m_FindOptimalNumberOfCompartments;
 
-    bool m_FixDiffusivity, m_OptimizeFreeWaterDiffusivity, m_OptimizeIRWDiffusivity, m_FixKappa, m_FixEAF;
+    bool m_FixDiffusivity, m_FixKappa, m_FixEAF;
     bool m_OptimizeStaniszDiffusivity, m_OptimizeStaniszRadius;
     bool m_CommonDiffusivities, m_CommonKappa, m_CommonEAF;
 
     double m_AxialDiffusivityValue;
     double m_RadialDiffusivity1Value, m_RadialDiffusivity2Value;
-    double m_IRWDiffusivityValue;
-    double m_StaniszDiffusivityValue;
+    double m_SphereDiffusivityValue;
 
     std::string m_OptimizerType;
     double m_AbsCostChange;

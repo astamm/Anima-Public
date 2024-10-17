@@ -1,4 +1,4 @@
-#include "animaStaniszCompartment.h"
+#include "animaPlaneSGPPulsedGradientCompartment.h"
 #include <animaMCMConstants.h>
 
 #include <limits>
@@ -6,7 +6,7 @@
 namespace anima
 {
 
-    StaniszCompartment::KeyType StaniszCompartment::GenerateKey(double smallDelta, double bigDelta, double gradientStrength)
+    PlaneSGPPulsedGradientCompartment::KeyType PlaneSGPPulsedGradientCompartment::GenerateKey(double smallDelta, double bigDelta, double gradientStrength)
     {
         unsigned int smallDeltaInt = std::floor(smallDelta * 1.0e6);
         unsigned int bigDeltaInt = std::floor(bigDelta * 1.0e6);
@@ -17,7 +17,7 @@ namespace anima
         return outValue;
     }
 
-    void StaniszCompartment::UpdateSignals(double smallDelta, double bigDelta, double gradientStrength)
+    void PlaneSGPPulsedGradientCompartment::UpdateSignals(double smallDelta, double bigDelta, double gradientStrength)
     {
         KeyType gradientKey = this->GenerateKey(smallDelta, bigDelta, gradientStrength);
         if (m_FirstSummations.find(gradientKey) != m_FirstSummations.end())
@@ -97,7 +97,7 @@ namespace anima
         m_FourthSummations[gradientKey] = fourthSummation;
     }
 
-    double StaniszCompartment::GetFourierTransformedDiffusionProfile(double smallDelta, double bigDelta, double gradientStrength, const Vector3DType &gradient)
+    double PlaneSGPPulsedGradientCompartment::GetFourierTransformedDiffusionProfile(double smallDelta, double bigDelta, double gradientStrength, const Vector3DType &gradient)
     {
         this->UpdateSignals(smallDelta, bigDelta, gradientStrength);
         KeyType gradientKey = this->GenerateKey(smallDelta, bigDelta, gradientStrength);
@@ -116,7 +116,7 @@ namespace anima
         return signalValue;
     }
 
-    StaniszCompartment::ListType &StaniszCompartment::GetSignalAttenuationJacobian(double smallDelta, double bigDelta, double gradientStrength, const Vector3DType &gradient)
+    PlaneSGPPulsedGradientCompartment::ListType &PlaneSGPPulsedGradientCompartment::GetSignalAttenuationJacobian(double smallDelta, double bigDelta, double gradientStrength, const Vector3DType &gradient)
     {
         this->UpdateSignals(smallDelta, bigDelta, gradientStrength);
         KeyType gradientKey = this->GenerateKey(smallDelta, bigDelta, gradientStrength);
@@ -158,7 +158,7 @@ namespace anima
         return m_JacobianVector;
     }
 
-    double StaniszCompartment::GetLogDiffusionProfile(const Vector3DType &sample)
+    double PlaneSGPPulsedGradientCompartment::GetLogDiffusionProfile(const Vector3DType &sample)
     {
         // Compute equivalent isotropic term for default delta values and gradient strength
         double bValue = 1000.0;
@@ -185,7 +185,7 @@ namespace anima
         return resVal;
     }
 
-    void StaniszCompartment::SetTissueRadius(double num)
+    void PlaneSGPPulsedGradientCompartment::SetTissueRadius(double num)
     {
         if (num != this->GetTissueRadius())
         {
@@ -197,7 +197,7 @@ namespace anima
         }
     }
 
-    void StaniszCompartment::SetAxialDiffusivity(double num)
+    void PlaneSGPPulsedGradientCompartment::SetAxialDiffusivity(double num)
     {
         if (num != this->GetAxialDiffusivity())
         {
@@ -209,7 +209,7 @@ namespace anima
         }
     }
 
-    void StaniszCompartment::SetParametersFromVector(const ListType &params)
+    void PlaneSGPPulsedGradientCompartment::SetParametersFromVector(const ListType &params)
     {
         if (params.size() != this->GetNumberOfParameters())
             return;
@@ -225,7 +225,7 @@ namespace anima
             this->SetAxialDiffusivity(params[pos]);
     }
 
-    StaniszCompartment::ListType &StaniszCompartment::GetParametersAsVector()
+    PlaneSGPPulsedGradientCompartment::ListType &PlaneSGPPulsedGradientCompartment::GetParametersAsVector()
     {
         m_ParametersVector.resize(this->GetNumberOfParameters());
 
@@ -242,7 +242,7 @@ namespace anima
         return m_ParametersVector;
     }
 
-    StaniszCompartment::ListType &StaniszCompartment::GetParameterLowerBounds()
+    PlaneSGPPulsedGradientCompartment::ListType &PlaneSGPPulsedGradientCompartment::GetParameterLowerBounds()
     {
         m_ParametersLowerBoundsVector.resize(this->GetNumberOfParameters());
 
@@ -259,7 +259,7 @@ namespace anima
         return m_ParametersLowerBoundsVector;
     }
 
-    StaniszCompartment::ListType &StaniszCompartment::GetParameterUpperBounds()
+    PlaneSGPPulsedGradientCompartment::ListType &PlaneSGPPulsedGradientCompartment::GetParameterUpperBounds()
     {
         m_ParametersUpperBoundsVector.resize(this->GetNumberOfParameters());
 
@@ -276,7 +276,7 @@ namespace anima
         return m_ParametersUpperBoundsVector;
     }
 
-    void StaniszCompartment::SetEstimateAxialDiffusivity(bool arg)
+    void PlaneSGPPulsedGradientCompartment::SetEstimateAxialDiffusivity(bool arg)
     {
         if (m_EstimateAxialDiffusivity == arg)
             return;
@@ -285,7 +285,7 @@ namespace anima
         m_ChangedConstraints = true;
     }
 
-    void StaniszCompartment::SetEstimateTissueRadius(bool arg)
+    void PlaneSGPPulsedGradientCompartment::SetEstimateTissueRadius(bool arg)
     {
         if (m_EstimateTissueRadius == arg)
             return;
@@ -294,7 +294,7 @@ namespace anima
         m_ChangedConstraints = true;
     }
 
-    void StaniszCompartment::SetCompartmentVector(ModelOutputVectorType &compartmentVector)
+    void PlaneSGPPulsedGradientCompartment::SetCompartmentVector(ModelOutputVectorType &compartmentVector)
     {
         if (compartmentVector.GetSize() != this->GetCompartmentSize())
             itkExceptionMacro("The input vector size does not match the size of the compartment");
@@ -303,12 +303,12 @@ namespace anima
         this->SetAxialDiffusivity(compartmentVector[1]);
     }
 
-    unsigned int StaniszCompartment::GetCompartmentSize()
+    unsigned int PlaneSGPPulsedGradientCompartment::GetCompartmentSize()
     {
         return 2;
     }
 
-    unsigned int StaniszCompartment::GetNumberOfParameters()
+    unsigned int PlaneSGPPulsedGradientCompartment::GetNumberOfParameters()
     {
         if (!m_ChangedConstraints)
             return m_NumberOfParameters;
@@ -325,7 +325,7 @@ namespace anima
         return m_NumberOfParameters;
     }
 
-    StaniszCompartment::ModelOutputVectorType &StaniszCompartment::GetCompartmentVector()
+    PlaneSGPPulsedGradientCompartment::ModelOutputVectorType &PlaneSGPPulsedGradientCompartment::GetCompartmentVector()
     {
         if (m_CompartmentVector.GetSize() != this->GetCompartmentSize())
             m_CompartmentVector.SetSize(this->GetCompartmentSize());
@@ -336,7 +336,7 @@ namespace anima
         return m_CompartmentVector;
     }
 
-    double StaniszCompartment::GetApparentFractionalAnisotropy()
+    double PlaneSGPPulsedGradientCompartment::GetApparentFractionalAnisotropy()
     {
         return 0.0;
     }

@@ -82,9 +82,7 @@ MCMScalarMapsImageFilter <TPixelType>
 
             if (currentComp->GetCompartmentType() == anima::FreeWater)
                 fwWeight += weight;
-            else if (currentComp->GetCompartmentType() == anima::IsotropicRestrictedWater)
-                isoRWeight += weight;
-            else if (currentComp->GetCompartmentType() == anima::Stanisz)
+            else if (currentComp->GetCompartmentType() == anima::PlaneSGPPulsedGradient)
                 isoRWeight += weight;
         }
 

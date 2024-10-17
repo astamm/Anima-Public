@@ -14,21 +14,18 @@ namespace anima
     enum DiffusionModelCompartmentType
     {
         FreeWater = 0,
-        StationaryWater,
-        IsotropicRestrictedWater,
-        Stanisz,
         SphereGPDPulsedGradient,
+        PlaneSGPPulsedGradient,
         Stick,
         Zeppelin,
         Tensor,
         NODDI,
         DDI,
+        CylinderGPDPulsedGradient,
         CHARMED,
-        StaniszCylinder,
         Neuman,
-        NeumanCylinder,
         VanGelderen,
-        VanGelderenCylinder
+        NeumanCylinder
     };
 
     class ANIMAMCMBASE_EXPORT BaseCompartment : public itk::LightObject

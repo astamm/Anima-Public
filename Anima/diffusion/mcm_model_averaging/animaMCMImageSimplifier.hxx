@@ -28,10 +28,8 @@ MCMImageSimplifier<PixelScalarType>
 ::InitializeReferenceOutputModel()
 {
     // We assume that all non free water compartments are of the same type
-    bool modelWithIRW = false;
-    bool modelWithSW = false;
     bool modelWithFW = false;
-    bool modelWithStanisz = false;
+    bool modelWithSphere = false;
 
     InputImageType *inImage = const_cast <InputImageType *> (this->GetInput());
     unsigned int numIsotropicCompartments = inImage->GetDescriptionModel()->GetNumberOfIsotropicCompartments();
@@ -44,15 +42,14 @@ MCMImageSimplifier<PixelScalarType>
             case anima::FreeWater:
                 modelWithFW = true;
                 break;
-            case anima::StationaryWater:
-                modelWithSW = true;
+            
+            case anima::SphereGPDPulsedGradient:
+                modelWithSphere = true;
                 break;
-            case anima::Stanisz:
-                modelWithStanisz = true;
-                break;
-            case anima::IsotropicRestrictedWater:
+                
+            case anima::PlaneSGPPulsedGradient:
             default:
-                modelWithIRW = true;
+                modelWithSphere = true;
                 break;
         }
     }
@@ -78,9 +75,7 @@ MCMImageSimplifier<PixelScalarType>
     typedef anima::MultiCompartmentModelCreator MCMCreatorType;
     MCMCreatorType mcmCreator;
     mcmCreator.SetModelWithFreeWaterComponent(modelWithFW);
-    mcmCreator.SetModelWithRestrictedWaterComponent(modelWithIRW);
-    mcmCreator.SetModelWithStationaryWaterComponent(modelWithSW);
-    mcmCreator.SetModelWithStaniszComponent(modelWithStanisz);
+    mcmCreator.SetModelWithSphereComponent(modelWithSphere);
     mcmCreator.SetCompartmentType(compartmentType);
     mcmCreator.SetNumberOfCompartments(maxCompartments);
 

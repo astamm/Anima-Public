@@ -99,10 +99,8 @@ MCMModelAveragingImageFilter<PixelScalarType>
     
     // We assume that all non free water compartments are of the same type
     anima::DiffusionModelCompartmentType compartmentType;
-    bool modelWithIRW = false;
-    bool modelWithSW = false;
     bool modelWithFW = false;
-    bool modelWithStanisz = false;
+    bool modelWithSphere = false;
 
     for (unsigned int i = 0;i < this->GetNumberOfIndexedInputs();++i)
     {
@@ -120,15 +118,14 @@ MCMModelAveragingImageFilter<PixelScalarType>
                     case anima::FreeWater:
                         modelWithFW = true;
                         break;
-                    case anima::StationaryWater:
-                        modelWithSW = true;
+                    
+                    case anima::SphereGPDPulsedGradient:
+                        modelWithSphere = true;
                         break;
-                    case anima::Stanisz:
-                        modelWithStanisz = true;
-                        break;
-                    case anima::IsotropicRestrictedWater:
+                    
+                    case anima::PlaneSGPPulsedGradient:
                     default:
-                        modelWithIRW = true;
+                        modelWithSphere = true;
                         break;
                 }
             }
@@ -153,9 +150,7 @@ MCMModelAveragingImageFilter<PixelScalarType>
     MCMCreatorType mcmCreator;
     
     mcmCreator.SetModelWithFreeWaterComponent(modelWithFW);
-    mcmCreator.SetModelWithStationaryWaterComponent(modelWithSW);
-    mcmCreator.SetModelWithRestrictedWaterComponent(modelWithIRW);
-    mcmCreator.SetModelWithStaniszComponent(modelWithStanisz);
+    mcmCreator.SetModelWithSphereComponent(modelWithSphere);
     
     mcmCreator.SetCompartmentType(compartmentType);
     mcmCreator.SetNumberOfCompartments(3 * numberOfCombinations);

@@ -6,11 +6,9 @@
 #include <animaCHARMEDCompartment.h>
 #include <animaDDICompartment.h>
 #include <animaFreeWaterCompartment.h>
-#include <animaIsotropicRestrictedWaterCompartment.h>
 #include <animaNODDICompartment.h>
 #include <animaSphereGPDPulsedGradientCompartment.h>
-#include <animaStaniszCompartment.h>
-#include <animaStationaryWaterCompartment.h>
+#include <animaPlaneSGPPulsedGradientCompartment.h>
 #include <animaStickCompartment.h>
 #include <animaTensorCompartment.h>
 #include <animaZeppelinCompartment.h>
@@ -180,14 +178,10 @@ MCMFileReader <PixelType, ImageDimension>
 
     if (compartmentType == "FreeWater")
         additionalCompartment = anima::FreeWaterCompartment::New();
-    else if (compartmentType == "StationaryWater")
-        additionalCompartment = anima::StationaryWaterCompartment::New();
-    else if (compartmentType == "IRWater")
-        additionalCompartment = anima::IsotropicRestrictedWaterCompartment::New();
-    else if (compartmentType == "Stanisz")
-        additionalCompartment = anima::StaniszCompartment::New();
     else if (compartmentType == "SphereGPDPulsedGradient")
         additionalCompartment = anima::SphereGPDPulsedGradientCompartment::New();
+    else if (compartmentType == "PlaneSGPPulsedGradient")
+        additionalCompartment = anima::PlaneSGPPulsedGradientCompartment::New();
     else if (compartmentType == "Stick")
         additionalCompartment = anima::StickCompartment::New();
     else if (compartmentType == "Zeppelin")

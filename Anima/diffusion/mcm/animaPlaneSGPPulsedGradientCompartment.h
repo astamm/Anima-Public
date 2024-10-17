@@ -2,16 +2,18 @@
 
 #include <animaBaseCompartment.h>
 #include <AnimaMCMExport.h>
-#include <animaStaniszCompartment.h>
+
+#include <tuple>
+#include <map>
 
 namespace anima
 {
 
-    class ANIMAMCM_EXPORT StaniszCylinderCompartment : public BaseCompartment
+    class ANIMAMCM_EXPORT PlaneSGPPulsedGradientCompartment : public BaseCompartment
     {
     public:
         // Useful typedefs
-        using Self = StaniszCylinderCompartment;
+        using Self = PlaneSGPPulsedGradientCompartment;
         using Superclass = BaseCompartment;
         using BasePointer = Superclass::Pointer;
         using Pointer = itk::SmartPointer<Self>;
@@ -24,11 +26,11 @@ namespace anima
         itkNewMacro(Self);
 
         /** Run-time type information (and related methods) */
-        itkTypeMacro(StaniszCylinderCompartment, BaseCompartment);
+        itkTypeMacro(PlaneSGPPulsedGradientCompartment, BaseCompartment);
 
         DiffusionModelCompartmentType GetCompartmentType() ITK_OVERRIDE
         {
-            return StaniszCylinder;
+            return PlaneSGPPulsedGradient;
         }
 
         virtual double GetFourierTransformedDiffusionProfile(double smallDelta, double bigDelta, double gradientStrength, const Vector3DType &gradient) ITK_OVERRIDE;
@@ -57,22 +59,35 @@ namespace anima
         double GetApparentFractionalAnisotropy() ITK_OVERRIDE;
 
     protected:
-        StaniszCylinderCompartment() : Superclass()
+        PlaneSGPPulsedGradientCompartment() : Superclass()
         {
             m_EstimateAxialDiffusivity = true;
             m_EstimateTissueRadius = true;
             m_ChangedConstraints = true;
-            m_StaniszCompartment = anima::StaniszCompartment::New();
+
+            m_SignalSummationTolerance = 1.0e-4;
         }
 
-        virtual ~StaniszCylinderCompartment() {}
+        virtual ~PlaneSGPPulsedGradientCompartment() {}
+
+        using KeyType = std::tuple<unsigned int, unsigned int, unsigned int>;
+        using MapType = std::map<KeyType, double>;
+
+        KeyType GenerateKey(double smallDelta, double bigDelta, double gradientStrength);
+
+        void UpdateSignals(double smallDelta, double bigDelta, double gradientStrength);
 
     private:
         bool m_EstimateAxialDiffusivity, m_EstimateTissueRadius;
         bool m_ChangedConstraints;
         unsigned int m_NumberOfParameters;
 
-        anima::StaniszCompartment::Pointer m_StaniszCompartment;
+        MapType m_FirstSummations, m_SecondSummations;
+        MapType m_ThirdSummations, m_FourthSummations;
+
+        double m_SignalSummationTolerance;
+
+        const unsigned int m_MaximumNumberOfSumElements = 2000;
     };
 
 } // end namespace anima

@@ -7,11 +7,11 @@
 namespace anima
 {
 
-    class ANIMAMCM_EXPORT VanGelderenCylinderCompartment : public BaseCompartment
+    class ANIMAMCM_EXPORT CylinderGPDPulsedGradientCompartment : public BaseCompartment
     {
     public:
         // Useful typedefs
-        using Self = VanGelderenCylinderCompartment;
+        using Self = CylinderGPDPulsedGradientCompartment;
         using Superclass = BaseCompartment;
         using BasePointer = Superclass::Pointer;
         using Pointer = itk::SmartPointer<Self>;
@@ -24,11 +24,11 @@ namespace anima
         itkNewMacro(Self);
 
         /** Run-time type information (and related methods) */
-        itkTypeMacro(VanGelderenCylinderCompartment, BaseCompartment);
+        itkTypeMacro(CylinderGPDPulsedGradientCompartment, BaseCompartment);
 
         DiffusionModelCompartmentType GetCompartmentType() ITK_OVERRIDE
         {
-            return VanGelderenCylinder;
+            return CylinderGPDPulsedGradient;
         }
 
         virtual double GetFourierTransformedDiffusionProfile(double smallDelta, double bigDelta, double gradientStrength, const Vector3DType &gradient) ITK_OVERRIDE;
@@ -57,7 +57,7 @@ namespace anima
         double GetApparentFractionalAnisotropy() ITK_OVERRIDE;
 
     protected:
-        VanGelderenCylinderCompartment() : Superclass()
+        CylinderGPDPulsedGradientCompartment() : Superclass()
         {
             m_EstimateAxialDiffusivity = true;
             m_EstimateTissueRadius = true;
@@ -65,7 +65,7 @@ namespace anima
             m_VanGelderenCompartment = anima::VanGelderenCompartment::New();
         }
 
-        virtual ~VanGelderenCylinderCompartment() {}
+        virtual ~CylinderGPDPulsedGradientCompartment() {}
 
     private:
         bool m_EstimateAxialDiffusivity, m_EstimateTissueRadius;

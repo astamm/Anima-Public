@@ -104,13 +104,16 @@ namespace anima
 
         // Model-related parameters
         itkSetMacro(ModelWithFreeWaterComponent, bool);
-        itkSetMacro(ModelWithStationaryWaterComponent, bool);
-        itkSetMacro(ModelWithRestrictedWaterComponent, bool);
-        itkSetMacro(ModelWithStaniszComponent, bool);
+        itkSetMacro(ModelWithSphereComponent, bool);
 
         itkSetMacro(NoiseType, SignalNoiseType);
         itkGetMacro(NoiseType, SignalNoiseType);
-        itkSetMacro(CompartmentType, CompartmentType);
+
+        itkSetMacro(SphereCompartmentType, CompartmentType);
+        itkGetMacro(SphereCompartmentType, CompartmentType);
+
+        itkSetMacro(CylinderCompartmentType, CompartmentType);
+        itkGetMacro(CylinderCompartmentType, CompartmentType);
 
         itkSetMacro(NumberOfCoils, unsigned int);
         itkGetMacro(NumberOfCoils, unsigned int);
@@ -118,10 +121,9 @@ namespace anima
         itkSetMacro(FindOptimalNumberOfCompartments, bool);
 
         itkSetMacro(UseConstrainedDiffusivity, bool);
-        itkSetMacro(UseConstrainedFreeWaterDiffusivity, bool);
-        itkSetMacro(UseConstrainedIRWDiffusivity, bool);
         itkSetMacro(UseConstrainedStaniszDiffusivity, bool);
         itkSetMacro(UseConstrainedStaniszRadius, bool);
+        itkSetMacro(UseConstrainedCylinderRadius, bool);
 
         itkSetMacro(UseConstrainedOrientationConcentration, bool);
         itkSetMacro(UseConstrainedExtraAxonalFraction, bool);
@@ -158,10 +160,11 @@ namespace anima
         void WriteMCMOutput(std::string fileName);
 
         itkSetMacro(AxialDiffusivityValue, double);
-        itkSetMacro(StaniszDiffusivityValue, double);
-        itkSetMacro(IRWDiffusivityValue, double);
+        itkSetMacro(SphereDiffusivityValue, double);
         itkSetMacro(RadialDiffusivity1Value, double);
         itkSetMacro(RadialDiffusivity2Value, double);
+        itkSetMacro(SphereRadiusValue, double);
+        itkSetMacro(CylinderRadiusValue, double);
 
         itkSetMacro(XTolerance, double);
         itkSetMacro(FTolerance, double);
@@ -185,22 +188,20 @@ namespace anima
             m_MLEstimationStrategy = Marginal;
 
             m_ModelWithFreeWaterComponent = true;
-            m_ModelWithStationaryWaterComponent = true;
-            m_ModelWithRestrictedWaterComponent = true;
-            m_ModelWithStaniszComponent = true;
+            m_ModelWithSphereComponent = true;
 
             m_NoiseType = Gaussian;
-            m_CompartmentType = anima::Tensor;
+            m_SphereCompartmentType = anima::SphereGPDPulsedGradient;
+            m_CylinderCompartmentType = anima::Tensor;
 
             m_NumberOfCoils = 1;
             m_NumberOfCompartments = 2;
             m_FindOptimalNumberOfCompartments = true;
 
             m_UseConstrainedDiffusivity = false;
-            m_UseConstrainedFreeWaterDiffusivity = true;
-            m_UseConstrainedIRWDiffusivity = true;
             m_UseConstrainedStaniszDiffusivity = true;
             m_UseConstrainedStaniszRadius = true;
+            m_UseConstrainedCylinderRadius = true;
             m_UseCommonDiffusivities = false;
 
             m_UseConstrainedOrientationConcentration = false;
@@ -209,10 +210,11 @@ namespace anima
             m_UseCommonExtraAxonalFractions = false;
 
             m_AxialDiffusivityValue = 1.71e-3;
-            m_StaniszDiffusivityValue = 1.71e-3;
-            m_IRWDiffusivityValue = 7.5e-4;
+            m_SphereDiffusivityValue = 1.71e-3;
             m_RadialDiffusivity1Value = 1.9e-4;
             m_RadialDiffusivity2Value = 1.5e-4;
+            m_SphereRadiusValue = 0.015;
+            m_CylinderRadiusValue = 0.0005;
 
             m_NumberOfImages = 0;
             m_ExternalMoseVolume = false;
@@ -333,20 +335,19 @@ namespace anima
         double m_AbsoluteCostChange;
         MaximumLikelihoodEstimationMode m_MLEstimationStrategy;
 
-        bool m_ModelWithFreeWaterComponent, m_ModelWithStationaryWaterComponent, m_ModelWithRestrictedWaterComponent, m_ModelWithStaniszComponent;
+        bool m_ModelWithFreeWaterComponent, m_ModelWithSphereComponent;
 
         SignalNoiseType m_NoiseType;
-        CompartmentType m_CompartmentType;
+        CompartmentType m_SphereCompartmentType, m_CylinderCompartmentType;
 
         unsigned int m_NumberOfCoils;
         unsigned int m_NumberOfCompartments;
         bool m_FindOptimalNumberOfCompartments;
 
         bool m_UseConstrainedDiffusivity;
-        bool m_UseConstrainedFreeWaterDiffusivity;
-        bool m_UseConstrainedIRWDiffusivity;
         bool m_UseConstrainedStaniszRadius;
         bool m_UseConstrainedStaniszDiffusivity;
+        bool m_UseConstrainedCylinderRadius;
         bool m_UseCommonDiffusivities;
 
         bool m_UseConstrainedOrientationConcentration;
@@ -355,10 +356,11 @@ namespace anima
         bool m_UseCommonExtraAxonalFractions;
 
         double m_AxialDiffusivityValue;
-        double m_IRWDiffusivityValue;
-        double m_StaniszDiffusivityValue;
+        double m_SphereDiffusivityValue;
         double m_RadialDiffusivity1Value;
         double m_RadialDiffusivity2Value;
+        double m_SphereRadiusValue;
+        double m_CylinderRadiusValue;
 
         bool m_ExternalMoseVolume;
 

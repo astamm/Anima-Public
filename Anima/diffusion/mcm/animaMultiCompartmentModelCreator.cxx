@@ -3,11 +3,9 @@
 #include <animaCHARMEDCompartment.h>
 #include <animaDDICompartment.h>
 #include <animaFreeWaterCompartment.h>
-#include <animaIsotropicRestrictedWaterCompartment.h>
 #include <animaNODDICompartment.h>
 #include <animaSphereGPDPulsedGradientCompartment.h>
-#include <animaStaniszCompartment.h>
-#include <animaStationaryWaterCompartment.h>
+#include <animaPlaneSGPPulsedGradientCompartment.h>
 #include <animaStickCompartment.h>
 #include <animaTensorCompartment.h>
 #include <animaZeppelinCompartment.h>
@@ -19,18 +17,16 @@ namespace anima
     {
         m_CompartmentType = Tensor;
         m_ModelWithFreeWaterComponent = false;
-        m_ModelWithStationaryWaterComponent = false;
-        m_ModelWithRestrictedWaterComponent = false;
-        m_ModelWithStaniszComponent = false;
+        m_ModelWithSphereComponent = false;
 
         m_NumberOfCompartments = 1;
         m_VariableProjectionEstimationMode = true;
 
         m_UseConstrainedDiffusivity = false;
         m_UseConstrainedFreeWaterDiffusivity = true;
-        m_UseConstrainedIRWDiffusivity = true;
         m_UseConstrainedStaniszDiffusivity = true;
         m_UseConstrainedStaniszRadius = true;
+        m_UseConstrainedCylinderRadius = true;
         m_UseConstrainedOrientationConcentration = false;
         m_UseConstrainedExtraAxonalFraction = false;
 
@@ -40,12 +36,13 @@ namespace anima
 
         m_AxialDiffusivity = 1.71e-3;
         m_FreeWaterDiffusivity = 3.0e-3;
-        m_IRWDiffusivity = 7.5e-4;
-        m_StaniszDiffusivity = 1.71e-3;
+        m_SphereDiffusivity = 1.71e-3;
         m_RadialDiffusivity1 = 1.9e-4;
         m_RadialDiffusivity2 = 1.5e-4;
         m_ExtraAxonalFraction = 0.1;
         m_OrientationConcentration = 10.0;
+        m_SphereRadius = 0.015;
+        m_CylinderRadius = 0.0005;
     }
 
     MultiCompartmentModelCreator::MCMPointer MultiCompartmentModelCreator::GetNewMultiCompartmentModel()
@@ -56,8 +53,7 @@ namespace anima
         outputMCM->SetCommonConcentrationParameters(m_UseCommonConcentrations);
         outputMCM->SetCommonExtraAxonalFractionParameters(m_UseCommonExtraAxonalFractions);
 
-        double numCompartments = m_ModelWithFreeWaterComponent + m_ModelWithRestrictedWaterComponent +
-                                 m_ModelWithStaniszComponent + m_ModelWithStationaryWaterComponent + m_NumberOfCompartments;
+        double numCompartments = m_ModelWithFreeWaterComponent + m_ModelWithSphereComponent + m_NumberOfCompartments;
         double defaultWeight = 1.0 / numCompartments;
 
         if (m_ModelWithFreeWaterComponent)
@@ -70,32 +66,15 @@ namespace anima
             outputMCM->AddCompartment(defaultWeight, fwComp);
         }
 
-        if (m_ModelWithStationaryWaterComponent)
-        {
-            using SWType = anima::StationaryWaterCompartment;
-            SWType::Pointer swComp = SWType::New();
-
-            outputMCM->AddCompartment(defaultWeight, swComp);
-        }
-
-        if (m_ModelWithRestrictedWaterComponent)
-        {
-            using IRWType = anima::IsotropicRestrictedWaterCompartment;
-            IRWType::Pointer restComp = IRWType::New();
-            restComp->SetEstimateAxialDiffusivity(!m_UseConstrainedIRWDiffusivity);
-            restComp->SetAxialDiffusivity(m_IRWDiffusivity);
-
-            outputMCM->AddCompartment(defaultWeight, restComp);
-        }
-
-        if (m_ModelWithStaniszComponent)
+        if (m_ModelWithSphereComponent)
         {
             // using StaniszType = anima::StaniszCompartment;
             using StaniszType = anima::SphereGPDPulsedGradientCompartment;
             StaniszType::Pointer restComp = StaniszType::New();
             restComp->SetEstimateAxialDiffusivity(!m_UseConstrainedStaniszDiffusivity);
             restComp->SetEstimateTissueRadius(!m_UseConstrainedStaniszRadius);
-            restComp->SetAxialDiffusivity(m_StaniszDiffusivity);
+            restComp->SetAxialDiffusivity(m_SphereDiffusivity);
+            restComp->SetTissueRadius(m_SphereRadius);
 
             outputMCM->AddCompartment(defaultWeight, restComp);
         }
@@ -266,7 +245,8 @@ namespace anima
         charmedComp->SetEstimateDiffusivities(!m_UseConstrainedDiffusivity);
         charmedComp->SetAxialDiffusivity(m_AxialDiffusivity);
         charmedComp->SetRadialDiffusivity1((m_RadialDiffusivity1 + m_RadialDiffusivity2) / 2.0);
-        charmedComp->SetTissueRadius(0.0005);
+        charmedComp->SetTissueRadius(m_CylinderRadius);
+        charmedComp->SetEstimateTissueRadius(!m_UseConstrainedCylinderRadius);
 
         if (applyConstraints)
         {

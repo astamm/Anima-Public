@@ -2,7 +2,7 @@
 
 #include <animaBaseCompartment.h>
 #include <AnimaMCMExport.h>
-#include <animaVanGelderenCylinderCompartment.h>
+#include <animaCylinderGPDPulsedGradientCompartment.h>
 #include <animaZeppelinCompartment.h>
 
 #include <map>
@@ -74,9 +74,9 @@ namespace anima
             m_EstimateTissueRadius = false;
             m_ChangedConstraints = true;
 
-            m_VanGelderenCylinderCompartment = anima::VanGelderenCylinderCompartment::New();
-            m_VanGelderenCylinderCompartment->SetEstimateTissueRadius(false);
-            m_VanGelderenCylinderCompartment->SetEstimateAxialDiffusivity(false);
+            m_CylinderGPDPulsedGradientCompartment = anima::CylinderGPDPulsedGradientCompartment::New();
+            m_CylinderGPDPulsedGradientCompartment->SetEstimateTissueRadius(false);
+            m_CylinderGPDPulsedGradientCompartment->SetEstimateAxialDiffusivity(false);
 
             m_ZeppelinCompartment = anima::ZeppelinCompartment::New();
             m_ZeppelinCompartment->SetEstimateDiffusivities(false);
@@ -96,7 +96,7 @@ namespace anima
         unsigned int m_NumberOfParameters;
 
         // Parameters for data perparation
-        anima::VanGelderenCylinderCompartment::Pointer m_VanGelderenCylinderCompartment;
+        anima::CylinderGPDPulsedGradientCompartment::Pointer m_CylinderGPDPulsedGradientCompartment;
         anima::ZeppelinCompartment::Pointer m_ZeppelinCompartment;
         bool m_UseTortuosityModel;
 

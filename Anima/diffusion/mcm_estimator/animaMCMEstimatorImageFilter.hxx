@@ -58,10 +58,8 @@ namespace anima
         // Create fake MCM output to get its length
         MCMCreatorType *tmpMCMCreator = this->GetNewMCMCreatorInstance();
         tmpMCMCreator->SetModelWithFreeWaterComponent(m_ModelWithFreeWaterComponent);
-        tmpMCMCreator->SetModelWithStationaryWaterComponent(m_ModelWithStationaryWaterComponent);
-        tmpMCMCreator->SetModelWithRestrictedWaterComponent(m_ModelWithRestrictedWaterComponent);
-        tmpMCMCreator->SetModelWithStaniszComponent(m_ModelWithStaniszComponent);
-        tmpMCMCreator->SetCompartmentType(m_CompartmentType);
+        tmpMCMCreator->SetModelWithSphereComponent(m_ModelWithSphereComponent);
+        tmpMCMCreator->SetCompartmentType(m_CylinderCompartmentType);
         tmpMCMCreator->SetNumberOfCompartments(m_NumberOfCompartments);
 
         MCMPointer tmpMCM = tmpMCMCreator->GetNewMultiCompartmentModel();
@@ -78,7 +76,7 @@ namespace anima
     {
         MCMPointer tmpMCM = m_MCMCreators[0]->GetNewMultiCompartmentModel();
 
-        typedef anima::MCMFileWriter<OutputPixelType, InputImageType::ImageDimension> MCMFileWriterType;
+        using MCMFileWriterType = anima::MCMFileWriter<OutputPixelType, InputImageType::ImageDimension>;
         MCMFileWriterType writer;
 
         writer.SetInputImage(this->GetOutput());
@@ -94,8 +92,8 @@ namespace anima
         if (this->GetComputationMask())
             return;
 
-        typedef itk::ImageRegionConstIterator<InputImageType> B0IteratorType;
-        typedef itk::ImageRegionIterator<MaskImageType> MaskIteratorType;
+        using B0IteratorType = itk::ImageRegionConstIterator<InputImageType>;
+        using MaskIteratorType = itk::ImageRegionIterator<MaskImageType>;
 
         unsigned int firstB0Index = 0;
         double bValueFirstB0Index = anima::GetBValueFromAcquisitionParameters(m_SmallDelta, m_BigDelta, m_GradientStrengths[firstB0Index]);
@@ -208,25 +206,23 @@ namespace anima
         std::cout << " - Radial diffusivity 1: " << m_RadialDiffusivity1Value << " mm2/s," << std::endl;
         std::cout << " - Radial diffusivity 2: " << m_RadialDiffusivity2Value << " mm2/s," << std::endl;
 
-        if (m_ModelWithRestrictedWaterComponent)
-            std::cout << " - IRW diffusivity: " << m_IRWDiffusivityValue << " mm2/s," << std::endl;
-
-        if (m_ModelWithStaniszComponent)
-            std::cout << " - Stanisz diffusivity: " << m_StaniszDiffusivityValue << " mm2/s," << std::endl;
+        if (m_ModelWithSphereComponent)
+            std::cout << " - Sphere diffusivity: " << m_SphereDiffusivityValue << " mm2/s," << std::endl;
 
         // Setting up creators
         for (unsigned int i = 0; i < this->GetNumberOfWorkUnits(); ++i)
         {
             m_MCMCreators[i]->SetAxialDiffusivityValue(m_AxialDiffusivityValue);
             m_MCMCreators[i]->SetFreeWaterDiffusivityValue(3.0e-3);
-            m_MCMCreators[i]->SetIRWDiffusivityValue(m_IRWDiffusivityValue);
-            m_MCMCreators[i]->SetStaniszDiffusivityValue(m_StaniszDiffusivityValue);
+            m_MCMCreators[i]->SetSphereDiffusivityValue(m_SphereDiffusivityValue);
             m_MCMCreators[i]->SetRadialDiffusivity1Value(m_RadialDiffusivity1Value);
             m_MCMCreators[i]->SetRadialDiffusivity2Value(m_RadialDiffusivity2Value);
+            m_MCMCreators[i]->SetSphereRadiusValue(m_SphereRadiusValue);
+            m_MCMCreators[i]->SetCylinderRadiusValue(m_CylinderRadiusValue);
         }
 
         // Switch over compartment types to setup coarse grid initialization
-        switch (m_CompartmentType)
+        switch (m_CylinderCompartmentType)
         {
         case NODDI:
         case DDI:
@@ -264,19 +260,7 @@ namespace anima
             ++countIsoComps;
         }
 
-        if (m_ModelWithStationaryWaterComponent)
-        {
-            m_DictionaryDirections.insert(m_DictionaryDirections.begin(), fakeIsotropicDirection);
-            ++countIsoComps;
-        }
-
-        if (m_ModelWithRestrictedWaterComponent)
-        {
-            m_DictionaryDirections.insert(m_DictionaryDirections.begin(), fakeIsotropicDirection);
-            ++countIsoComps;
-        }
-
-        if (m_ModelWithStaniszComponent)
+        if (m_ModelWithSphereComponent)
         {
             m_DictionaryDirections.insert(m_DictionaryDirections.begin(), fakeIsotropicDirection);
             ++countIsoComps;
@@ -289,9 +273,7 @@ namespace anima
         MCMPointer mcm;
         MCMCreatorType *mcmCreator = m_MCMCreators[0];
         mcmCreator->SetModelWithFreeWaterComponent(false);
-        mcmCreator->SetModelWithStationaryWaterComponent(false);
-        mcmCreator->SetModelWithRestrictedWaterComponent(false);
-        mcmCreator->SetModelWithStaniszComponent(false);
+        mcmCreator->SetModelWithSphereComponent(false);
         mcmCreator->SetNumberOfCompartments(0);
 
         if (m_ModelWithFreeWaterComponent)
@@ -306,35 +288,11 @@ namespace anima
             ++countIsoComps;
         }
 
-        if (m_ModelWithStationaryWaterComponent)
+        if (m_ModelWithSphereComponent)
         {
-            mcmCreator->SetModelWithStationaryWaterComponent(true);
+            mcmCreator->SetModelWithSphereComponent(true);
             mcm = mcmCreator->GetNewMultiCompartmentModel();
-            mcmCreator->SetModelWithStationaryWaterComponent(false);
-
-            for (unsigned int i = 0; i < m_NumberOfImages; ++i)
-                m_SparseSticksDictionary(i, countIsoComps) = mcm->GetPredictedSignal(m_SmallDelta, m_BigDelta, m_GradientStrengths[i], m_GradientDirections[i]);
-
-            ++countIsoComps;
-        }
-
-        if (m_ModelWithRestrictedWaterComponent)
-        {
-            mcmCreator->SetModelWithRestrictedWaterComponent(true);
-            mcm = mcmCreator->GetNewMultiCompartmentModel();
-            mcmCreator->SetModelWithRestrictedWaterComponent(false);
-
-            for (unsigned int i = 0; i < m_NumberOfImages; ++i)
-                m_SparseSticksDictionary(i, countIsoComps) = mcm->GetPredictedSignal(m_SmallDelta, m_BigDelta, m_GradientStrengths[i], m_GradientDirections[i]);
-
-            ++countIsoComps;
-        }
-
-        if (m_ModelWithStaniszComponent)
-        {
-            mcmCreator->SetModelWithStaniszComponent(true);
-            mcm = mcmCreator->GetNewMultiCompartmentModel();
-            mcmCreator->SetModelWithStaniszComponent(false);
+            mcmCreator->SetModelWithSphereComponent(false);
 
             for (unsigned int i = 0; i < m_NumberOfImages; ++i)
                 m_SparseSticksDictionary(i, countIsoComps) = mcm->GetPredictedSignal(m_SmallDelta, m_BigDelta, m_GradientStrengths[i], m_GradientDirections[i]);
@@ -405,7 +363,7 @@ namespace anima
         {
             double tmpVal = (i + 1.0) / (coarseGridSize + 1.0);
             m_ValuesCoarseGrid[0][i] = tmpVal;
-            m_ValuesCoarseGrid[1][i] = 0.0005; // anima::MCMTissueRadiusLowerBound + tmpVal * (anima::MCMTissueRadiusUpperBound - anima::MCMTissueRadiusLowerBound);
+            m_ValuesCoarseGrid[1][i] = (m_UseConstrainedCylinderRadius) ? m_CylinderRadiusValue : anima::MCMTissueRadiusLowerBound + tmpVal * (anima::MCMTissueRadiusUpperBound - anima::MCMTissueRadiusLowerBound);
         }
     }
 
@@ -434,24 +392,24 @@ namespace anima
     void
     MCMEstimatorImageFilter<InputPixelType, OutputPixelType>::DynamicThreadedGenerateData(const OutputImageRegionType &outputRegionForThread)
     {
-        typedef itk::ImageRegionConstIterator<InputImageType> ConstImageIteratorType;
+        using ConstImageIteratorType = itk::ImageRegionConstIterator<InputImageType>;
 
         std::vector<ConstImageIteratorType> inIterators(m_NumberOfImages);
         for (unsigned int i = 0; i < m_NumberOfImages; ++i)
             inIterators[i] = ConstImageIteratorType(this->GetInput(i), outputRegionForThread);
 
-        typedef itk::ImageRegionIterator<OutputImageType> OutImageIteratorType;
+        using OutImageIteratorType = itk::ImageRegionIterator<OutputImageType>;
         OutImageIteratorType outIterator(this->GetOutput(), outputRegionForThread);
 
-        typedef itk::ImageRegionIterator<MaskImageType> MaskIteratorType;
+        using MaskIteratorType = itk::ImageRegionIterator<MaskImageType>;
         MaskIteratorType maskItr(this->GetComputationMask(), outputRegionForThread);
 
-        typedef itk::ImageRegionIterator<OutputScalarImageType> ImageIteratorType;
+        using ImageIteratorType = itk::ImageRegionIterator<OutputScalarImageType>;
         ImageIteratorType aiccIterator(m_AICcVolume, outputRegionForThread);
         ImageIteratorType b0Iterator(m_B0Volume, outputRegionForThread);
         ImageIteratorType sigmaIterator(m_SigmaSquareVolume, outputRegionForThread);
 
-        typedef itk::ImageRegionIterator<MoseImageType> MoseIteratorType;
+        using MoseIteratorType = itk::ImageRegionIterator<MoseImageType>;
         MoseIteratorType moseIterator(m_MoseVolume, outputRegionForThread);
 
         std::vector<double> observedSignals(m_NumberOfImages, 0);
@@ -500,8 +458,6 @@ namespace anima
             // Load DWI
             for (unsigned int i = 0; i < m_NumberOfImages; ++i)
                 observedSignals[i] = std::max(inIterators[i].Get(), 1.0e-4);
-            
-            // std::cout << "Done loading DWI" << std::endl;
 
             int moseValue = -1;
             bool estimateNonIsoCompartments = false;
@@ -514,7 +470,7 @@ namespace anima
             else if (m_NumberOfCompartments > 0)
                 estimateNonIsoCompartments = true;
 
-            bool hasIsoCompartment = m_ModelWithFreeWaterComponent || m_ModelWithRestrictedWaterComponent || m_ModelWithStationaryWaterComponent || m_ModelWithStaniszComponent;
+            bool hasIsoCompartment = m_ModelWithFreeWaterComponent || m_ModelWithSphereComponent;
             if (estimateNonIsoCompartments)
             {
                 // If model selection, handle it here
@@ -543,9 +499,7 @@ namespace anima
                     double tmpAiccValue = 0;
                     MCMPointer mcmValue;
 
-                    // std::cout << "Starting estimation for " << i << " compartments" << std::endl;
                     this->OptimizeNonIsotropicCompartments(mcmValue, i, observedSignals, threadId, tmpAiccValue, tmpB0Value, tmpSigmaSqValue);
-                    // std::cout << "Done estimation for " << i << " compartments" << std::endl;
 
                     if ((tmpAiccValue < aiccValue) || (!m_FindOptimalNumberOfCompartments))
                     {
@@ -613,10 +567,7 @@ namespace anima
         this->InitialOrientationsEstimation(mcmValue, false, currentNumberOfCompartments, observedSignals, threadId,
                                             aiccValue, b0Value, sigmaSqValue);
 
-        // std::cout << "Initial orientations done" << std::endl;
-        // std::cout << "Starting model estimation" << std::endl;
         this->ModelEstimation(mcmValue, false, observedSignals, threadId, aiccValue, b0Value, sigmaSqValue);
-        // std::cout << "Model estimation done" << std::endl;
 
         if (b0Value == 0.0)
         {
@@ -645,15 +596,12 @@ namespace anima
         // Declarations for optimization
         MCMCreatorType *mcmCreator = m_MCMCreators[threadId];
         mcmCreator->SetModelWithFreeWaterComponent(m_ModelWithFreeWaterComponent);
-        mcmCreator->SetModelWithStationaryWaterComponent(m_ModelWithStationaryWaterComponent);
-        mcmCreator->SetModelWithRestrictedWaterComponent(m_ModelWithRestrictedWaterComponent);
-        mcmCreator->SetModelWithStaniszComponent(m_ModelWithStaniszComponent);
+        mcmCreator->SetModelWithSphereComponent(m_ModelWithSphereComponent);
         mcmCreator->SetNumberOfCompartments(0);
         mcmCreator->SetVariableProjectionEstimationMode(m_MLEstimationStrategy == VariableProjection);
-        mcmCreator->SetUseConstrainedFreeWaterDiffusivity(m_UseConstrainedFreeWaterDiffusivity);
-        mcmCreator->SetUseConstrainedIRWDiffusivity(m_UseConstrainedIRWDiffusivity);
         mcmCreator->SetUseConstrainedStaniszDiffusivity(m_UseConstrainedStaniszDiffusivity);
         mcmCreator->SetUseConstrainedStaniszRadius(m_UseConstrainedStaniszRadius);
+        mcmCreator->SetUseConstrainedCylinderRadius(m_UseConstrainedCylinderRadius);
 
         mcmValue = mcmCreator->GetNewMultiCompartmentModel();
 
@@ -815,30 +763,23 @@ namespace anima
 
         // - First create model
         mcmCreator->SetModelWithFreeWaterComponent(m_ModelWithFreeWaterComponent);
-        mcmCreator->SetModelWithStationaryWaterComponent(m_ModelWithStationaryWaterComponent);
-        mcmCreator->SetModelWithRestrictedWaterComponent(m_ModelWithRestrictedWaterComponent);
-        mcmCreator->SetModelWithStaniszComponent(m_ModelWithStaniszComponent);
+        mcmCreator->SetModelWithSphereComponent(m_ModelWithSphereComponent);
         mcmCreator->SetCompartmentType(Stick);
         mcmCreator->SetNumberOfCompartments(currentNumberOfCompartments);
         mcmCreator->SetVariableProjectionEstimationMode(m_MLEstimationStrategy == VariableProjection);
         mcmCreator->SetUseConstrainedDiffusivity(true);
-        mcmCreator->SetUseConstrainedFreeWaterDiffusivity(m_UseConstrainedFreeWaterDiffusivity);
-        mcmCreator->SetUseConstrainedIRWDiffusivity(m_UseConstrainedIRWDiffusivity);
         mcmCreator->SetUseConstrainedStaniszDiffusivity(m_UseConstrainedStaniszDiffusivity);
         mcmCreator->SetUseConstrainedStaniszRadius(m_UseConstrainedStaniszRadius);
+        mcmCreator->SetUseConstrainedCylinderRadius(m_UseConstrainedCylinderRadius);
         mcmCreator->SetUseCommonDiffusivities(m_UseCommonDiffusivities);
 
         MCMPointer mcmUpdateValue = mcmCreator->GetNewMultiCompartmentModel();
         mcmUpdateValue->SetNegativeWeightBounds(authorizedNegativeB0Value);
 
         // - Now initialize sticks from dictionary
-        // std::cout << "Starting sparse initialization" << std::endl;
-        // std::cout << "Dimension (initial orientation estimation): " << mcmUpdateValue->GetNumberOfParameters() << std::endl;
         this->SparseInitializeSticks(mcmUpdateValue, authorizedNegativeB0Value, observedSignals, threadId);
-        // std::cout << "Done sparse initialization" << std::endl;
 
         unsigned int dimension = mcmUpdateValue->GetNumberOfParameters();
-        // std::cout << "Dimension (initial orientation estimation): " << mcmUpdateValue->GetNumberOfParameters() << std::endl;
         ParametersType p(dimension);
         MCMType::ListType workVec(dimension);
         itk::Array<double> lowerBounds(dimension), upperBounds(dimension);
@@ -858,9 +799,7 @@ namespace anima
         for (unsigned int j = 0; j < dimension; ++j)
             p[j] = workVec[j];
 
-        // std::cout << "Starting initial orientations estimation" << std::endl;
         double costValue = this->PerformSingleOptimization(p, cost, lowerBounds, upperBounds);
-        // std::cout << "Done initial orientations estimation" << std::endl;
 
         // - Get estimated data
         for (unsigned int j = 0; j < dimension; ++j)
@@ -882,7 +821,7 @@ namespace anima
         unsigned int optimalNumberOfCompartments = mcmValue->GetNumberOfCompartments() - mcmValue->GetNumberOfIsotropicCompartments();
 
         // Already done in initial orientations estimation
-        if ((m_CompartmentType == Stick) && (m_UseConstrainedDiffusivity))
+        if ((m_CylinderCompartmentType == Stick) && (m_UseConstrainedDiffusivity))
             return;
 
         // - First create model
@@ -900,9 +839,6 @@ namespace anima
         CostFunctionBasePointer cost = this->CreateCostFunction(observedSignals, mcmUpdateValue);
 
         unsigned int dimension = mcmUpdateValue->GetNumberOfParameters();
-        // std::cout << "Dimension: " << mcmValue->GetNumberOfParameters() << std::endl;
-        // std::cout << "Dimension: " << dimension << std::endl;
-        // exit(-1);
 
         ParametersType p(dimension);
         MCMType::ListType workVec(dimension);
@@ -919,7 +855,6 @@ namespace anima
         workVec = mcmUpdateValue->GetParametersAsVector();
         for (unsigned int i = 0; i < dimension; ++i)
             p[i] = workVec[i];
-        // std::cout << p << std::endl;
 
         double costValue = this->PerformSingleOptimization(p, cost, lowerBounds, upperBounds);
         this->GetProfiledInformation(cost, mcmUpdateValue, b0Value, sigmaSqValue);
@@ -932,7 +867,7 @@ namespace anima
         mcmValue = mcmUpdateValue;
         aiccValue = this->ComputeAICcValue(mcmValue, costValue);
 
-        if ((m_CompartmentType == Stick) || (b0Value == 0.0))
+        if ((m_CylinderCompartmentType == Stick) || (b0Value == 0.0))
             return;
 
         // We're done with ball and stick, next up is ball and zeppelin
@@ -974,12 +909,12 @@ namespace anima
         mcmValue = mcmUpdateValue;
         aiccValue = this->ComputeAICcValue(mcmValue, costValue);
 
-        if ((m_CompartmentType == Zeppelin) || (b0Value == 0.0))
+        if ((m_CylinderCompartmentType == Zeppelin) || (b0Value == 0.0))
             return;
 
         // Finally, we're done with ball and zeppelin, an example of what's next up with multi-tensor
         // - First create model
-        mcmCreator->SetCompartmentType(m_CompartmentType);
+        mcmCreator->SetCompartmentType(m_CylinderCompartmentType);
         mcmCreator->SetUseConstrainedExtraAxonalFraction(m_UseConstrainedExtraAxonalFraction);
         mcmCreator->SetUseConstrainedOrientationConcentration(m_UseConstrainedOrientationConcentration);
         mcmCreator->SetUseCommonConcentrations(m_UseCommonConcentrations);
@@ -1006,7 +941,7 @@ namespace anima
         for (unsigned int i = 0; i < dimension; ++i)
             upperBounds[i] = workVec[i];
 
-        switch (m_CompartmentType)
+        switch (m_CylinderCompartmentType)
         {
         case NODDI:
         case DDI:
@@ -1294,7 +1229,7 @@ namespace anima
             if (m_MLEstimationStrategy == Marginal)
                 itkExceptionMacro("Levenberg Marquardt optimizer not supported with marginal optimization");
 
-            typedef anima::BoundedLevenbergMarquardtOptimizer LevenbergMarquardtOptimizerType;
+            using LevenbergMarquardtOptimizerType = anima::BoundedLevenbergMarquardtOptimizer;
             LevenbergMarquardtOptimizerType::Pointer tmpOpt = LevenbergMarquardtOptimizerType::New();
 
             anima::MCMMultipleValuedCostFunction *costCast =
@@ -1421,8 +1356,6 @@ namespace anima
         unsigned int numNonIsotropicComponents = complexModel->GetNumberOfCompartments() - numIsotropicComponents;
         unsigned int numCompartments = complexModel->GetNumberOfCompartments();
 
-        // std::cout << "1) Number of compartments: " << numCompartments << std::endl;
-
         // First compute sparse solution as NNLS optmization
         anima::NNLSOptimizer::Pointer sparseOptimizer = anima::NNLSOptimizer::New();
         sparseOptimizer->SetDataMatrix(m_SparseSticksDictionary);
@@ -1432,7 +1365,6 @@ namespace anima
         ParametersType rightHandValues(numSignals);
         for (unsigned int i = 0; i < numSignals; ++i)
             rightHandValues[i] = observedSignals[i];
-        // std::cout << "Parameters: " << rightHandValues << std::endl;
 
         if (authorizeNegativeB0Value)
             rightHandValues *= -1;
@@ -1440,13 +1372,10 @@ namespace anima
         sparseOptimizer->SetPoints(rightHandValues);
         sparseOptimizer->SetSquaredProblem(false);
 
-        // std::cout << "Starting NNLS optimization" << std::endl;
         sparseOptimizer->StartOptimization();
-        // std::cout << "Done NNLS optimization" << std::endl;
 
         // Get atom weights and determine the number of non null weighted components, first quartile of their weights
         ParametersType dictionaryWeights = sparseOptimizer->GetCurrentPosition();
-        // std::cout << "Dictionary weights: " << dictionaryWeights << std::endl;
         std::vector<unsigned int> nonNullAtomIndexes;
 
         double totalWeightsSum = 0.0;
@@ -1490,7 +1419,6 @@ namespace anima
         }
 
         numRealAnisotropicCompartments = nonNullAtomIndexes.size();
-        // std::cout << "2) Number of compartments: " << numRealAnisotropicCompartments << std::endl;
 
         MCMType::ListType sparseWeights(numCompartments, 0.0);
         for (unsigned int i = 0; i < numIsotropicComponents; ++i)
@@ -1548,7 +1476,7 @@ namespace anima
             }
         }
 
-        typedef anima::SpectralClusteringFilter<double> SpectralClusterFilterType;
+        using SpectralClusterFilterType = anima::SpectralClusteringFilter<double>;
         SpectralClusterFilterType spectralClustering;
         spectralClustering.SetInputData(directionsDistanceMatrix);
         spectralClustering.SetNbClass(numNonIsotropicComponents);
@@ -1562,9 +1490,9 @@ namespace anima
         // Compute cluster direction for each cluster
         std::vector<double> classMemberships;
         vnl_matrix<double> dcmMatrix(3, 3);
-        typedef vnl_matrix<double> EigenMatrixType;
-        typedef vnl_vector_fixed<double, 3> EigenVectorType;
-        typedef itk::SymmetricEigenAnalysis<EigenMatrixType, EigenVectorType, EigenMatrixType> EigenAnalysisType;
+        using EigenMatrixType = vnl_matrix<double>;
+        using EigenVectorType = vnl_vector_fixed<double, 3>;
+        using EigenAnalysisType = itk::SymmetricEigenAnalysis<EigenMatrixType, EigenVectorType, EigenMatrixType>;
         EigenAnalysisType eigSystem(3);
         EigenMatrixType eigVecs(3, 3);
         EigenVectorType eigVals;

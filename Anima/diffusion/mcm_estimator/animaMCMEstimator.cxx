@@ -86,40 +86,24 @@ int main(int argc, char **argv)
         "n", "nb-fascicles",
         "Number of computed fascicles (default: 2)",
         false, 2, "number of fascicles", cmd);
-    TCLAP::ValueArg<unsigned int> compartmentTypeArg(
-        "c", "comp-type",
-        "Compartment type for fascicles: 1: stick, 2: zeppelin, 3: tensor, 4: noddi, 5: ddi, 6: charmed (default: 3)",
-        false, 3, "fascicles type", cmd);
+    TCLAP::ValueArg<unsigned int> cylinderTypeArg(
+        "c", "cylinder-type",
+        "Compartment type for cylinders: 1: Stick, 2: Zeppelin, 3: Tensor, 4: NODDI, 5: DDI, 6: CHARMED (default: 3)",
+        false, 3, "cylinder type", cmd);
     TCLAP::SwitchArg aicSelectNbCompartmentsArg(
         "M", "opt-nb-comp",
         "Activate AICC-based number of compartments selection",
         cmd, false);
+    TCLAP::ValueArg<unsigned int> sphereTypeArg(
+        "s", "sphere-type",
+        "Compartment type for spheres: 0: none, 1: SphereGPDPulsedGradient, 2: PlaneSGPPulsedGradient (default: 1)",
+        false, 3, "sphere type", cmd);
 
     TCLAP::SwitchArg freeWaterCompartmentArg(
         "F", "free-water",
         "Model with free water",
         cmd, false);
-    TCLAP::SwitchArg stationaryWaterCompartmentArg(
-        "S", "stationary-water",
-        "Model with stationary water",
-        cmd, false);
-    TCLAP::SwitchArg restrictedWaterCompartmentArg(
-        "R", "restricted-water",
-        "Model with restricted water",
-        cmd, false);
-    TCLAP::SwitchArg staniszCompartmentArg(
-        "Z", "stanisz",
-        "Model with stanisz isotropic compartment",
-        cmd, false);
-
-    TCLAP::SwitchArg optFWDiffArg(
-        "", "opt-free-water-diff",
-        "Optimize free water diffusivity value",
-        cmd, false);
-    TCLAP::SwitchArg optIRWDiffArg(
-        "", "opt-ir-water-diff",
-        "Optimize isotropic restricted water diffusivity value",
-        cmd, false);
+    
     TCLAP::SwitchArg optStaniszRadiusArg(
         "", "opt-stanisz-radius",
         "Optimize isotropic Stanisz radius value",
@@ -127,6 +111,10 @@ int main(int argc, char **argv)
     TCLAP::SwitchArg optStaniszDiffArg(
         "", "opt-stanisz-diff",
         "Optimize isotropic Stanisz diffusivity value",
+        cmd, false);
+    TCLAP::SwitchArg optCylinderRadiusArg(
+        "", "opt-cylinder-radius",
+        "Optimize cylinder radius value",
         cmd, false);
 
     TCLAP::SwitchArg fixDiffArg(
@@ -155,7 +143,17 @@ int main(int argc, char **argv)
         "Share extra axonal fraction values among compartments",
         cmd, false);
 
-    // Initial values for diffusivities
+    // Initial values for sphere compartment
+    TCLAP::ValueArg<double> initSphereDiffArg(
+        "", "init-sphere-diff",
+        "Initial sphere diffusivity in mm2/s (default: 1.71e-3 mm2/s)",
+        false, 1.71e-3, "initial sphere diffusivity", cmd);
+    TCLAP::ValueArg<double> initSphereRadiusArg(
+        "", "init-sphere-radius",
+        "Initial sphere radius in mm (default: 0.015 mm)",
+        false, 0.015, "initial sphere radius", cmd);
+    
+    // Initial values for cylinder compartments
     TCLAP::ValueArg<double> initAxialDiffArg(
         "", "init-axial-diff",
         "Initial axial diffusivity (default: 1.71e-3)",
@@ -168,14 +166,10 @@ int main(int argc, char **argv)
         "", "init-radial-diff2",
         "Initial second radial diffusivity (default: 1.5e-4)",
         false, 1.5e-4, "initial second radial diffusivity", cmd);
-    TCLAP::ValueArg<double> initIRWDiffArg(
-        "", "init-irw-diff",
-        "Initial isotropic restricted diffusivity (default: 7.5e-4)",
-        false, 7.5e-4, "initial IRW diffusivity", cmd);
-    TCLAP::ValueArg<double> initStaniszDiffArg(
-        "", "init-stanisz-diff",
-        "Initial Stanisz diffusivity (default: 1.71e-3)",
-        false, 1.71e-3, "initial Stanisz diffusivity", cmd);
+    TCLAP::ValueArg<double> initCylinderRadiusArg(
+        "", "init-cylinder-radius",
+        "Initial cylinder radius (default: 0.0005)",
+        false, 0.0005, "initial cylinder radius", cmd);
 
     // Optimization parameters
     TCLAP::ValueArg<std::string> optimizerArg(
@@ -275,34 +269,49 @@ int main(int argc, char **argv)
     filter->SetB0Threshold(b0thrArg.getValue());
 
     filter->SetModelWithFreeWaterComponent(freeWaterCompartmentArg.isSet());
-    filter->SetModelWithStationaryWaterComponent(stationaryWaterCompartmentArg.isSet());
-    filter->SetModelWithRestrictedWaterComponent(restrictedWaterCompartmentArg.isSet());
-    filter->SetModelWithStaniszComponent(staniszCompartmentArg.isSet());
 
-    switch (compartmentTypeArg.getValue())
+    bool modelWithSphereComponent = true;
+    switch(sphereTypeArg.getValue())
+    {
+        case 0:
+        default:
+        modelWithSphereComponent = false;
+        break;
+
+        case 1:
+        filter->SetSphereCompartmentType(anima::SphereGPDPulsedGradient);
+        break;
+
+        case 2:
+        filter->SetSphereCompartmentType(anima::PlaneSGPPulsedGradient);
+        break;
+    }
+    filter->SetModelWithSphereComponent(modelWithSphereComponent);
+
+    switch (cylinderTypeArg.getValue())
     {
     case 1:
-        filter->SetCompartmentType(anima::Stick);
+        filter->SetCylinderCompartmentType(anima::Stick);
         break;
 
     case 2:
-        filter->SetCompartmentType(anima::Zeppelin);
+        filter->SetCylinderCompartmentType(anima::Zeppelin);
         break;
 
     case 3:
-        filter->SetCompartmentType(anima::Tensor);
+        filter->SetCylinderCompartmentType(anima::Tensor);
         break;
 
     case 4:
-        filter->SetCompartmentType(anima::NODDI);
+        filter->SetCylinderCompartmentType(anima::NODDI);
         break;
 
     case 5:
-        filter->SetCompartmentType(anima::DDI);
+        filter->SetCylinderCompartmentType(anima::DDI);
         break;
 
     case 6:
-        filter->SetCompartmentType(anima::CHARMED);
+        filter->SetCylinderCompartmentType(anima::CHARMED);
         break;
 
     default:
@@ -313,8 +322,9 @@ int main(int argc, char **argv)
     filter->SetAxialDiffusivityValue(initAxialDiffArg.getValue());
     filter->SetRadialDiffusivity1Value(initRadialDiff1Arg.getValue());
     filter->SetRadialDiffusivity2Value(initRadialDiff2Arg.getValue());
-    filter->SetIRWDiffusivityValue(initIRWDiffArg.getValue());
-    filter->SetStaniszDiffusivityValue(initStaniszDiffArg.getValue());
+    filter->SetSphereDiffusivityValue(initSphereDiffArg.getValue());
+    filter->SetSphereRadiusValue(initSphereRadiusArg.getValue());
+    filter->SetCylinderRadiusValue(initCylinderRadiusArg.getValue());
 
     filter->SetNumberOfCompartments(nbFasciclesArg.getValue());
     filter->SetFindOptimalNumberOfCompartments(aicSelectNbCompartmentsArg.isSet());
@@ -330,10 +340,9 @@ int main(int argc, char **argv)
     filter->SetMaxEval(maxEvalArg.getValue());
 
     filter->SetUseConstrainedDiffusivity(fixDiffArg.isSet());
-    filter->SetUseConstrainedFreeWaterDiffusivity(!optFWDiffArg.isSet());
-    filter->SetUseConstrainedIRWDiffusivity(!optIRWDiffArg.isSet());
     filter->SetUseConstrainedStaniszDiffusivity(!optStaniszDiffArg.isSet());
     filter->SetUseConstrainedStaniszRadius(!optStaniszRadiusArg.isSet());
+    filter->SetUseConstrainedCylinderRadius(!optCylinderRadiusArg.isSet());
 
     if (!fixDiffArg.isSet())
         filter->SetUseCommonDiffusivities(commonDiffusivitiesArg.isSet());

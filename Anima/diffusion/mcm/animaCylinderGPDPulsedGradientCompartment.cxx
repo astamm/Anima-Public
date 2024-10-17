@@ -1,4 +1,4 @@
-#include "animaVanGelderenCylinderCompartment.h"
+#include "animaCylinderGPDPulsedGradientCompartment.h"
 #include <animaMCMConstants.h>
 #include <animaVectorOperations.h>
 
@@ -7,7 +7,7 @@
 namespace anima
 {
 
-    double VanGelderenCylinderCompartment::GetFourierTransformedDiffusionProfile(double smallDelta, double bigDelta, double gradientStrength, const Vector3DType &gradient)
+    double CylinderGPDPulsedGradientCompartment::GetFourierTransformedDiffusionProfile(double smallDelta, double bigDelta, double gradientStrength, const Vector3DType &gradient)
     {
         double bValue = anima::GetBValueFromAcquisitionParameters(smallDelta, bigDelta, gradientStrength);
         Vector3DType sphCoords, carCoords;
@@ -21,18 +21,18 @@ namespace anima
         return axialSignal * radialSignal;
     }
 
-    VanGelderenCylinderCompartment::ListType &VanGelderenCylinderCompartment::GetSignalAttenuationJacobian(double smallDelta, double bigDelta, double gradientStrength, const Vector3DType &gradient)
+    CylinderGPDPulsedGradientCompartment::ListType &CylinderGPDPulsedGradientCompartment::GetSignalAttenuationJacobian(double smallDelta, double bigDelta, double gradientStrength, const Vector3DType &gradient)
     {
         m_JacobianVector.resize(this->GetNumberOfParameters());
         return m_JacobianVector;
     }
 
-    double VanGelderenCylinderCompartment::GetLogDiffusionProfile(const Vector3DType &sample)
+    double CylinderGPDPulsedGradientCompartment::GetLogDiffusionProfile(const Vector3DType &sample)
     {
         return 0.0;
     }
 
-    void VanGelderenCylinderCompartment::SetTissueRadius(double num)
+    void CylinderGPDPulsedGradientCompartment::SetTissueRadius(double num)
     {
         if (num != this->GetTissueRadius())
         {
@@ -41,7 +41,7 @@ namespace anima
         }
     }
 
-    void VanGelderenCylinderCompartment::SetAxialDiffusivity(double num)
+    void CylinderGPDPulsedGradientCompartment::SetAxialDiffusivity(double num)
     {
         if (num != this->GetAxialDiffusivity())
         {
@@ -50,7 +50,7 @@ namespace anima
         }
     }
 
-    void VanGelderenCylinderCompartment::SetParametersFromVector(const ListType &params)
+    void CylinderGPDPulsedGradientCompartment::SetParametersFromVector(const ListType &params)
     {
         if (params.size() != this->GetNumberOfParameters())
             return;
@@ -73,7 +73,7 @@ namespace anima
             this->SetAxialDiffusivity(params[pos]);
     }
 
-    VanGelderenCylinderCompartment::ListType &VanGelderenCylinderCompartment::GetParametersAsVector()
+    CylinderGPDPulsedGradientCompartment::ListType &CylinderGPDPulsedGradientCompartment::GetParametersAsVector()
     {
         m_ParametersVector.resize(this->GetNumberOfParameters());
 
@@ -97,7 +97,7 @@ namespace anima
         return m_ParametersVector;
     }
 
-    VanGelderenCylinderCompartment::ListType &VanGelderenCylinderCompartment::GetParameterLowerBounds()
+    CylinderGPDPulsedGradientCompartment::ListType &CylinderGPDPulsedGradientCompartment::GetParameterLowerBounds()
     {
         m_ParametersLowerBoundsVector.resize(this->GetNumberOfParameters());
 
@@ -121,7 +121,7 @@ namespace anima
         return m_ParametersLowerBoundsVector;
     }
 
-    VanGelderenCylinderCompartment::ListType &VanGelderenCylinderCompartment::GetParameterUpperBounds()
+    CylinderGPDPulsedGradientCompartment::ListType &CylinderGPDPulsedGradientCompartment::GetParameterUpperBounds()
     {
         m_ParametersUpperBoundsVector.resize(this->GetNumberOfParameters());
 
@@ -145,7 +145,7 @@ namespace anima
         return m_ParametersUpperBoundsVector;
     }
 
-    void VanGelderenCylinderCompartment::SetEstimateAxialDiffusivity(bool arg)
+    void CylinderGPDPulsedGradientCompartment::SetEstimateAxialDiffusivity(bool arg)
     {
         if (m_EstimateAxialDiffusivity == arg)
             return;
@@ -155,7 +155,7 @@ namespace anima
         m_ChangedConstraints = true;
     }
 
-    void VanGelderenCylinderCompartment::SetEstimateTissueRadius(bool arg)
+    void CylinderGPDPulsedGradientCompartment::SetEstimateTissueRadius(bool arg)
     {
         if (m_EstimateTissueRadius == arg)
             return;
@@ -165,7 +165,7 @@ namespace anima
         m_ChangedConstraints = true;
     }
 
-    void VanGelderenCylinderCompartment::SetCompartmentVector(ModelOutputVectorType &compartmentVector)
+    void CylinderGPDPulsedGradientCompartment::SetCompartmentVector(ModelOutputVectorType &compartmentVector)
     {
         if (compartmentVector.GetSize() != this->GetCompartmentSize())
             itkExceptionMacro("The input vector size does not match the size of the compartment");
@@ -176,12 +176,12 @@ namespace anima
         this->SetAxialDiffusivity(compartmentVector[3]);
     }
 
-    unsigned int VanGelderenCylinderCompartment::GetCompartmentSize()
+    unsigned int CylinderGPDPulsedGradientCompartment::GetCompartmentSize()
     {
         return 4;
     }
 
-    unsigned int VanGelderenCylinderCompartment::GetNumberOfParameters()
+    unsigned int CylinderGPDPulsedGradientCompartment::GetNumberOfParameters()
     {
         if (!m_ChangedConstraints)
             return m_NumberOfParameters;
@@ -198,7 +198,7 @@ namespace anima
         return m_NumberOfParameters;
     }
 
-    VanGelderenCylinderCompartment::ModelOutputVectorType &VanGelderenCylinderCompartment::GetCompartmentVector()
+    CylinderGPDPulsedGradientCompartment::ModelOutputVectorType &CylinderGPDPulsedGradientCompartment::GetCompartmentVector()
     {
         if (m_CompartmentVector.GetSize() != this->GetCompartmentSize())
             m_CompartmentVector.SetSize(this->GetCompartmentSize());
@@ -217,7 +217,7 @@ namespace anima
         return m_CompartmentVector;
     }
 
-    double VanGelderenCylinderCompartment::GetApparentFractionalAnisotropy()
+    double CylinderGPDPulsedGradientCompartment::GetApparentFractionalAnisotropy()
     {
         return 0.0;
     }
