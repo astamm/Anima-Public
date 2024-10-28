@@ -222,6 +222,18 @@ namespace anima
         }
 
         // Switch over compartment types to setup coarse grid initialization
+        switch(m_SphereCompartmentType)
+        {
+            case SphereGPDPulsedGradient:
+            case PlaneSGPPulsedGradient:
+                this->ComputeSphereRadiusCoarseGrid();
+                break;
+            
+            default:
+                // No coarse grid initialization for simple models
+                break;
+        }
+
         switch (m_CylinderCompartmentType)
         {
         case NODDI:
@@ -318,6 +330,19 @@ namespace anima
 
             for (unsigned int j = 0; j < m_NumberOfImages; ++j)
                 m_SparseSticksDictionary(j, countIsoComps + i) = mcm->GetPredictedSignal(m_SmallDelta, m_BigDelta, m_GradientStrengths[j], m_GradientDirections[j]);
+        }
+    }
+
+    template <class InputPixelType, class OutputPixelType>
+    void
+    MCMEstimatorImageFilter<InputPixelType, OutputPixelType>::ComputeSphereRadiusCoarseGrid()
+    {
+        unsigned int coarseGridSize = 8 * 8;
+        m_SphereRadiusCoarseGrid.resize(coarseGridSize);
+        for (unsigned int i = 0; i < coarseGridSize; ++i)
+        {
+            double tmpVal = (i + 1.0) / (coarseGridSize + 1.0);
+            m_SphereRadiusCoarseGrid[i] = anima::MCMTissueRadiusLowerBound + tmpVal * (anima::MCMTissueRadiusUpperBound - anima::MCMTissueRadiusLowerBound);
         }
     }
 
@@ -794,6 +819,18 @@ namespace anima
 
         CostFunctionBasePointer cost = this->CreateCostFunction(observedSignals, mcmUpdateValue);
 
+        // initialize sphere compartment if it exists
+        switch (m_SphereCompartmentType)
+        {
+            case SphereGPDPulsedGradient:
+            case PlaneSGPPulsedGradient:
+                this->SphereRadiusCoarseGridInitialization(mcmUpdateValue, cost, workVec, p);
+                break;
+
+            default:
+                break;
+        }
+
         // - Update ball and stick model against observed signals
         workVec = mcmUpdateValue->GetParametersAsVector();
         for (unsigned int j = 0; j < dimension; ++j)
@@ -975,6 +1012,48 @@ namespace anima
 
         mcmValue = mcmUpdateValue;
         aiccValue = this->ComputeAICcValue(mcmValue, costValue);
+    }
+
+    template <class InputPixelType, class OutputPixelType>
+    void
+    MCMEstimatorImageFilter<InputPixelType, OutputPixelType>::SphereRadiusCoarseGridInitialization(MCMPointer &mcmUpdateValue, CostFunctionBasePointer &cost,
+                                                                                                   MCMType::ListType &workVec, ParametersType &p)
+    {
+        unsigned int dimension = p.GetSize();
+        double optRadius = 0;
+        double optValue = -1.0;
+
+        unsigned int numIsoCompartments = mcmUpdateValue->GetNumberOfIsotropicCompartments();
+        unsigned int sphereCompIndex = 0;
+        for (unsigned int i = 0;i < numIsoCompartments;++i)
+        {
+            if (mcmUpdateValue->GetCompartment(i)->GetCompartmentType() == anima::SphereGPDPulsedGradient ||
+            mcmUpdateValue->GetCompartment(i)->GetCompartmentType() == anima::PlaneSGPPulsedGradient)
+            {
+                sphereCompIndex = i;
+                break;
+            }
+        }
+
+        for (unsigned int j = 0; j < m_SphereRadiusCoarseGrid.size(); ++j)
+        {
+            double tmpRadius = m_SphereRadiusCoarseGrid[j];
+            mcmUpdateValue->GetCompartment(sphereCompIndex)->SetTissueRadius(tmpRadius);
+
+            workVec = mcmUpdateValue->GetParametersAsVector();
+            for (unsigned int i = 0; i < dimension; ++i)
+                p[i] = workVec[i];
+
+            double tmpValue = this->GetCostValue(cost, p);
+
+            if ((tmpValue < optValue) || (optValue < 0))
+            {
+                optValue = tmpValue;
+                optRadius = tmpRadius;
+            }
+        }
+
+        mcmUpdateValue->GetCompartment(sphereCompIndex)->SetTissueRadius(optRadius);
     }
 
     template <class InputPixelType, class OutputPixelType>

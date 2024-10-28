@@ -68,9 +68,8 @@ namespace anima
 
         if (m_ModelWithSphereComponent)
         {
-            // using StaniszType = anima::StaniszCompartment;
-            using StaniszType = anima::SphereGPDPulsedGradientCompartment;
-            StaniszType::Pointer restComp = StaniszType::New();
+            using SphereType = anima::SphereGPDPulsedGradientCompartment;
+            SphereType::Pointer restComp = SphereType::New();
             restComp->SetEstimateAxialDiffusivity(!m_UseConstrainedStaniszDiffusivity);
             restComp->SetEstimateTissueRadius(!m_UseConstrainedStaniszRadius);
             restComp->SetAxialDiffusivity(m_SphereDiffusivity);

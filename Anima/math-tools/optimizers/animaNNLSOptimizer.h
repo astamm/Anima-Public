@@ -20,22 +20,22 @@ class ANIMAOPTIMIZERS_EXPORT NNLSOptimizer : public itk::Optimizer
 {
 public:
     /** Standard class typedefs. */
-    typedef NNLSOptimizer Self;
-    typedef itk::Optimizer Superclass;
-    typedef itk::SmartPointer<Self> Pointer;
-    typedef itk::SmartPointer<const Self> ConstPointer;
+    using Self = NNLSOptimizer;
+    using Superclass = itk::Optimizer;
+    using Pointer = itk::SmartPointer<Self>;
+    using ConstPointer = itk::SmartPointer<const Self>;
 
-    typedef Superclass::ParametersType ParametersType;
+    using ParametersType = Superclass::ParametersType;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self)
+    itkNewMacro(Self);
 
     /** Run-time type information (and related methods). */
-    itkTypeMacro(NNLSOptimizer, Optimizer)
+    itkTypeMacro(NNLSOptimizer, Optimizer);
 
     /** Type of the input matrix data */
-    typedef vnl_matrix <double> MatrixType;
-    typedef vnl_vector <double> VectorType;
+    using MatrixType = vnl_matrix <double>;
+    using VectorType = vnl_vector <double>;
 
     /** Start optimization. */
     void StartOptimization() ITK_OVERRIDE;
@@ -45,12 +45,14 @@ public:
 
     double GetCurrentResidual();
 
-    itkSetMacro(SquaredProblem, bool)
+    itkSetMacro(SquaredProblem, bool);
+    itkSetMacro(MaximumNumberOfIterations, unsigned int);
 
 protected:
     NNLSOptimizer()
     {
         m_SquaredProblem = false;
+        m_MaximumNumberOfIterations = 100;
     }
 
     virtual ~NNLSOptimizer() ITK_OVERRIDE {}
@@ -69,6 +71,8 @@ private:
 
     //! Flag to indicate if the inputs are already AtA and AtB
     bool m_SquaredProblem;
+
+    unsigned int m_MaximumNumberOfIterations;
 
     // Working values
     std::vector <unsigned short> m_TreatedIndexes;

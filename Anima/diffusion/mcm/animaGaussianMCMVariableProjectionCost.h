@@ -21,15 +21,15 @@ class ANIMAMCM_EXPORT GaussianMCMVariableProjectionCost : public anima::BaseMCMC
 {
 public:
     /** Standard class typedefs. */
-    typedef GaussianMCMVariableProjectionCost Self;
-    typedef anima::BaseMCMCost Superclass;
-    typedef itk::SmartPointer<Self> Pointer;
-    typedef itk::SmartPointer<const Self> ConstPointer;
+    using Self = GaussianMCMVariableProjectionCost;
+    using Superclass = anima::BaseMCMCost;
+    using Pointer = itk::SmartPointer<Self>;
+    using ConstPointer = itk::SmartPointer<const Self>;
 
-    itkNewMacro(Self)
+    itkNewMacro(Self);
 
     /** Run-time type information (and related methods). */
-    itkTypeMacro(GaussianMCMVariableProjectionCost, anima::BaseMCMCost)
+    itkTypeMacro(GaussianMCMVariableProjectionCost, anima::BaseMCMCost);
 
     using LECalculatorType = anima::LogEuclideanTensorCalculator <double>;
     using LECalculatorPointer = LECalculatorType::Pointer;

@@ -26,9 +26,14 @@ void NNLSOptimizer::StartOptimization()
     this->ComputeWVector();
 
     bool continueMainLoop = true;
+    unsigned int currentNumberOfIterations = 0;
     double previousMaxW = -1;
     while (continueMainLoop)
     {   
+        ++currentNumberOfIterations;
+        if (currentNumberOfIterations > m_MaximumNumberOfIterations)
+            break;
+
         double maxW = 0;
         int maxIndex = -1;
         for (unsigned int i = 0;i < parametersSize;++i)

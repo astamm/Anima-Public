@@ -284,6 +284,9 @@ namespace anima
         //! Compute AICc value from a cost function value and model
         double ComputeAICcValue(MCMPointer &mcmValue, double costValue);
 
+        //! Computes sphere radius coarse grid (used for sphere compartment initialization)
+        void ComputeSphereRadiusCoarseGrid();
+
         //! Computes extra axonal and kappa coarse grids (used for NODDI and DDI initialization)
         void ComputeExtraAxonalAndKappaCoarseGrids();
 
@@ -292,6 +295,10 @@ namespace anima
 
         //! Computes extra axonal and kappa coarse grids (used for tensor final initaialization)
         void ComputeTensorRadialDiffsAndAzimuthCoarseGrids();
+
+        //! Coarse grid initialization of sphere models
+        void SphereRadiusCoarseGridInitialization(MCMPointer &mcmUpdateValue, CostFunctionBasePointer &cost,
+                                                  MCMType::ListType &workVec, ParametersType &p);
 
         //! Coarse grid initialization of NODDI and DDI models
         void ExtraAxonalAndKappaCoarseGridInitialization(MCMPointer &mcmUpdateValue, CostFunctionBasePointer &cost,
@@ -370,6 +377,7 @@ namespace anima
 
         //! Coarse grid values for complex model initialization
         std::vector<std::vector<double>> m_ValuesCoarseGrid;
+        std::vector<double> m_SphereRadiusCoarseGrid;
     };
 
 } // end namespace anima

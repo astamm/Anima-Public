@@ -48,15 +48,15 @@ void MultiCompartmentModel::AddCompartment(double weight, BaseCompartment *compa
             break;
     }
 
-    m_Compartments.insert(m_Compartments.begin() + pos, compartment);
-    m_CompartmentWeights.insert(m_CompartmentWeights.begin() + pos, weight);
-
     DiffusionModelCompartmentType compType = compartment->GetCompartmentType();
 
     if ((compType == anima::FreeWater)||
             (compType == anima::PlaneSGPPulsedGradient)||
             (compType == anima::SphereGPDPulsedGradient))
         ++m_NumberOfIsotropicCompartments;
+    
+    m_Compartments.insert(m_Compartments.begin() + pos, compartment);
+    m_CompartmentWeights.insert(m_CompartmentWeights.begin() + pos, weight);
 }
 
 BaseCompartment *MultiCompartmentModel::GetCompartment(unsigned int i)

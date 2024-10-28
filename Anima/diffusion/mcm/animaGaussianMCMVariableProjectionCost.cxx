@@ -38,6 +38,12 @@ double GaussianMCMVariableProjectionCost::GetCurrentCostValue()
 
     costValue = nbImages * (1.0 + std::log(2.0 * M_PI * m_SigmaSquare));
 
+    if (!std::isfinite(costValue))
+    {
+        std::cout << "Non finite cost value" << std::endl;
+        costValue = DBL_MAX;
+    }
+
     return costValue;
 }
 
@@ -156,6 +162,13 @@ GaussianMCMVariableProjectionCost::PrepareDataForLLS()
             normTest = std::sqrt(normTest);
 
             double normsProduct = normRef * normTest;
+
+            if (normsProduct < 1.0e-8)
+            {
+                useCholeskyMatrix = false;
+                break;
+            }
+
             double dotProduct = 0.0;
             for (unsigned int k = 0;k < numCompartments;++k)
                 dotProduct += m_CholeskyMatrix.get(k,i) * m_CholeskyMatrix.get(k,j) / normsProduct;
@@ -189,11 +202,18 @@ GaussianMCMVariableProjectionCost::PrepareDataForLLS()
         }
     }
 
-    bool nnlsNeeded = false;
+    double maxObservedSignal = 0.0;
+    for (unsigned int i = 0;i < nbValues;++i)
+    {
+        double observedSignal = std::abs(m_ObservedSignals[i]);
+        if (observedSignal > maxObservedSignal)
+            maxObservedSignal = observedSignal;
+    }
 
+    bool nnlsNeeded = false;
     for (unsigned int i = 0;i < numCompartments;++i)
     {
-        if (m_OptimalUsefulWeights[i] <= 0.0)
+        if (m_OptimalUsefulWeights[i] <= 0.0 || std::abs(m_OptimalUsefulWeights[i]) > maxObservedSignal)
         {
             nnlsNeeded = true;
             break;
@@ -215,6 +235,7 @@ GaussianMCMVariableProjectionCost::PrepareDataForLLS()
             m_NNLSBordersOptimizer->SetSquaredProblem(false);
         }
 
+        m_NNLSBordersOptimizer->SetMaximumNumberOfIterations(100);
         m_NNLSBordersOptimizer->StartOptimization();
         m_OptimalUsefulWeights = m_NNLSBordersOptimizer->GetCurrentPosition();
     }

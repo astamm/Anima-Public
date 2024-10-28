@@ -20,20 +20,20 @@ class ANIMAMCMBASE_EXPORT MultiCompartmentModel : public itk::LightObject
 {
 public:
     // Useful typedefs
-    typedef MultiCompartmentModel Self;
-    typedef itk::LightObject Superclass;
-    typedef itk::SmartPointer<Self> Pointer;
-    typedef itk::SmartPointer<const Self> ConstPointer;
+    using Self = MultiCompartmentModel;
+    using Superclass = itk::LightObject;
+    using Pointer = itk::SmartPointer<Self>;
+    using ConstPointer = itk::SmartPointer<const Self>;
 
     /** Run-time type information (and related methods) */
-    itkTypeMacro(MultiCompartmentModel, itk::LightObject)
+    itkTypeMacro(MultiCompartmentModel, itk::LightObject);
 
-    itkNewMacro(Self)
+    itkNewMacro(Self);
 
-    typedef BaseCompartment::Pointer BaseCompartmentPointer;
-    typedef BaseCompartment::Vector3DType Vector3DType;
-    typedef BaseCompartment::ListType ListType;
-    typedef BaseCompartment::ModelOutputVectorType ModelOutputVectorType;
+    using BaseCompartmentPointer = BaseCompartment::Pointer;
+    using Vector3DType = BaseCompartment::Vector3DType;
+    using ListType = BaseCompartment::ListType;
+    using ModelOutputVectorType = BaseCompartment::ModelOutputVectorType;
 
     /**
      * Returns a clone of this MCM in terms of compartment organization, used by Clone method
