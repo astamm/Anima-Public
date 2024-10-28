@@ -69,7 +69,7 @@ int main(int argc, char **argv)
         }
     }
 
-    mcmCreator.SetCompartmentType(inputModel->GetCompartment(inputModel->GetNumberOfIsotropicCompartments())->GetCompartmentType());
+    mcmCreator.SetCylinderCompartmentType(inputModel->GetCompartment(inputModel->GetNumberOfIsotropicCompartments())->GetCompartmentType());
     mcmCreator.SetNumberOfCompartments(inputModel->GetNumberOfCompartments() - inputModel->GetNumberOfIsotropicCompartments());
 
     anima::MultiCompartmentModel::Pointer outputReferenceModel = mcmCreator.GetNewMultiCompartmentModel();

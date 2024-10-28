@@ -76,7 +76,7 @@ MCMImageSimplifier<PixelScalarType>
     MCMCreatorType mcmCreator;
     mcmCreator.SetModelWithFreeWaterComponent(modelWithFW);
     mcmCreator.SetModelWithSphereComponent(modelWithSphere);
-    mcmCreator.SetCompartmentType(compartmentType);
+    mcmCreator.SetCylinderCompartmentType(compartmentType);
     mcmCreator.SetNumberOfCompartments(maxCompartments);
 
     m_ReferenceOutputModel = mcmCreator.GetNewMultiCompartmentModel();

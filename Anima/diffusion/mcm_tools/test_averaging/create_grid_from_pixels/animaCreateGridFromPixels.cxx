@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
     size[2] = 1;
 
     anima::MultiCompartmentModelCreator mcmCreator;
-    mcmCreator.SetCompartmentType(anima::DDI);
+    mcmCreator.SetCylinderCompartmentType(anima::DDI);
     mcmCreator.SetNumberOfCompartments(numInput);
     mcmCreator.SetModelWithFreeWaterComponent(false);
 

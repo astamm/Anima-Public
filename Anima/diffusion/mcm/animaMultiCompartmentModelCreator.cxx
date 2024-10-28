@@ -12,10 +12,12 @@
 
 namespace anima
 {
+    const double MultiCompartmentModelCreator::m_FreeWaterDiffusivity = 3.0e-3;
 
     MultiCompartmentModelCreator::MultiCompartmentModelCreator()
     {
-        m_CompartmentType = Tensor;
+        m_SphereCompartmentType = SphereGPDPulsedGradient;
+        m_CylinderCompartmentType = Tensor;
         m_ModelWithFreeWaterComponent = false;
         m_ModelWithSphereComponent = false;
 
@@ -23,7 +25,6 @@ namespace anima
         m_VariableProjectionEstimationMode = true;
 
         m_UseConstrainedDiffusivity = false;
-        m_UseConstrainedFreeWaterDiffusivity = true;
         m_UseConstrainedStaniszDiffusivity = true;
         m_UseConstrainedStaniszRadius = true;
         m_UseConstrainedCylinderRadius = true;
@@ -35,7 +36,6 @@ namespace anima
         m_UseCommonExtraAxonalFractions = false;
 
         m_AxialDiffusivity = 1.71e-3;
-        m_FreeWaterDiffusivity = 3.0e-3;
         m_SphereDiffusivity = 1.71e-3;
         m_RadialDiffusivity1 = 1.9e-4;
         m_RadialDiffusivity2 = 1.5e-4;
@@ -60,7 +60,7 @@ namespace anima
         {
             using FreeWaterType = anima::FreeWaterCompartment;
             FreeWaterType::Pointer fwComp = FreeWaterType::New();
-            fwComp->SetEstimateAxialDiffusivity(!m_UseConstrainedFreeWaterDiffusivity);
+            fwComp->SetEstimateAxialDiffusivity(false);
             fwComp->SetAxialDiffusivity(m_FreeWaterDiffusivity);
 
             outputMCM->AddCompartment(defaultWeight, fwComp);
@@ -68,14 +68,24 @@ namespace anima
 
         if (m_ModelWithSphereComponent)
         {
-            using SphereType = anima::SphereGPDPulsedGradientCompartment;
-            SphereType::Pointer restComp = SphereType::New();
-            restComp->SetEstimateAxialDiffusivity(!m_UseConstrainedStaniszDiffusivity);
-            restComp->SetEstimateTissueRadius(!m_UseConstrainedStaniszRadius);
-            restComp->SetAxialDiffusivity(m_SphereDiffusivity);
-            restComp->SetTissueRadius(m_SphereRadius);
+            anima::BaseCompartment::Pointer sphereComp;
 
-            outputMCM->AddCompartment(defaultWeight, restComp);
+            switch (m_SphereCompartmentType)
+            {
+                case SphereGPDPulsedGradient:
+                    this->CreateSphereGPDPulsedGradientCompartment(sphereComp);
+                    break;
+                
+                case PlaneSGPPulsedGradient:
+                    this->CreatePlaneSGPPulsedGradientCompartment(sphereComp);
+                    break;
+                
+                default:
+                    throw itk::ExceptionObject(__FILE__, __LINE__, "The sphere compartment must be one of SphereGPDPulsedGradient or PlaneSGPPulsedGradient.", ITK_LOCATION);
+                    break;
+            }
+
+            outputMCM->AddCompartment(defaultWeight, sphereComp);
         }
 
         for (unsigned int i = 0; i < m_NumberOfCompartments; ++i)
@@ -83,7 +93,7 @@ namespace anima
             anima::BaseCompartment::Pointer tmpPointer;
             bool applyCommonConstraints = (i > 0);
 
-            switch (m_CompartmentType)
+            switch (m_CylinderCompartmentType)
             {
             case Stick:
                 this->CreateStickCompartment(tmpPointer, applyCommonConstraints);
@@ -110,7 +120,7 @@ namespace anima
                 break;
 
             default:
-                throw itk::ExceptionObject(__FILE__, __LINE__, "Creation of multiple free water compartment model not handled", ITK_LOCATION);
+                throw itk::ExceptionObject(__FILE__, __LINE__, "Cylinder compartments must be one of Stick, Zeppelin, Tensor, NODDI, DDI or CHARMED.", ITK_LOCATION);
                 break;
             }
 
@@ -121,6 +131,28 @@ namespace anima
         }
 
         return outputMCM;
+    }
+
+    void MultiCompartmentModelCreator::CreateSphereGPDPulsedGradientCompartment(BaseCompartmentPointer &compartmentPointer)
+    {
+        using SphereType = anima::SphereGPDPulsedGradientCompartment;
+        SphereType::Pointer sphereComp = SphereType::New();
+        sphereComp->SetEstimateAxialDiffusivity(!m_UseConstrainedStaniszDiffusivity);
+        sphereComp->SetEstimateTissueRadius(!m_UseConstrainedStaniszRadius);
+        sphereComp->SetAxialDiffusivity(m_SphereDiffusivity);
+        sphereComp->SetTissueRadius(m_SphereRadius);
+        compartmentPointer = sphereComp;
+    }
+
+    void MultiCompartmentModelCreator::CreatePlaneSGPPulsedGradientCompartment(BaseCompartmentPointer &compartmentPointer)
+    {
+        using SphereType = anima::PlaneSGPPulsedGradientCompartment;
+        SphereType::Pointer sphereComp = SphereType::New();
+        sphereComp->SetEstimateAxialDiffusivity(!m_UseConstrainedStaniszDiffusivity);
+        sphereComp->SetEstimateTissueRadius(!m_UseConstrainedStaniszRadius);
+        sphereComp->SetAxialDiffusivity(m_SphereDiffusivity);
+        sphereComp->SetTissueRadius(m_SphereRadius);
+        compartmentPointer = sphereComp;
     }
 
     void MultiCompartmentModelCreator::CreateStickCompartment(BaseCompartmentPointer &compartmentPointer, bool applyConstraints)
@@ -242,10 +274,10 @@ namespace anima
 
         CHARMEDType::Pointer charmedComp = CHARMEDType::New();
         charmedComp->SetEstimateDiffusivities(!m_UseConstrainedDiffusivity);
+        charmedComp->SetEstimateTissueRadius(!m_UseConstrainedCylinderRadius);
         charmedComp->SetAxialDiffusivity(m_AxialDiffusivity);
         charmedComp->SetRadialDiffusivity1((m_RadialDiffusivity1 + m_RadialDiffusivity2) / 2.0);
         charmedComp->SetTissueRadius(m_CylinderRadius);
-        charmedComp->SetEstimateTissueRadius(!m_UseConstrainedCylinderRadius);
 
         if (applyConstraints)
         {

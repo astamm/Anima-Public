@@ -26,14 +26,14 @@ namespace anima
         void SetModelWithFreeWaterComponent(bool arg) { m_ModelWithFreeWaterComponent = arg; }
         void SetModelWithSphereComponent(bool arg) { m_ModelWithSphereComponent = arg; }
 
-        void SetCompartmentType(CompartmentType arg) { m_CompartmentType = arg; }
+        void SetSphereCompartmentType(CompartmentType arg) { m_SphereCompartmentType = arg; }
+        void SetCylinderCompartmentType(CompartmentType arg) { m_CylinderCompartmentType = arg; }
         void SetNumberOfCompartments(unsigned int num) { m_NumberOfCompartments = num; }
         void SetVariableProjectionEstimationMode(bool arg) { m_VariableProjectionEstimationMode = arg; }
 
         void SetUseConstrainedDiffusivity(bool arg) { m_UseConstrainedDiffusivity = arg; }
         void SetUseConstrainedOrientationConcentration(bool arg) { m_UseConstrainedOrientationConcentration = arg; }
         void SetUseConstrainedExtraAxonalFraction(bool arg) { m_UseConstrainedExtraAxonalFraction = arg; }
-        void SetUseConstrainedFreeWaterDiffusivity(bool arg) { m_UseConstrainedFreeWaterDiffusivity = arg; }
         void SetUseConstrainedStaniszDiffusivity(bool arg) { m_UseConstrainedStaniszDiffusivity = arg; }
         void SetUseConstrainedStaniszRadius(bool arg) { m_UseConstrainedStaniszRadius = arg; }
         void SetUseConstrainedCylinderRadius(bool arg) { m_UseConstrainedCylinderRadius = arg; }
@@ -50,7 +50,6 @@ namespace anima
         bool GetUseCommonConcentrations() { return m_UseCommonConcentrations; }
         bool GetUseCommonExtraAxonalFractions() { return m_UseCommonExtraAxonalFractions; }
 
-        void SetFreeWaterDiffusivityValue(double arg) { m_FreeWaterDiffusivity = arg; }
         void SetSphereDiffusivityValue(double arg) { m_SphereDiffusivity = arg; }
         void SetAxialDiffusivityValue(double arg) { m_AxialDiffusivity = arg; }
         void SetRadialDiffusivity1Value(double arg) { m_RadialDiffusivity1 = arg; }
@@ -69,6 +68,8 @@ namespace anima
         MCMPointer GetNewMultiCompartmentModel();
 
     private:
+        void CreateSphereGPDPulsedGradientCompartment(BaseCompartmentPointer &compartmentPointer);
+        void CreatePlaneSGPPulsedGradientCompartment(BaseCompartmentPointer &compartmentPointer);
         void CreateStickCompartment(BaseCompartmentPointer &compartmentPointer, bool applyConstraints);
         void CreateZeppelinCompartment(BaseCompartmentPointer &compartmentPointer, bool applyConstraints);
         void CreateTensorCompartment(BaseCompartmentPointer &compartmentPointer, bool applyConstraints);
@@ -76,7 +77,7 @@ namespace anima
         void CreateDDICompartment(BaseCompartmentPointer &compartmentPointer, bool applyConstraints);
         void CreateCHARMEDCompartment(BaseCompartmentPointer &compartmentPointer, bool applyConstraints);
 
-        CompartmentType m_CompartmentType;
+        CompartmentType m_SphereCompartmentType, m_CylinderCompartmentType;
         bool m_ModelWithFreeWaterComponent;
         bool m_ModelWithSphereComponent;
         unsigned int m_NumberOfCompartments;
@@ -85,7 +86,6 @@ namespace anima
         bool m_UseConstrainedDiffusivity;
         bool m_UseConstrainedOrientationConcentration;
         bool m_UseConstrainedExtraAxonalFraction;
-        bool m_UseConstrainedFreeWaterDiffusivity;
         bool m_UseConstrainedStaniszDiffusivity;
         bool m_UseConstrainedStaniszRadius;
         bool m_UseConstrainedCylinderRadius;
@@ -94,11 +94,13 @@ namespace anima
         bool m_UseCommonConcentrations;
         bool m_UseCommonExtraAxonalFractions;
 
-        double m_FreeWaterDiffusivity, m_SphereDiffusivity;
+        double m_SphereDiffusivity;
         double m_OrientationConcentration, m_ExtraAxonalFraction;
         double m_AxialDiffusivity;
         double m_RadialDiffusivity1, m_RadialDiffusivity2;
         double m_SphereRadius, m_CylinderRadius;
+
+        static const double m_FreeWaterDiffusivity;
     };
 
 } // end namespace anima

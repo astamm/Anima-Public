@@ -59,7 +59,8 @@ namespace anima
         MCMCreatorType *tmpMCMCreator = this->GetNewMCMCreatorInstance();
         tmpMCMCreator->SetModelWithFreeWaterComponent(m_ModelWithFreeWaterComponent);
         tmpMCMCreator->SetModelWithSphereComponent(m_ModelWithSphereComponent);
-        tmpMCMCreator->SetCompartmentType(m_CylinderCompartmentType);
+        tmpMCMCreator->SetSphereCompartmentType(m_SphereCompartmentType);
+        tmpMCMCreator->SetCylinderCompartmentType(m_CylinderCompartmentType);
         tmpMCMCreator->SetNumberOfCompartments(m_NumberOfCompartments);
 
         MCMPointer tmpMCM = tmpMCMCreator->GetNewMultiCompartmentModel();
@@ -212,8 +213,8 @@ namespace anima
         // Setting up creators
         for (unsigned int i = 0; i < this->GetNumberOfWorkUnits(); ++i)
         {
+            m_MCMCreators[i]->SetSphereCompartmentType(m_SphereCompartmentType);
             m_MCMCreators[i]->SetAxialDiffusivityValue(m_AxialDiffusivityValue);
-            m_MCMCreators[i]->SetFreeWaterDiffusivityValue(3.0e-3);
             m_MCMCreators[i]->SetSphereDiffusivityValue(m_SphereDiffusivityValue);
             m_MCMCreators[i]->SetRadialDiffusivity1Value(m_RadialDiffusivity1Value);
             m_MCMCreators[i]->SetRadialDiffusivity2Value(m_RadialDiffusivity2Value);
@@ -313,7 +314,7 @@ namespace anima
         }
 
         mcmCreator->SetNumberOfCompartments(1);
-        mcmCreator->SetCompartmentType(Stick);
+        mcmCreator->SetCylinderCompartmentType(Stick);
 
         mcm = mcmCreator->GetNewMultiCompartmentModel();
 
@@ -789,7 +790,7 @@ namespace anima
         // - First create model
         mcmCreator->SetModelWithFreeWaterComponent(m_ModelWithFreeWaterComponent);
         mcmCreator->SetModelWithSphereComponent(m_ModelWithSphereComponent);
-        mcmCreator->SetCompartmentType(Stick);
+        mcmCreator->SetCylinderCompartmentType(Stick);
         mcmCreator->SetNumberOfCompartments(currentNumberOfCompartments);
         mcmCreator->SetVariableProjectionEstimationMode(m_MLEstimationStrategy == VariableProjection);
         mcmCreator->SetUseConstrainedDiffusivity(true);
@@ -863,7 +864,7 @@ namespace anima
 
         // - First create model
         MCMCreatorType *mcmCreator = m_MCMCreators[threadId];
-        mcmCreator->SetCompartmentType(Stick);
+        mcmCreator->SetCylinderCompartmentType(Stick);
         mcmCreator->SetNumberOfCompartments(optimalNumberOfCompartments);
         mcmCreator->SetUseConstrainedDiffusivity(m_UseConstrainedDiffusivity);
 
@@ -909,7 +910,7 @@ namespace anima
 
         // We're done with ball and stick, next up is ball and zeppelin
         // - First create model
-        mcmCreator->SetCompartmentType(Zeppelin);
+        mcmCreator->SetCylinderCompartmentType(Zeppelin);
         mcmUpdateValue = mcmCreator->GetNewMultiCompartmentModel();
         mcmUpdateValue->SetNegativeWeightBounds(authorizedNegativeB0Value);
 
@@ -951,7 +952,7 @@ namespace anima
 
         // Finally, we're done with ball and zeppelin, an example of what's next up with multi-tensor
         // - First create model
-        mcmCreator->SetCompartmentType(m_CylinderCompartmentType);
+        mcmCreator->SetCylinderCompartmentType(m_CylinderCompartmentType);
         mcmCreator->SetUseConstrainedExtraAxonalFraction(m_UseConstrainedExtraAxonalFraction);
         mcmCreator->SetUseConstrainedOrientationConcentration(m_UseConstrainedOrientationConcentration);
         mcmCreator->SetUseCommonConcentrations(m_UseCommonConcentrations);

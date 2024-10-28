@@ -152,7 +152,7 @@ MCMModelAveragingImageFilter<PixelScalarType>
     mcmCreator.SetModelWithFreeWaterComponent(modelWithFW);
     mcmCreator.SetModelWithSphereComponent(modelWithSphere);
     
-    mcmCreator.SetCompartmentType(compartmentType);
+    mcmCreator.SetCylinderCompartmentType(compartmentType);
     mcmCreator.SetNumberOfCompartments(3 * numberOfCombinations);
     
     m_ReferenceOutputModel = mcmCreator.GetNewMultiCompartmentModel();
