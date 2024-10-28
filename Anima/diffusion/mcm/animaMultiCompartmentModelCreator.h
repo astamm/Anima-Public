@@ -34,8 +34,8 @@ namespace anima
         void SetUseConstrainedDiffusivity(bool arg) { m_UseConstrainedDiffusivity = arg; }
         void SetUseConstrainedOrientationConcentration(bool arg) { m_UseConstrainedOrientationConcentration = arg; }
         void SetUseConstrainedExtraAxonalFraction(bool arg) { m_UseConstrainedExtraAxonalFraction = arg; }
-        void SetUseConstrainedStaniszDiffusivity(bool arg) { m_UseConstrainedStaniszDiffusivity = arg; }
-        void SetUseConstrainedStaniszRadius(bool arg) { m_UseConstrainedStaniszRadius = arg; }
+        void SetUseConstrainedSphereDiffusivity(bool arg) { m_UseConstrainedSphereDiffusivity = arg; }
+        void SetUseConstrainedSphereRadius(bool arg) { m_UseConstrainedSphereRadius = arg; }
         void SetUseConstrainedCylinderRadius(bool arg) { m_UseConstrainedCylinderRadius = arg; }
 
         bool GetUseConstrainedDiffusivity() { return m_UseConstrainedDiffusivity; }
@@ -86,8 +86,8 @@ namespace anima
         bool m_UseConstrainedDiffusivity;
         bool m_UseConstrainedOrientationConcentration;
         bool m_UseConstrainedExtraAxonalFraction;
-        bool m_UseConstrainedStaniszDiffusivity;
-        bool m_UseConstrainedStaniszRadius;
+        bool m_UseConstrainedSphereDiffusivity;
+        bool m_UseConstrainedSphereRadius;
         bool m_UseConstrainedCylinderRadius;
 
         bool m_UseCommonDiffusivities;

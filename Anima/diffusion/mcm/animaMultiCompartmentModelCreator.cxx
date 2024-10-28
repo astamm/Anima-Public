@@ -25,8 +25,8 @@ namespace anima
         m_VariableProjectionEstimationMode = true;
 
         m_UseConstrainedDiffusivity = false;
-        m_UseConstrainedStaniszDiffusivity = true;
-        m_UseConstrainedStaniszRadius = true;
+        m_UseConstrainedSphereDiffusivity = true;
+        m_UseConstrainedSphereRadius = true;
         m_UseConstrainedCylinderRadius = true;
         m_UseConstrainedOrientationConcentration = false;
         m_UseConstrainedExtraAxonalFraction = false;
@@ -137,8 +137,8 @@ namespace anima
     {
         using SphereType = anima::SphereGPDPulsedGradientCompartment;
         SphereType::Pointer sphereComp = SphereType::New();
-        sphereComp->SetEstimateAxialDiffusivity(!m_UseConstrainedStaniszDiffusivity);
-        sphereComp->SetEstimateTissueRadius(!m_UseConstrainedStaniszRadius);
+        sphereComp->SetEstimateAxialDiffusivity(!m_UseConstrainedSphereDiffusivity);
+        sphereComp->SetEstimateTissueRadius(!m_UseConstrainedSphereRadius);
         sphereComp->SetAxialDiffusivity(m_SphereDiffusivity);
         sphereComp->SetTissueRadius(m_SphereRadius);
         compartmentPointer = sphereComp;
@@ -148,8 +148,8 @@ namespace anima
     {
         using SphereType = anima::PlaneSGPPulsedGradientCompartment;
         SphereType::Pointer sphereComp = SphereType::New();
-        sphereComp->SetEstimateAxialDiffusivity(!m_UseConstrainedStaniszDiffusivity);
-        sphereComp->SetEstimateTissueRadius(!m_UseConstrainedStaniszRadius);
+        sphereComp->SetEstimateAxialDiffusivity(!m_UseConstrainedSphereDiffusivity);
+        sphereComp->SetEstimateTissueRadius(!m_UseConstrainedSphereRadius);
         sphereComp->SetAxialDiffusivity(m_SphereDiffusivity);
         sphereComp->SetTissueRadius(m_SphereRadius);
         compartmentPointer = sphereComp;

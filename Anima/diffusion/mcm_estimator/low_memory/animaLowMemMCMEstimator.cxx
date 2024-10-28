@@ -28,14 +28,20 @@ int main(int argc, char **argv)
     TCLAP::ValueArg<double> b0thrArg("", "b0-thr", "Background threshold on B0 value (default: 10)", false, 10.0, "B0 theshold", cmd);
 
     TCLAP::ValueArg<unsigned int> nbFasciclesArg("n", "nb-fascicles", "Number of computed fascicles (default: 2)", false, 2, "number of fascicles", cmd);
-    TCLAP::ValueArg<unsigned int> compartmentTypeArg("c", "comp-type", "Compartment type for fascicles: 1: stick, 2: zeppelin, 3: tensor, 4: NODDI, 5: DDI (default: 3)", false, 3, "fascicles type", cmd);
+    TCLAP::ValueArg<unsigned int> cylinderTypeArg(
+        "c", "cylinder-type",
+        "Compartment type for cylinders: 1: Stick, 2: Zeppelin, 3: Tensor, 4: NODDI, 5: DDI, 6: CHARMED (default: 3)",
+        false, 3, "cylinder type", cmd);
+    TCLAP::ValueArg<unsigned int> sphereTypeArg(
+        "s", "sphere-type",
+        "Compartment type for spheres: 0: none, 1: SphereGPDPulsedGradient, 2: PlaneSGPPulsedGradient (default: 1)",
+        false, 3, "sphere type", cmd);
     TCLAP::SwitchArg aicSelectNbCompartmentsArg("M", "opt-nb-comp", "Activate AICC-based number of compartments selection", cmd, false);
 
     TCLAP::SwitchArg freeWaterCompartmentArg("F", "free-water", "Model with free water", cmd, false);
-    TCLAP::SwitchArg staniszCompartmentArg("Z", "stanisz", "Model with stanisz isotropic compartment", cmd, false);
 
-    TCLAP::SwitchArg optStaniszRadiusArg("", "opt-stanisz-radius", "Optimize isotropic Stanisz radius value", cmd, false);
-    TCLAP::SwitchArg optStaniszDiffArg("", "opt-stanisz-diff", "Optimize isotropic Stanisz diffusivity value", cmd, false);
+    TCLAP::SwitchArg optSphereRadiusArg("", "opt-sphere-radius", "Optimize sphere radius value", cmd, false);
+    TCLAP::SwitchArg optSphereDiffArg("", "opt-sphere-diff", "Optimize sphere diffusivity value", cmd, false);
 
     TCLAP::SwitchArg fixDiffArg("", "fix-diff", "Fix diffusivity value", cmd, false);
     TCLAP::SwitchArg fixKappaArg("", "fix-kappa", "Fix orientation concentration values", cmd, false);
@@ -49,7 +55,7 @@ int main(int argc, char **argv)
     TCLAP::ValueArg<double> initAxialDiffArg("", "init-axial-diff", "Initial axial diffusivity (default: 1.71e-3)", false, 1.71e-3, "initial axial diffusivity", cmd);
     TCLAP::ValueArg<double> initRadialDiff1Arg("", "init-radial-diff1", "Initial first radial diffusivity (default: 1.9e-4)", false, 1.9e-4, "initial first radial diffusivity", cmd);
     TCLAP::ValueArg<double> initRadialDiff2Arg("", "init-radial-diff2", "Initial second radial diffusivity (default: 1.5e-4)", false, 1.5e-4, "initial second radial diffusivity", cmd);
-    TCLAP::ValueArg<double> initStaniszDiffArg("", "init-stanisz-diff", "Initial Stanisz diffusivity (default: 1.71e-3)", false, 1.71e-3, "initial Stanisz diffusivity", cmd);
+    TCLAP::ValueArg<double> initSphereDiffArg("", "init-sphere-diff", "Initial sphere diffusivity (default: 1.71e-3)", false, 1.71e-3, "initial sphere diffusivity", cmd);
 
     // Optimization parameters
     TCLAP::ValueArg<std::string> optimizerArg("", "optimizer", "Optimizer for estimation: bobyqa (default), ccsaq, bfgs or levenberg", false, "bobyqa", "optimizer", cmd);
@@ -104,18 +110,18 @@ int main(int argc, char **argv)
     mainFilter->SetB0Threshold(b0thrArg.getValue());
     mainFilter->SetNumberOfFascicles(nbFasciclesArg.getValue());
     mainFilter->SetFindOptimalNumberOfCompartments(aicSelectNbCompartmentsArg.isSet());
-    mainFilter->SetCompartmentType(compartmentTypeArg.getValue());
 
-    mainFilter->SetFreeWaterCompartment(freeWaterCompartmentArg.isSet());
-    mainFilter->SetSphereCompartment(staniszCompartmentArg.isSet());
+    mainFilter->SetUseFreeWaterCompartment(freeWaterCompartmentArg.isSet());
+    mainFilter->SetSphereCompartmentType(sphereTypeArg.getValue());
+    mainFilter->SetCylinderCompartmentType(cylinderTypeArg.getValue());
 
     mainFilter->SetAxialDiffusivityValue(initAxialDiffArg.getValue());
     mainFilter->SetRadialDiffusivity1Value(initRadialDiff1Arg.getValue());
     mainFilter->SetRadialDiffusivity2Value(initRadialDiff2Arg.getValue());
-    mainFilter->SetSphereDiffusivityValue(initStaniszDiffArg.getValue());
+    mainFilter->SetSphereDiffusivityValue(initSphereDiffArg.getValue());
 
-    mainFilter->SetOptimizeStaniszDiffusivity(optStaniszDiffArg.isSet());
-    mainFilter->SetOptimizeStaniszRadius(optStaniszRadiusArg.isSet());
+    mainFilter->SetOptimizeSphereDiffusivity(optSphereDiffArg.isSet());
+    mainFilter->SetOptimizeSphereRadius(optSphereRadiusArg.isSet());
 
     mainFilter->SetFixDiffusivity(fixDiffArg.isSet());
     mainFilter->SetFixKappa(fixKappaArg.isSet());

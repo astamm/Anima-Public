@@ -10,17 +10,17 @@ namespace anima
 class LowMemMCMEstimatorBridge
 {
 public:
-    typedef anima::MCMEstimatorImageFilter <double, double> BaseFilterType;
-    typedef BaseFilterType::InputImageType InputImageType;
-    typedef BaseFilterType::OutputImageType OutputImageType;
-    typedef BaseFilterType::OutputScalarImageType OutputScalarImageType;
-    typedef BaseFilterType::MCMType MCMType;
-    typedef BaseFilterType::SignalNoiseType SignalNoiseType;
-    typedef BaseFilterType::MaximumLikelihoodEstimationMode MaximumLikelihoodEstimationMode;
+    using BaseFilterType = anima::MCMEstimatorImageFilter <double, double>;
+    using InputImageType = BaseFilterType::InputImageType;
+    using OutputImageType = BaseFilterType::OutputImageType;
+    using OutputScalarImageType = BaseFilterType::OutputScalarImageType;
+    using MCMType = BaseFilterType::MCMType;
+    using SignalNoiseType = BaseFilterType::SignalNoiseType;
+    using MaximumLikelihoodEstimationMode = BaseFilterType::MaximumLikelihoodEstimationMode;
 
-    typedef anima::ImageDataSplitter < InputImageType > ImageSplitterType;
-    typedef itk::Image <unsigned char,3> MaskImageType;
-    typedef anima::ImageDataSplitter < MaskImageType > MoseImageSplitterType;
+    using ImageSplitterType = anima::ImageDataSplitter < InputImageType >;
+    using MaskImageType = itk::Image <unsigned char,3>;
+    using MoseImageSplitterType = anima::ImageDataSplitter < MaskImageType >;
 
     LowMemMCMEstimatorBridge();
     ~LowMemMCMEstimatorBridge();
@@ -54,13 +54,14 @@ public:
 
     void SetB0Threshold(double b0Thr) {m_B0Threshold = b0Thr;}
     void SetNumberOfFascicles(unsigned int nbFasc) {m_NumberOfFascicles = nbFasc;}
-    void SetCompartmentType(unsigned int cType) {m_CompartmentType = cType;}
+    void SetSphereCompartmentType(unsigned int sType) {m_SphereCompartmentType = sType;}
+    void SetCylinderCompartmentType(unsigned int cType) {m_CylinderCompartmentType = cType;}
 
-    void SetFreeWaterCompartment(bool fwComp) {m_FreeWaterCompartment = fwComp;}
-    void SetSphereCompartment(bool zComp) {m_SphereCompartment = zComp;}
+    void SetUseFreeWaterCompartment(bool fwComp) {m_UseFreeWaterCompartment = fwComp;}
+    void SetUseSphereCompartment(bool zComp) {m_UseSphereCompartment = zComp;}
 
-    void SetOptimizeStaniszDiffusivity(bool fix) {m_OptimizeStaniszDiffusivity = fix;}
-    void SetOptimizeStaniszRadius(bool fix) {m_OptimizeStaniszRadius = fix;}
+    void SetOptimizeSphereDiffusivity(bool fix) {m_OptimizeSphereDiffusivity = fix;}
+    void SetOptimizeSphereRadius(bool fix) {m_OptimizeSphereRadius = fix;}
 
     void SetFixDiffusivity(bool fix) {m_FixDiffusivity = fix;}
     void SetFixKappa(bool fix) {m_FixKappa = fix;}
@@ -145,14 +146,14 @@ private:
     std::string m_OutputAICName, m_OutputB0Name, m_OutputSigmaName, m_OutputMoseName;
 
     double m_B0Threshold;
-    unsigned int m_NumberOfFascicles, m_CompartmentType;
+    unsigned int m_NumberOfFascicles, m_SphereCompartmentType, m_CylinderCompartmentType;
 
-    bool m_FreeWaterCompartment, m_SphereCompartment;
+    bool m_UseFreeWaterCompartment, m_UseSphereCompartment;
     MaximumLikelihoodEstimationMode m_MLEstimationStrategy;
     bool m_FindOptimalNumberOfCompartments;
 
     bool m_FixDiffusivity, m_FixKappa, m_FixEAF;
-    bool m_OptimizeStaniszDiffusivity, m_OptimizeStaniszRadius;
+    bool m_OptimizeSphereDiffusivity, m_OptimizeSphereRadius;
     bool m_CommonDiffusivities, m_CommonKappa, m_CommonEAF;
 
     double m_AxialDiffusivityValue;

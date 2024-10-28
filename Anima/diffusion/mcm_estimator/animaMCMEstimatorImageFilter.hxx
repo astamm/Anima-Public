@@ -625,8 +625,8 @@ namespace anima
         mcmCreator->SetModelWithSphereComponent(m_ModelWithSphereComponent);
         mcmCreator->SetNumberOfCompartments(0);
         mcmCreator->SetVariableProjectionEstimationMode(m_MLEstimationStrategy == VariableProjection);
-        mcmCreator->SetUseConstrainedStaniszDiffusivity(m_UseConstrainedStaniszDiffusivity);
-        mcmCreator->SetUseConstrainedStaniszRadius(m_UseConstrainedStaniszRadius);
+        mcmCreator->SetUseConstrainedSphereDiffusivity(m_UseConstrainedSphereDiffusivity);
+        mcmCreator->SetUseConstrainedSphereRadius(m_UseConstrainedSphereRadius);
         mcmCreator->SetUseConstrainedCylinderRadius(m_UseConstrainedCylinderRadius);
 
         mcmValue = mcmCreator->GetNewMultiCompartmentModel();
@@ -794,8 +794,8 @@ namespace anima
         mcmCreator->SetNumberOfCompartments(currentNumberOfCompartments);
         mcmCreator->SetVariableProjectionEstimationMode(m_MLEstimationStrategy == VariableProjection);
         mcmCreator->SetUseConstrainedDiffusivity(true);
-        mcmCreator->SetUseConstrainedStaniszDiffusivity(m_UseConstrainedStaniszDiffusivity);
-        mcmCreator->SetUseConstrainedStaniszRadius(m_UseConstrainedStaniszRadius);
+        mcmCreator->SetUseConstrainedSphereDiffusivity(m_UseConstrainedSphereDiffusivity);
+        mcmCreator->SetUseConstrainedSphereRadius(m_UseConstrainedSphereRadius);
         mcmCreator->SetUseConstrainedCylinderRadius(m_UseConstrainedCylinderRadius);
         mcmCreator->SetUseCommonDiffusivities(m_UseCommonDiffusivities);
 

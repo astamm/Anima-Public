@@ -104,13 +104,13 @@ int main(int argc, char **argv)
         "Model with free water",
         cmd, false);
     
-    TCLAP::SwitchArg optStaniszRadiusArg(
-        "", "opt-stanisz-radius",
-        "Optimize isotropic Stanisz radius value",
+    TCLAP::SwitchArg optSphereRadiusArg(
+        "", "opt-sphere-radius",
+        "Optimize sphere radius value",
         cmd, false);
-    TCLAP::SwitchArg optStaniszDiffArg(
-        "", "opt-stanisz-diff",
-        "Optimize isotropic Stanisz diffusivity value",
+    TCLAP::SwitchArg optSphereDiffArg(
+        "", "opt-sphere-diff",
+        "Optimize sphere diffusivity value",
         cmd, false);
     TCLAP::SwitchArg optCylinderRadiusArg(
         "", "opt-cylinder-radius",
@@ -340,8 +340,8 @@ int main(int argc, char **argv)
     filter->SetMaxEval(maxEvalArg.getValue());
 
     filter->SetUseConstrainedDiffusivity(fixDiffArg.isSet());
-    filter->SetUseConstrainedStaniszDiffusivity(!optStaniszDiffArg.isSet());
-    filter->SetUseConstrainedStaniszRadius(!optStaniszRadiusArg.isSet());
+    filter->SetUseConstrainedSphereDiffusivity(!optSphereDiffArg.isSet());
+    filter->SetUseConstrainedSphereRadius(!optSphereRadiusArg.isSet());
     filter->SetUseConstrainedCylinderRadius(!optCylinderRadiusArg.isSet());
 
     if (!fixDiffArg.isSet())

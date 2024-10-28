@@ -156,33 +156,56 @@ void LowMemMCMEstimatorBridge::Update(int specificSplitToDo, bool genOutputDescr
 
         filter->SetB0Threshold(m_B0Threshold);
 
-        filter->SetModelWithFreeWaterComponent(m_FreeWaterCompartment);
-        filter->SetModelWithSphereComponent(m_SphereCompartment);
-
-        switch (m_CompartmentType)
+        filter->SetModelWithFreeWaterComponent(m_UseFreeWaterCompartment);
+        
+        bool modelWithSphereComponent = true;
+        switch (m_SphereCompartmentType)
         {
-            case 1:
-                filter->SetCylinderCompartmentType(anima::Stick);
-                break;
+        case 0:
+            modelWithSphereComponent = false;
+            break;
 
-            case 2:
-                filter->SetCylinderCompartmentType(anima::Zeppelin);
-                break;
+        case 1:
+            filter->SetSphereCompartmentType(anima::SphereGPDPulsedGradient);
+            break;
 
-            case 3:
-                filter->SetCylinderCompartmentType(anima::Tensor);
-                break;
+        case 2:
+            filter->SetSphereCompartmentType(anima::PlaneSGPPulsedGradient);
+            break;
 
-            case 4:
-                filter->SetCylinderCompartmentType(anima::NODDI);
-                break;
+        default:
+            itkExceptionMacro("Unsupported sphere compartment type");
+        }
+        filter->SetModelWithSphereComponent(modelWithSphereComponent);
 
-            case 5:
-                filter->SetCylinderCompartmentType(anima::DDI);
-                break;
+        switch (m_CylinderCompartmentType)
+        {
+        case 1:
+            filter->SetCylinderCompartmentType(anima::Stick);
+            break;
 
-            default:
-                itkExceptionMacro("Unsupported compartment type");
+        case 2:
+            filter->SetCylinderCompartmentType(anima::Zeppelin);
+            break;
+
+        case 3:
+            filter->SetCylinderCompartmentType(anima::Tensor);
+            break;
+
+        case 4:
+            filter->SetCylinderCompartmentType(anima::NODDI);
+            break;
+
+        case 5:
+            filter->SetCylinderCompartmentType(anima::DDI);
+            break;
+
+        case 6:
+            filter->SetCylinderCompartmentType(anima::CHARMED);
+            break;
+
+        default:
+            itkExceptionMacro("Unsupported cylinder compartment type");
         }
 
         filter->SetAxialDiffusivityValue(m_AxialDiffusivityValue);
@@ -204,8 +227,8 @@ void LowMemMCMEstimatorBridge::Update(int specificSplitToDo, bool genOutputDescr
         filter->SetNumberOfCoils(m_NumberOfCoils);
 
         filter->SetUseConstrainedDiffusivity(m_FixDiffusivity);
-        filter->SetUseConstrainedStaniszDiffusivity(!m_OptimizeStaniszDiffusivity);
-        filter->SetUseConstrainedStaniszRadius(!m_OptimizeStaniszRadius);
+        filter->SetUseConstrainedSphereDiffusivity(!m_OptimizeSphereDiffusivity);
+        filter->SetUseConstrainedSphereRadius(!m_OptimizeSphereRadius);
 
         if (!m_FixDiffusivity)
             filter->SetUseCommonDiffusivities(m_CommonDiffusivities);

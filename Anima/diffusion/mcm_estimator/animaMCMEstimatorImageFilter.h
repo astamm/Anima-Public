@@ -121,8 +121,8 @@ namespace anima
         itkSetMacro(FindOptimalNumberOfCompartments, bool);
 
         itkSetMacro(UseConstrainedDiffusivity, bool);
-        itkSetMacro(UseConstrainedStaniszDiffusivity, bool);
-        itkSetMacro(UseConstrainedStaniszRadius, bool);
+        itkSetMacro(UseConstrainedSphereDiffusivity, bool);
+        itkSetMacro(UseConstrainedSphereRadius, bool);
         itkSetMacro(UseConstrainedCylinderRadius, bool);
 
         itkSetMacro(UseConstrainedOrientationConcentration, bool);
@@ -199,8 +199,8 @@ namespace anima
             m_FindOptimalNumberOfCompartments = true;
 
             m_UseConstrainedDiffusivity = false;
-            m_UseConstrainedStaniszDiffusivity = true;
-            m_UseConstrainedStaniszRadius = true;
+            m_UseConstrainedSphereDiffusivity = true;
+            m_UseConstrainedSphereRadius = true;
             m_UseConstrainedCylinderRadius = true;
             m_UseCommonDiffusivities = false;
 
@@ -352,8 +352,8 @@ namespace anima
         bool m_FindOptimalNumberOfCompartments;
 
         bool m_UseConstrainedDiffusivity;
-        bool m_UseConstrainedStaniszRadius;
-        bool m_UseConstrainedStaniszDiffusivity;
+        bool m_UseConstrainedSphereRadius;
+        bool m_UseConstrainedSphereDiffusivity;
         bool m_UseConstrainedCylinderRadius;
         bool m_UseCommonDiffusivities;
 
