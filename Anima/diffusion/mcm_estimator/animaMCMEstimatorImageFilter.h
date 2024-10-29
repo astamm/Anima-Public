@@ -376,8 +376,10 @@ namespace anima
         double m_FTolerance;
 
         //! Coarse grid values for complex model initialization
-        std::vector<std::vector<double>> m_ValuesCoarseGrid;
+        std::vector<std::vector<double>> m_CoarseGridValues;
         std::vector<double> m_SphereRadiusCoarseGrid;
+
+        static const unsigned int m_UnidimensionalCoarseGridSize = 8;
     };
 
 } // end namespace anima

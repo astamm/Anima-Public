@@ -338,7 +338,7 @@ namespace anima
     void
     MCMEstimatorImageFilter<InputPixelType, OutputPixelType>::ComputeSphereRadiusCoarseGrid()
     {
-        unsigned int coarseGridSize = 8 * 8;
+        unsigned int coarseGridSize = m_UnidimensionalCoarseGridSize * m_UnidimensionalCoarseGridSize;
         m_SphereRadiusCoarseGrid.resize(coarseGridSize);
         for (unsigned int i = 0; i < coarseGridSize; ++i)
         {
@@ -351,12 +351,11 @@ namespace anima
     void
     MCMEstimatorImageFilter<InputPixelType, OutputPixelType>::ComputeExtraAxonalAndKappaCoarseGrids()
     {
-        // m_ValuesCoarseGrid[0] -> extra axonal fractions, m_ValuesCoarseGrid[1] -> kappa
-        m_ValuesCoarseGrid.resize(2);
+        // m_CoarseGridValues[0] -> extra axonal fractions, m_CoarseGridValues[1] -> kappa
+        m_CoarseGridValues.resize(2);
 
-        unsigned int coarseGridSize = 8;
-        m_ValuesCoarseGrid[0].resize(coarseGridSize);
-        m_ValuesCoarseGrid[1].resize(coarseGridSize);
+        m_CoarseGridValues[0].resize(m_UnidimensionalCoarseGridSize);
+        m_CoarseGridValues[1].resize(m_UnidimensionalCoarseGridSize);
 
         // The anisotropy index suggested by NODDI signal expression is not the ODI
         // index defined in Zhang et al., 2012, Neuroimage. Instead, it amounts to
@@ -366,11 +365,11 @@ namespace anima
 
         double power = 1.385829;
         double halfLife = 5.312364;
-        for (unsigned int i = 0; i < coarseGridSize; ++i)
+        for (unsigned int i = 0; i < m_UnidimensionalCoarseGridSize; ++i)
         {
-            double tmpVal = (i + 1.0) / (coarseGridSize + 1.0);
-            m_ValuesCoarseGrid[0][i] = tmpVal;
-            m_ValuesCoarseGrid[1][i] = std::pow(tmpVal * halfLife / (1.0 - tmpVal), 1.0 / power);
+            double tmpVal = (i + 1.0) / (m_UnidimensionalCoarseGridSize + 1.0);
+            m_CoarseGridValues[0][i] = tmpVal;
+            m_CoarseGridValues[1][i] = std::pow(tmpVal * halfLife / (1.0 - tmpVal), 1.0 / power);
         }
     }
 
@@ -378,18 +377,17 @@ namespace anima
     void
     MCMEstimatorImageFilter<InputPixelType, OutputPixelType>::ComputeCHARMEDCoarseGrids()
     {
-        // m_ValuesCoarseGrid[0] -> extra axonal fractions, m_ValuesCoarseGrid[1] -> tissue radius
-        m_ValuesCoarseGrid.resize(2);
+        // m_CoarseGridValues[0] -> extra axonal fractions, m_CoarseGridValues[1] -> tissue radius
+        m_CoarseGridValues.resize(2);
 
-        unsigned int coarseGridSize = 8;
-        m_ValuesCoarseGrid[0].resize(coarseGridSize);
-        m_ValuesCoarseGrid[1].resize(coarseGridSize);
+        m_CoarseGridValues[0].resize(m_UnidimensionalCoarseGridSize);
+        m_CoarseGridValues[1].resize(m_UnidimensionalCoarseGridSize);
 
-        for (unsigned int i = 0; i < coarseGridSize; ++i)
+        for (unsigned int i = 0; i < m_UnidimensionalCoarseGridSize; ++i)
         {
-            double tmpVal = (i + 1.0) / (coarseGridSize + 1.0);
-            m_ValuesCoarseGrid[0][i] = tmpVal;
-            m_ValuesCoarseGrid[1][i] = (m_UseConstrainedCylinderRadius) ? m_CylinderRadiusValue : anima::MCMTissueRadiusLowerBound + tmpVal * (anima::MCMTissueRadiusUpperBound - anima::MCMTissueRadiusLowerBound);
+            double tmpVal = (i + 1.0) / (m_UnidimensionalCoarseGridSize + 1.0);
+            m_CoarseGridValues[0][i] = tmpVal;
+            m_CoarseGridValues[1][i] = (m_UseConstrainedCylinderRadius) ? m_CylinderRadiusValue : anima::MCMTissueRadiusLowerBound + tmpVal * (anima::MCMTissueRadiusUpperBound - anima::MCMTissueRadiusLowerBound);
         }
     }
 
@@ -397,20 +395,19 @@ namespace anima
     void
     MCMEstimatorImageFilter<InputPixelType, OutputPixelType>::ComputeTensorRadialDiffsAndAzimuthCoarseGrids()
     {
-        // m_ValuesCoarseGrid[0] -> azimuth
-        // m_ValuesCoarseGrid[1] -> radial diff 1 vs axial diff weight
-        // m_ValuesCoarseGrid[2] -> radial diff 2 vs radial diff 1 weight
-        m_ValuesCoarseGrid.resize(3);
+        // m_CoarseGridValues[0] -> azimuth
+        // m_CoarseGridValues[1] -> radial diff 1 vs axial diff weight
+        // m_CoarseGridValues[2] -> radial diff 2 vs radial diff 1 weight
+        m_CoarseGridValues.resize(3);
 
-        unsigned int coarseGridSize = 8;
         for (unsigned int i = 0; i < 3; ++i)
-            m_ValuesCoarseGrid[i].resize(coarseGridSize);
+            m_CoarseGridValues[i].resize(m_UnidimensionalCoarseGridSize);
 
-        for (unsigned int i = 0; i < coarseGridSize; ++i)
+        for (unsigned int i = 0; i < m_UnidimensionalCoarseGridSize; ++i)
         {
-            m_ValuesCoarseGrid[0][i] = 2.0 * (i + 1) * M_PI / (coarseGridSize + 1.0);
-            m_ValuesCoarseGrid[1][i] = i / (coarseGridSize - 1.0);
-            m_ValuesCoarseGrid[2][i] = i / (coarseGridSize - 1.0);
+            m_CoarseGridValues[0][i] = 2.0 * (i + 1) * M_PI / (m_UnidimensionalCoarseGridSize + 1.0);
+            m_CoarseGridValues[1][i] = i / (m_UnidimensionalCoarseGridSize - 1.0);
+            m_CoarseGridValues[2][i] = i / (m_UnidimensionalCoarseGridSize - 1.0);
         }
     }
 
@@ -504,7 +501,7 @@ namespace anima
                 unsigned int maximalNumberOfCompartments = m_NumberOfCompartments;
                 if (m_FindOptimalNumberOfCompartments)
                 {
-                    minimalNumberOfCompartments = 1;
+                    minimalNumberOfCompartments = 1; // AST: shouldn't it be 0?
                     moseValue = 0;
                     aiccValue = std::numeric_limits<double>::max();
 
@@ -1070,13 +1067,13 @@ namespace anima
         unsigned int numIsoCompartments = mcmUpdateValue->GetNumberOfIsotropicCompartments();
         unsigned int numCompartments = mcmUpdateValue->GetNumberOfCompartments();
 
-        for (unsigned int j = 0; j < m_ValuesCoarseGrid[1].size(); ++j)
+        for (unsigned int j = 0; j < m_CoarseGridValues[1].size(); ++j)
         {
-            double tmpKappa = m_ValuesCoarseGrid[1][j];
+            double tmpKappa = m_CoarseGridValues[1][j];
 
-            for (unsigned int k = 0; k < m_ValuesCoarseGrid[0].size(); ++k)
+            for (unsigned int k = 0; k < m_CoarseGridValues[0].size(); ++k)
             {
-                double tmpNu = m_ValuesCoarseGrid[0][k];
+                double tmpNu = m_CoarseGridValues[0][k];
 
                 for (unsigned int i = numIsoCompartments; i < numCompartments; ++i)
                 {
@@ -1119,13 +1116,13 @@ namespace anima
         unsigned int numIsoCompartments = mcmUpdateValue->GetNumberOfIsotropicCompartments();
         unsigned int numCompartments = mcmUpdateValue->GetNumberOfCompartments();
 
-        for (unsigned int j = 0; j < m_ValuesCoarseGrid[1].size(); ++j)
+        for (unsigned int j = 0; j < m_CoarseGridValues[1].size(); ++j)
         {
-            double tmpRadius = m_ValuesCoarseGrid[1][j];
+            double tmpRadius = m_CoarseGridValues[1][j];
 
-            for (unsigned int k = 0; k < m_ValuesCoarseGrid[0].size(); ++k)
+            for (unsigned int k = 0; k < m_CoarseGridValues[0].size(); ++k)
             {
-                double tmpNu = m_ValuesCoarseGrid[0][k];
+                double tmpNu = m_CoarseGridValues[0][k];
 
                 for (unsigned int i = numIsoCompartments; i < numCompartments; ++i)
                 {
@@ -1201,25 +1198,25 @@ namespace anima
         for (unsigned int i = numIsoCompartments; i < numCompartments; ++i)
             mcmUpdateValue->GetCompartment(i)->SetAxialDiffusivity(meanAxialDiff);
 
-        for (unsigned int l = 0; l < m_ValuesCoarseGrid[2].size(); ++l)
+        for (unsigned int l = 0; l < m_CoarseGridValues[2].size(); ++l)
         {
-            double tmpWeight2 = m_ValuesCoarseGrid[2][l];
+            double tmpWeight2 = m_CoarseGridValues[2][l];
 
             // In between meanRD and (meanRD + MCMDiffusivityLowerBound) / 2
             double tmpRadialDiffusivity2 = 0.5 * ((1.0 + tmpWeight2) * meanRadialDiff + (1.0 - tmpWeight2) * anima::MCMDiffusivityLowerBound);
 
-            for (unsigned int k = 0; k < m_ValuesCoarseGrid[1].size(); ++k)
+            for (unsigned int k = 0; k < m_CoarseGridValues[1].size(); ++k)
             {
-                double tmpWeight1 = m_ValuesCoarseGrid[1][k];
+                double tmpWeight1 = m_CoarseGridValues[1][k];
 
                 // In between meanRD and (meanRD + meanAD) / 2
                 double tmpRadialDiffusivity1 = 0.5 * ((1.0 + tmpWeight1) * meanRadialDiff + (1.0 - tmpWeight1) * meanAxialDiff);
                 if (meanAxialDiff - tmpRadialDiffusivity1 < anima::MCMAxialDiffusivityAddonLowerBound)
                     continue;
 
-                for (unsigned int j = 0; j < m_ValuesCoarseGrid[0].size(); ++j)
+                for (unsigned int j = 0; j < m_CoarseGridValues[0].size(); ++j)
                 {
-                    double tmpAzimuth = m_ValuesCoarseGrid[0][j];
+                    double tmpAzimuth = m_CoarseGridValues[0][j];
 
                     for (unsigned int i = numIsoCompartments; i < numCompartments; ++i)
                     {
