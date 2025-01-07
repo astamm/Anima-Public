@@ -13,6 +13,9 @@
 namespace anima
 {
     const double MultiCompartmentModelCreator::m_FreeWaterDiffusivity = 3.0e-3;
+    const double MultiCompartmentModelCreator::m_SmallGlialCellRadius = 5e-3;
+    const double MultiCompartmentModelCreator::m_MediumGlialCellRadius = 25e-3;
+    const double MultiCompartmentModelCreator::m_LargeGlialCellRadius = 50e-3;
 
     MultiCompartmentModelCreator::MultiCompartmentModelCreator()
     {
@@ -64,6 +67,42 @@ namespace anima
             fwComp->SetAxialDiffusivity(m_FreeWaterDiffusivity);
 
             outputMCM->AddCompartment(defaultWeight, fwComp);
+        }
+
+        if (m_ModelWithSmallGlialCellComponent)
+        {
+            using SphereType = anima::SphereGPDPulsedGradientCompartment;
+            SphereType::Pointer sphereComp = SphereType::New();
+            sphereComp->SetEstimateAxialDiffusivity(false);
+            sphereComp->SetEstimateTissueRadius(false);
+            sphereComp->SetAxialDiffusivity(m_SphereDiffusivity);
+            sphereComp->SetTissueRadius(m_SmallGlialCellRadius);
+
+            outputMCM->AddCompartment(defaultWeight, sphereComp);
+        }
+
+        if (m_ModelWithMediumGlialCellComponent)
+        {
+            using SphereType = anima::SphereGPDPulsedGradientCompartment;
+            SphereType::Pointer sphereComp = SphereType::New();
+            sphereComp->SetEstimateAxialDiffusivity(false);
+            sphereComp->SetEstimateTissueRadius(false);
+            sphereComp->SetAxialDiffusivity(m_SphereDiffusivity);
+            sphereComp->SetTissueRadius(m_MediumGlialCellRadius);
+
+            outputMCM->AddCompartment(defaultWeight, sphereComp);
+        }
+
+        if (m_ModelWithLargeGlialCellComponent)
+        {
+            using SphereType = anima::SphereGPDPulsedGradientCompartment;
+            SphereType::Pointer sphereComp = SphereType::New();
+            sphereComp->SetEstimateAxialDiffusivity(false);
+            sphereComp->SetEstimateTissueRadius(false);
+            sphereComp->SetAxialDiffusivity(m_SphereDiffusivity);
+            sphereComp->SetTissueRadius(m_LargeGlialCellRadius);
+
+            outputMCM->AddCompartment(defaultWeight, sphereComp);
         }
 
         if (m_ModelWithSphereComponent)

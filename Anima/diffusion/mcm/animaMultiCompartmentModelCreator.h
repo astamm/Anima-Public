@@ -24,6 +24,9 @@ namespace anima
 
         // Isotropic compartments (one free water, one sphere)
         void SetModelWithFreeWaterComponent(bool arg) { m_ModelWithFreeWaterComponent = arg; }
+        void SetModelWithSmallGlialCellComponent(bool arg) { m_ModelWithSmallGlialCellComponent = arg; }
+        void SetModelWithMediumGlialCellComponent(bool arg) { m_ModelWithMediumGlialCellComponent = arg; }
+        void SetModelWithLargeGlialCellComponent(bool arg) { m_ModelWithLargeGlialCellComponent = arg; }
         void SetModelWithSphereComponent(bool arg) { m_ModelWithSphereComponent = arg; }
 
         void SetSphereCompartmentType(CompartmentType arg) { m_SphereCompartmentType = arg; }
@@ -80,6 +83,9 @@ namespace anima
         CompartmentType m_SphereCompartmentType, m_CylinderCompartmentType;
         bool m_ModelWithFreeWaterComponent;
         bool m_ModelWithSphereComponent;
+        bool m_ModelWithSmallGlialCellComponent;
+        bool m_ModelWithMediumGlialCellComponent;
+        bool m_ModelWithLargeGlialCellComponent;
         unsigned int m_NumberOfCompartments;
 
         bool m_VariableProjectionEstimationMode;
@@ -101,6 +107,9 @@ namespace anima
         double m_SphereRadius, m_CylinderRadius;
 
         static const double m_FreeWaterDiffusivity;
+        static const double m_SmallGlialCellRadius;
+        static const double m_MediumGlialCellRadius;
+        static const double m_LargeGlialCellRadius;
     };
 
 } // end namespace anima

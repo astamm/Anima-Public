@@ -58,6 +58,9 @@ namespace anima
         // Create fake MCM output to get its length
         MCMCreatorType *tmpMCMCreator = this->GetNewMCMCreatorInstance();
         tmpMCMCreator->SetModelWithFreeWaterComponent(m_ModelWithFreeWaterComponent);
+        tmpMCMCreator->SetModelWithSmallGlialCellComponent(m_ModelWithSmallGlialCellComponent);
+        tmpMCMCreator->SetModelWithMediumGlialCellComponent(m_ModelWithMediumGlialCellComponent);
+        tmpMCMCreator->SetModelWithLargeGlialCellComponent(m_ModelWithLargeGlialCellComponent);
         tmpMCMCreator->SetModelWithSphereComponent(m_ModelWithSphereComponent);
         tmpMCMCreator->SetSphereCompartmentType(m_SphereCompartmentType);
         tmpMCMCreator->SetCylinderCompartmentType(m_CylinderCompartmentType);
@@ -207,7 +210,10 @@ namespace anima
         std::cout << " - Radial diffusivity 1: " << m_RadialDiffusivity1Value << " mm2/s," << std::endl;
         std::cout << " - Radial diffusivity 2: " << m_RadialDiffusivity2Value << " mm2/s," << std::endl;
 
-        if (m_ModelWithSphereComponent)
+        if (m_ModelWithSmallGlialCellComponent || 
+            m_ModelWithMediumGlialCellComponent || 
+            m_ModelWithLargeGlialCellComponent || 
+            m_ModelWithSphereComponent)
             std::cout << " - Sphere diffusivity: " << m_SphereDiffusivityValue << " mm2/s," << std::endl;
 
         // Setting up creators
@@ -273,6 +279,24 @@ namespace anima
             ++countIsoComps;
         }
 
+        if (m_ModelWithSmallGlialCellComponent)
+        {
+            m_DictionaryDirections.insert(m_DictionaryDirections.begin(), fakeIsotropicDirection);
+            ++countIsoComps;
+        }
+
+        if (m_ModelWithMediumGlialCellComponent)
+        {
+            m_DictionaryDirections.insert(m_DictionaryDirections.begin(), fakeIsotropicDirection);
+            ++countIsoComps;
+        }
+
+        if (m_ModelWithLargeGlialCellComponent)
+        {
+            m_DictionaryDirections.insert(m_DictionaryDirections.begin(), fakeIsotropicDirection);
+            ++countIsoComps;
+        }
+
         if (m_ModelWithSphereComponent)
         {
             m_DictionaryDirections.insert(m_DictionaryDirections.begin(), fakeIsotropicDirection);
@@ -294,6 +318,42 @@ namespace anima
             mcmCreator->SetModelWithFreeWaterComponent(true);
             mcm = mcmCreator->GetNewMultiCompartmentModel();
             mcmCreator->SetModelWithFreeWaterComponent(false);
+
+            for (unsigned int i = 0; i < m_NumberOfImages; ++i)
+                m_SparseSticksDictionary(i, countIsoComps) = mcm->GetPredictedSignal(m_SmallDelta, m_BigDelta, m_GradientStrengths[i], m_GradientDirections[i]);
+
+            ++countIsoComps;
+        }
+
+        if (m_ModelWithSmallGlialCellComponent)
+        {
+            mcmCreator->SetModelWithSmallGlialCellComponent(true);
+            mcm = mcmCreator->GetNewMultiCompartmentModel();
+            mcmCreator->SetModelWithSmallGlialCellComponent(false);
+
+            for (unsigned int i = 0; i < m_NumberOfImages; ++i)
+                m_SparseSticksDictionary(i, countIsoComps) = mcm->GetPredictedSignal(m_SmallDelta, m_BigDelta, m_GradientStrengths[i], m_GradientDirections[i]);
+
+            ++countIsoComps;
+        }
+
+        if (m_ModelWithMediumGlialCellComponent)
+        {
+            mcmCreator->SetModelWithMediumGlialCellComponent(true);
+            mcm = mcmCreator->GetNewMultiCompartmentModel();
+            mcmCreator->SetModelWithMediumGlialCellComponent(false);
+
+            for (unsigned int i = 0; i < m_NumberOfImages; ++i)
+                m_SparseSticksDictionary(i, countIsoComps) = mcm->GetPredictedSignal(m_SmallDelta, m_BigDelta, m_GradientStrengths[i], m_GradientDirections[i]);
+
+            ++countIsoComps;
+        }
+
+        if (m_ModelWithLargeGlialCellComponent)
+        {
+            mcmCreator->SetModelWithLargeGlialCellComponent(true);
+            mcm = mcmCreator->GetNewMultiCompartmentModel();
+            mcmCreator->SetModelWithLargeGlialCellComponent(false);
 
             for (unsigned int i = 0; i < m_NumberOfImages; ++i)
                 m_SparseSticksDictionary(i, countIsoComps) = mcm->GetPredictedSignal(m_SmallDelta, m_BigDelta, m_GradientStrengths[i], m_GradientDirections[i]);
@@ -493,7 +553,11 @@ namespace anima
             else if (m_NumberOfCompartments > 0)
                 estimateNonIsoCompartments = true;
 
-            bool hasIsoCompartment = m_ModelWithFreeWaterComponent || m_ModelWithSphereComponent;
+            bool hasIsoCompartment = m_ModelWithFreeWaterComponent || 
+                m_ModelWithSmallGlialCellComponent || 
+                m_ModelWithMediumGlialCellComponent || 
+                m_ModelWithLargeGlialCellComponent || 
+                m_ModelWithSphereComponent;
             if (estimateNonIsoCompartments)
             {
                 // If model selection, handle it here
@@ -619,6 +683,9 @@ namespace anima
         // Declarations for optimization
         MCMCreatorType *mcmCreator = m_MCMCreators[threadId];
         mcmCreator->SetModelWithFreeWaterComponent(m_ModelWithFreeWaterComponent);
+        mcmCreator->SetModelWithSmallGlialCellComponent(m_ModelWithSmallGlialCellComponent);
+        mcmCreator->SetModelWithMediumGlialCellComponent(m_ModelWithMediumGlialCellComponent);
+        mcmCreator->SetModelWithLargeGlialCellComponent(m_ModelWithLargeGlialCellComponent);
         mcmCreator->SetModelWithSphereComponent(m_ModelWithSphereComponent);
         mcmCreator->SetNumberOfCompartments(0);
         mcmCreator->SetVariableProjectionEstimationMode(m_MLEstimationStrategy == VariableProjection);
@@ -786,6 +853,9 @@ namespace anima
 
         // - First create model
         mcmCreator->SetModelWithFreeWaterComponent(m_ModelWithFreeWaterComponent);
+        mcmCreator->SetModelWithSmallGlialCellComponent(m_ModelWithSmallGlialCellComponent);
+        mcmCreator->SetModelWithMediumGlialCellComponent(m_ModelWithMediumGlialCellComponent);
+        mcmCreator->SetModelWithLargeGlialCellComponent(m_ModelWithLargeGlialCellComponent);
         mcmCreator->SetModelWithSphereComponent(m_ModelWithSphereComponent);
         mcmCreator->SetCylinderCompartmentType(Stick);
         mcmCreator->SetNumberOfCompartments(currentNumberOfCompartments);

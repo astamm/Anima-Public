@@ -104,6 +104,9 @@ namespace anima
 
         // Model-related parameters
         itkSetMacro(ModelWithFreeWaterComponent, bool);
+        itkSetMacro(ModelWithSmallGlialCellComponent, bool);
+        itkSetMacro(ModelWithMediumGlialCellComponent, bool);
+        itkSetMacro(ModelWithLargeGlialCellComponent, bool);
         itkSetMacro(ModelWithSphereComponent, bool);
 
         itkSetMacro(NoiseType, SignalNoiseType);
@@ -188,6 +191,9 @@ namespace anima
             m_MLEstimationStrategy = Marginal;
 
             m_ModelWithFreeWaterComponent = true;
+            m_ModelWithSmallGlialCellComponent = true;
+            m_ModelWithMediumGlialCellComponent = true;
+            m_ModelWithLargeGlialCellComponent = true;
             m_ModelWithSphereComponent = true;
 
             m_NoiseType = Gaussian;
@@ -342,7 +348,11 @@ namespace anima
         double m_AbsoluteCostChange;
         MaximumLikelihoodEstimationMode m_MLEstimationStrategy;
 
-        bool m_ModelWithFreeWaterComponent, m_ModelWithSphereComponent;
+        bool m_ModelWithFreeWaterComponent;
+        bool m_ModelWithSmallGlialCellComponent;
+        bool m_ModelWithMediumGlialCellComponent;
+        bool m_ModelWithLargeGlialCellComponent;
+        bool m_ModelWithSphereComponent;
 
         SignalNoiseType m_NoiseType;
         CompartmentType m_SphereCompartmentType, m_CylinderCompartmentType;

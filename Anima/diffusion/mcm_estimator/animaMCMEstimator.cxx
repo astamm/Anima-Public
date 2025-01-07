@@ -104,6 +104,21 @@ int main(int argc, char **argv)
         "Model with free water",
         cmd, false);
     
+    TCLAP::SwitchArg smallGlialCellCompartmentArg(
+        "", "with-small-glial-cells",
+        "Model with small glial cells",
+        cmd, false);
+    
+    TCLAP::SwitchArg mediumGlialCellCompartmentArg(
+        "", "with-medium-glial-cells",
+        "Model with medium glial cells",
+        cmd, false);
+    
+    TCLAP::SwitchArg largeGlialCellCompartmentArg(
+        "", "with-large-glial-cells",
+        "Model with large glial cells",
+        cmd, false);
+    
     TCLAP::SwitchArg optSphereRadiusArg(
         "", "opt-sphere-radius",
         "Optimize sphere radius value",
@@ -269,6 +284,9 @@ int main(int argc, char **argv)
     filter->SetB0Threshold(b0thrArg.getValue());
 
     filter->SetModelWithFreeWaterComponent(freeWaterCompartmentArg.isSet());
+    filter->SetModelWithSmallGlialCellComponent(smallGlialCellCompartmentArg.isSet());
+    filter->SetModelWithMediumGlialCellComponent(mediumGlialCellCompartmentArg.isSet());
+    filter->SetModelWithLargeGlialCellComponent(largeGlialCellCompartmentArg.isSet());
 
     bool modelWithSphereComponent = true;
     switch(sphereTypeArg.getValue())
