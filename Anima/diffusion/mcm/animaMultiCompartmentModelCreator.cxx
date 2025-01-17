@@ -22,6 +22,9 @@ namespace anima
         m_SphereCompartmentType = SphereGPDPulsedGradient;
         m_CylinderCompartmentType = Tensor;
         m_ModelWithFreeWaterComponent = false;
+        m_ModelWithSmallGlialCellComponent = false;
+        m_ModelWithMediumGlialCellComponent = false;
+        m_ModelWithLargeGlialCellComponent = false;
         m_ModelWithSphereComponent = false;
 
         m_NumberOfCompartments = 1;
@@ -56,7 +59,12 @@ namespace anima
         outputMCM->SetCommonConcentrationParameters(m_UseCommonConcentrations);
         outputMCM->SetCommonExtraAxonalFractionParameters(m_UseCommonExtraAxonalFractions);
 
-        double numCompartments = m_ModelWithFreeWaterComponent + m_ModelWithSphereComponent + m_NumberOfCompartments;
+        double numCompartments = m_ModelWithFreeWaterComponent + 
+            m_ModelWithSmallGlialCellComponent + 
+            m_ModelWithMediumGlialCellComponent + 
+            m_ModelWithLargeGlialCellComponent + 
+            m_ModelWithSphereComponent + 
+            m_NumberOfCompartments;
         double defaultWeight = 1.0 / numCompartments;
 
         if (m_ModelWithFreeWaterComponent)

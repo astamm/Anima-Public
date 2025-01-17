@@ -310,6 +310,9 @@ namespace anima
         MCMPointer mcm;
         MCMCreatorType *mcmCreator = m_MCMCreators[0];
         mcmCreator->SetModelWithFreeWaterComponent(false);
+        mcmCreator->SetModelWithSmallGlialCellComponent(false);
+        mcmCreator->SetModelWithMediumGlialCellComponent(false);
+        mcmCreator->SetModelWithLargeGlialCellComponent(false);
         mcmCreator->SetModelWithSphereComponent(false);
         mcmCreator->SetNumberOfCompartments(0);
 
