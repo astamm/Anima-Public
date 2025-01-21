@@ -1095,15 +1095,22 @@ namespace anima
         double optValue = -1.0;
 
         unsigned int numIsoCompartments = mcmUpdateValue->GetNumberOfIsotropicCompartments();
-        unsigned int sphereCompIndex = 0;
+        int sphereCompIndex = -1;
         for (unsigned int i = 0;i < numIsoCompartments;++i)
         {
             if (mcmUpdateValue->GetCompartment(i)->GetCompartmentType() == anima::SphereGPDPulsedGradient ||
             mcmUpdateValue->GetCompartment(i)->GetCompartmentType() == anima::PlaneSGPPulsedGradient)
             {
+                if (!mcmUpdateValue->GetCompartment(i)->GetEstimateTissueRadius())
+                    continue;
                 sphereCompIndex = i;
                 break;
             }
+        }
+
+        if (sphereCompIndex < 0)
+        {
+            return;
         }
 
         for (unsigned int j = 0; j < m_SphereRadiusCoarseGrid.size(); ++j)

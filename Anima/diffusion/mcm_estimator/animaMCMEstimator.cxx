@@ -97,7 +97,7 @@ int main(int argc, char **argv)
     TCLAP::ValueArg<unsigned int> sphereTypeArg(
         "s", "sphere-type",
         "Compartment type for spheres: 0: none, 1: SphereGPDPulsedGradient, 2: PlaneSGPPulsedGradient (default: 1)",
-        false, 3, "sphere type", cmd);
+        false, 0, "sphere type", cmd);
 
     TCLAP::SwitchArg freeWaterCompartmentArg(
         "F", "free-water",

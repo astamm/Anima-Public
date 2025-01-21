@@ -100,6 +100,8 @@ namespace anima
         virtual void SetExtraAxonalFraction(double num) { m_ExtraAxonalFraction = num; }
         virtual void SetTissueRadius(double num) { m_TissueRadius = num; }
 
+        itkGetMacro(EstimateTissueRadius, bool);
+
         double GetPredictedSignal(double smallDelta, double bigDelta, double gradientStrength, const Vector3DType &gradient);
 
         virtual bool GetTensorCompatible() { return true; }
@@ -162,6 +164,8 @@ namespace anima
         double m_OrientationConcentration;
         double m_ExtraAxonalFraction;
         double m_TissueRadius;
+
+        bool m_EstimateTissueRadius;
     };
 
 } // end namespace anima
