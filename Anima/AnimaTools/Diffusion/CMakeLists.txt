@@ -1,13 +1,9 @@
-################################################################################
-# Here go the add_subdirectories, no code should be at the root
-################################################################################
-
 cmake_path(GET CMAKE_CURRENT_SOURCE_DIR STEM DIRNAME)
 set(PROJECT_PREFIX anima${DIRNAME})
 
-add_subdirectory(dti)
-add_subdirectory(ExpTensors)
-add_subdirectory(FibersAnalysis)
-add_subdirectory(LogTensors)
-add_subdirectory(MCM)
-add_subdirectory(odf)
+add_subdirectory(Average)
+add_subdirectory(Estimate)
+add_subdirectory(Extract)
+add_subdirectory(Misc)
+add_subdirectory(Simulate)
+add_subdirectory(Track)

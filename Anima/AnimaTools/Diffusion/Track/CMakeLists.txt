@@ -1,0 +1,12 @@
+cmake_path(GET CMAKE_CURRENT_SOURCE_DIR STEM DIRNAME)
+set(PROJECT_PREFIX ${PROJECT_PREFIX}${DIRNAME})
+
+add_subdirectory(AContrarioAnalysis)
+add_subdirectory(Add)
+add_subdirectory(Compare)
+add_subdirectory(Converter)
+add_subdirectory(Counter)
+add_subdirectory(Deterministically)
+add_subdirectory(DiseaseScores)
+add_subdirectory(Filterer)
+add_subdirectory(Probabilistically)

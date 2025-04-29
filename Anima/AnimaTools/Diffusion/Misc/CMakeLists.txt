@@ -1,0 +1,11 @@
+cmake_path(GET CMAKE_CURRENT_SOURCE_DIR STEM DIRNAME)
+set(PROJECT_PREFIX ${PROJECT_PREFIX}${DIRNAME})
+
+add_subdirectory(ExpTensors)
+add_subdirectory(FlipTensors)
+add_subdirectory(GenerateIsoradiusDDI_Surface)
+add_subdirectory(LogTensors)
+add_subdirectory(MCM_MergeAnisotropicWeights)
+add_subdirectory(MCM_MergeBlockImages)
+add_subdirectory(MCM_OrientationPriors)
+add_subdirectory(MCMModelAveraging)
