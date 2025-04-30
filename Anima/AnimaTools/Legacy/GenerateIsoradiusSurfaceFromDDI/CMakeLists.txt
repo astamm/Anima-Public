@@ -1,7 +1,4 @@
-cmake_path(GET CMAKE_CURRENT_SOURCE_DIR STEM DIRNAME)
-set(PROJECT_PREFIX ${PROJECT_PREFIX}${DIRNAME})
-
-project(${PROJECT_PREFIX})
+project(${PROJECT_PREFIX}GenerateIsoradiusSurfaceFromDDI)
 
 ## #############################################################################
 ## List Sources
@@ -19,13 +16,10 @@ add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_CFILES})
 ## Link
 ## #############################################################################
 
-target_link_libraries(${PROJECT_NAME}
-  ${ITKIO_LIBRARIES}
-  libAnimaCore
-)
+target_link_libraries(${PROJECT_NAME} libAnimaDiffusion)
 
 ## #############################################################################
 ## install
 ## #############################################################################
 
-set_exe_install_rules(${PROJECT_NAME} "animaMergeBlockImages")
+set_exe_install_rules(${PROJECT_NAME} "animaGenerateIsoradiusDDISurface")

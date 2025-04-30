@@ -22,10 +22,11 @@ add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_CFILES})
 target_link_libraries(${PROJECT_NAME}
   ${ITKIO_LIBRARIES}
   libAnimaCore
+  libAnimaMaths
 )
 
 ## #############################################################################
 ## install
 ## #############################################################################
 
-set_exe_install_rules(${PROJECT_NAME} "animaMergeBlockImages")
+set_exe_install_rules(${PROJECT_NAME} "animaExpTensors")

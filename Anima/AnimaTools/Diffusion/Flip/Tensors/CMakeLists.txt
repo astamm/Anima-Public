@@ -28,4 +28,4 @@ target_link_libraries(${PROJECT_NAME}
 ## install
 ## #############################################################################
 
-set_exe_install_rules(${PROJECT_NAME} "animaMergeBlockImages")
+set_exe_install_rules(${PROJECT_NAME} "animaFlipTensors")
