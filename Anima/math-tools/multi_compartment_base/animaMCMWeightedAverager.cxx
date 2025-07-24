@@ -242,6 +242,44 @@ void MCMWeightedAverager::ComputeNonTensorDistanceMatrix()
                                                  m_DDIInterpolationMethod,m_InternalDistanceMatrix);
 }
 
+void MCMWeightedAverager::ComputeOrientationDistanceMatrix()
+{
+    unsigned int numCompartments = m_WorkCompartmentsVector.size();
+
+    vnl_vector <double> tmpVec(3);
+    tmpVec.fill(0);
+    for (unsigned int i = 0;i < numCompartments;++i)
+        m_InternalDDIDirections[i] = tmpVec;
+
+    for (unsigned int i = 0;i < numCompartments;++i)
+    {
+        anima::TransformSphericalToCartesianCoordinates(
+            m_WorkCompartmentsVector[i]->GetOrientationTheta(), 
+            m_WorkCompartmentsVector[i]->GetOrientationPhi(), 
+            1.0, 
+            m_InternalDDIDirections[i]
+        );
+    }
+
+    m_InternalDistanceMatrix.set_size(numCompartments,numCompartments);
+    m_InternalDistanceMatrix.fill(0);
+
+    for (unsigned int i = 0;i < numCompartments;++i)
+    {
+        for (unsigned int j = i+1;j < numCompartments;++j)
+        {
+            double cosValue = anima::ComputeScalarProduct(m_InternalDDIDirections[i], m_InternalDDIDirections[j]);
+            cosValue = std::abs(cosValue);
+            if (cosValue > 1.0)
+                cosValue = 1.0;
+            double distanceValue = std::acos(cosValue) / M_PI;
+            m_InternalDistanceMatrix(i,j) = distanceValue;
+            if (i != j)
+                m_InternalDistanceMatrix(j,i) = distanceValue;
+        }
+    }
+}
+
 void MCMWeightedAverager::ComputeOutputTensorCompatibleModel()
 {
     unsigned int numCompartments = m_WorkCompartmentsVector.size();

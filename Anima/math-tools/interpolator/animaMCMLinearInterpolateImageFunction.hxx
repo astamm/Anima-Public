@@ -121,7 +121,7 @@ void
 MCMLinearInterpolateImageFunction< TInputImage, TCoordRep >
 ::SetSpecificAveragerParameters(unsigned int threadIndex) const
 {
-    typedef anima::MCMWeightedAverager InternalAveragerType;
+    using InternalAveragerType = anima::MCMWeightedAverager;
     InternalAveragerType *castAverager = dynamic_cast <InternalAveragerType *> (this->GetAveragers()[threadIndex].GetPointer());
 
     castAverager->SetDDIInterpolationMethod(m_DDIInterpolationMethod);

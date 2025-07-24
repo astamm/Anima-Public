@@ -14,10 +14,10 @@ public itk::InterpolateImageFunction<TInputImage,TCoordRep>
 {
 public:
     /** Standard class typedefs. */
-    typedef MCMLinearInterpolateImageFunction Self;
-    typedef itk::InterpolateImageFunction<TInputImage,TCoordRep> Superclass;
-    typedef itk::SmartPointer<Self> Pointer;
-    typedef itk::SmartPointer<const Self> ConstPointer;
+    using Self = MCMLinearInterpolateImageFunction;
+    using Superclass = itk::InterpolateImageFunction<TInputImage,TCoordRep>;
+    using Pointer = itk::SmartPointer<Self>;
+    using ConstPointer = itk::SmartPointer<const Self>;
 
     /** Method for creation through the object factory. */
     itkNewMacro(Self)
@@ -27,29 +27,29 @@ public:
                  InterpolateImageFunction)
 
     /** InputImageType typedef support. */
-    typedef typename Superclass::InputImageType InputImageType;
-    typedef typename TInputImage::PixelType PixelType;
-    typedef typename Superclass::RealType RealType;
-    typedef typename Superclass::SizeType SizeType;
+    using InputImageType = typename Superclass::InputImageType;
+    using PixelType = typename TInputImage::PixelType;
+    using RealType = typename Superclass::RealType;
+    using SizeType = typename Superclass::SizeType;
 
     /** Dimension underlying input image. */
     itkStaticConstMacro(ImageDimension, unsigned int,Superclass::ImageDimension);
 
     /** Index typedef support. */
-    typedef typename Superclass::IndexType       IndexType;
-    typedef typename Superclass::IndexValueType  IndexValueType;
+    using IndexType = typename Superclass::IndexType;
+    using IndexValueType = typename Superclass::IndexValueType;
 
     /** ContinuousIndex typedef support. */
-    typedef typename Superclass::ContinuousIndexType ContinuousIndexType;
+    using ContinuousIndexType = typename Superclass::ContinuousIndexType;
 
-    typedef typename Superclass::OutputType OutputType;
+    using OutputType = typename Superclass::OutputType;
 
     // Multi-compartment models typedefs
-    typedef anima::MultiCompartmentModel MCModelType;
-    typedef MCModelType::Pointer MCModelPointer;
+    using MCModelType = anima::MultiCompartmentModel;
+    using MCModelPointer = MCModelType::Pointer;
 
-    typedef anima::MCMWeightedAverager AveragerType;
-    typedef AveragerType::Pointer AveragerPointer;
+    using AveragerType = anima::MCMWeightedAverager;
+    using AveragerPointer = AveragerType::Pointer;
 
     /** Evaluate the function at a ContinuousIndex position
      *

@@ -24,15 +24,15 @@ namespace anima
 class ANIMAMCMBASE_EXPORT MCMWeightedAverager : public itk::LightObject
 {
 public:
-    typedef MCMWeightedAverager Self;
-    typedef itk::LightObject Superclass;
-    typedef itk::SmartPointer<Self> Pointer;
-    typedef itk::SmartPointer<const Self> ConstPointer;
+    using Self = MCMWeightedAverager;
+    using Superclass = itk::LightObject;
+    using Pointer = itk::SmartPointer<Self>;
+    using ConstPointer = itk::SmartPointer<const Self>;
 
     /** Run-time type information (and related methods) */
-    itkTypeMacro(MCMWeightedAverager, itk::LightObject)
+    itkTypeMacro(MCMWeightedAverager, itk::LightObject);
 
-    itkNewMacro(Self)
+    itkNewMacro(Self);
 
     using MCMType = anima::MultiCompartmentModel;
     using MCMCompartmentPointer = MCMType::BaseCompartmentPointer;
@@ -66,6 +66,7 @@ protected:
 
     void ComputeTensorDistanceMatrix();
     void ComputeNonTensorDistanceMatrix();
+    void ComputeOrientationDistanceMatrix();
 
     void ComputeOutputTensorCompatibleModel();
     void ComputeOutputNonTensorModel();
