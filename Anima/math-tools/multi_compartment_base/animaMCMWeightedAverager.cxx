@@ -59,9 +59,9 @@ MCMWeightedAverager::GetUntouchedOutputModel() {
 
 unsigned int MCMWeightedAverager::GetOutputModelSize() {
   if (!m_OutputModel)
-    itkExceptionMacro("Output model not initialized");
+    itkExceptionMacro("Output model not initialized")
 
-  return m_OutputModel->GetSize();
+        return m_OutputModel->GetSize();
 }
 
 void MCMWeightedAverager::Update() {
@@ -365,127 +365,12 @@ void MCMWeightedAverager::ComputeOutputTensorCompatibleModel() {
   }
 }
 
-void MCMWeightedAverager::ComputeNonTensorDistanceMatrix() {
-  if (m_WorkCompartmentsVector[0]->GetCompartmentType() != anima::DDI)
-    itkExceptionMacro("Only DDI supported in addition to tensor");
-
-  unsigned int numCompartments = m_WorkCompartmentsVector.size();
-  m_InternalDDIKappa.resize(numCompartments);
-  m_InternalDDINu.resize(numCompartments);
-  m_InternalDDIDiffusivity.resize(numCompartments);
-  m_InternalDDIDirections.resize(numCompartments);
-  vnl_vector<double> tmpVec(3);
-  tmpVec.fill(0);
-  for (unsigned int i = 0; i < numCompartments; ++i)
-    m_InternalDDIDirections[i] = tmpVec;
-
-  for (unsigned int i = 0; i < numCompartments; ++i) {
-    anima::TransformSphericalToCartesianCoordinates(
-        m_WorkCompartmentsVector[i]->GetOrientationTheta(),
-        m_WorkCompartmentsVector[i]->GetOrientationPhi(), 1.0,
-        m_InternalDDIDirections[i]);
-
-    m_InternalDDIKappa[i] =
-        m_WorkCompartmentsVector[i]->GetOrientationConcentration();
-    m_InternalDDIDiffusivity[i] =
-        m_WorkCompartmentsVector[i]->GetAxialDiffusivity();
-    m_InternalDDINu[i] = m_WorkCompartmentsVector[i]->GetExtraAxonalFraction();
-  }
-
-  anima::ComputeDistanceMatrixBetweenFascicles(
-      m_InternalDDINu, m_InternalDDIDiffusivity, m_InternalDDIKappa,
-      m_InternalDDIDirections, m_DDIInterpolationMethod,
-      m_InternalDistanceMatrix);
-}
-
-void MCMWeightedAverager::ComputeOutputTensorCompatibleModel() {
-  unsigned int numCompartments = m_WorkCompartmentsVector.size();
-  unsigned int numIsoCompartments =
-      m_OutputModel->GetNumberOfIsotropicCompartments();
-  unsigned int numberOfOutputCompartments =
-      m_InternalSpectralMemberships[0].size();
-
-  m_InternalWorkMatrix.set_size(3, 3);
-  m_InternalWorkEigenVectors.set_size(3, 3);
-  m_InternalWorkEigenValues.set_size(3);
-
-  m_InternalOutputVector.SetSize(6);
-  m_InternalWorkEigenValuesInputSticks.set_size(3);
-
-  anima::DiffusionModelCompartmentType anisoCompartmentType =
-      m_OutputModel->GetCompartment(numIsoCompartments)->GetCompartmentType();
-
-  for (unsigned int i = 0; i < numberOfOutputCompartments; ++i) {
-    m_InternalOutputVector.Fill(0);
-    double totalWeights = 0;
-    for (unsigned int j = 0; j < numCompartments; ++j) {
-      double weight =
-          m_WorkCompartmentWeights[j] * m_InternalSpectralMemberships[j][i];
-      if (weight == 0)
-        continue;
-
-      // Stick is with a fixed radial diffusivity, get it for later setting it
-      // back
-      if ((anisoCompartmentType == anima::Stick) && (totalWeights == 0.0)) {
-        anima::GetTensorFromVectorRepresentation(m_InternalLogTensors[j],
-                                                 m_InternalWorkMatrix, 3, true);
-        m_InternalEigenAnalyzer.ComputeEigenValues(
-            m_InternalWorkMatrix, m_InternalWorkEigenValuesInputSticks);
-      }
-
-      totalWeights += weight;
-      m_InternalOutputVector += m_InternalLogTensors[j] * weight;
-    }
-
-    if (totalWeights > 0.0) {
-      m_InternalOutputVector /= totalWeights;
-
-      m_InternalOutputWeights[i + numIsoCompartments] = totalWeights;
-      anima::GetTensorFromVectorRepresentation(m_InternalOutputVector,
-                                               m_InternalWorkMatrix, 3, true);
-
-      if (anisoCompartmentType != anima::Tensor)
-        m_InternalEigenAnalyzer.ComputeEigenValuesAndVectors(
-            m_InternalWorkMatrix, m_InternalWorkEigenValues,
-            m_InternalWorkEigenVectors);
-
-      if (anisoCompartmentType == anima::Stick) {
-        // Replace smaller eigen values by stick default value
-        m_InternalWorkEigenValues[0] = m_InternalWorkEigenValuesInputSticks[0];
-        m_InternalWorkEigenValues[1] = m_InternalWorkEigenValuesInputSticks[0];
-
-        anima::RecomposeTensor(m_InternalWorkEigenValues,
-                               m_InternalWorkEigenVectors,
-                               m_InternalWorkMatrix);
-      } else if (anisoCompartmentType == anima::Zeppelin) {
-        // Force radial diffusivity as the sum of the two smallest ones
-        double logEigenValue =
-            (m_InternalWorkEigenValues[0] + m_InternalWorkEigenValues[1]) / 2.0;
-        m_InternalWorkEigenValues[0] = logEigenValue;
-        m_InternalWorkEigenValues[1] = logEigenValue;
-
-        anima::RecomposeTensor(m_InternalWorkEigenValues,
-                               m_InternalWorkEigenVectors,
-                               m_InternalWorkMatrix);
-      }
-
-      m_leCalculator->GetTensorExponential(m_InternalWorkMatrix,
-                                           m_InternalWorkMatrix);
-      anima::GetVectorRepresentation(m_InternalWorkMatrix,
-                                     m_InternalOutputVector);
-    }
-
-    anima::BaseCompartment *workCompartment =
-        m_OutputModel->GetCompartment(i + numIsoCompartments);
-    workCompartment->SetCompartmentVector(m_InternalOutputVector);
-  }
-}
-
 void MCMWeightedAverager::ComputeOutputNonTensorModel() {
   if (m_WorkCompartmentsVector[0]->GetCompartmentType() != anima::DDI)
-    itkExceptionMacro("Only DDI supported in addition to tensor");
+    itkExceptionMacro("Only DDI supported in addition to tensor")
 
-  std::vector<double> referenceDDIWeights = m_WorkCompartmentWeights;
+        std::vector<double>
+            referenceDDIWeights = m_WorkCompartmentWeights;
 
   double averageNu = 0, averageDiffusivity = 0, averageKappa = 0,
          averageWeight = 0;
