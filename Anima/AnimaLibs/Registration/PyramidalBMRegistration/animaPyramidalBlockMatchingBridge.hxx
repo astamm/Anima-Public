@@ -514,15 +514,19 @@ void PyramidalBlockMatchingBridge<ImageDimension>::Update()
         vnl_matrix <double> affResult(NDimensions,NDimensions,0);
         typename AffineTransformType::OffsetType offset(NDimensions);
 
+        typename AffineTransformType::MatrixType itkMatrix;
         for (unsigned int i = 0;i < NDimensions;++i)
         {
-            for (unsigned int j = 0;j < NDimensions;++j)
-                affResult(i,j) = affMatrix(i,j);
+            for (unsigned int j = 0; j < NDimensions; ++j)
+            {
+                affResult(i, j) = affMatrix(i, j);
+                itkMatrix(i, j) = affResult(i, j);
+            }
 
             offset[i] = affMatrix(i,NDimensions);
         }
 
-        tmpTrsf->SetMatrix(affResult);
+        tmpTrsf->SetMatrix(itkMatrix);
         tmpTrsf->SetOffset(offset);
     }
 
@@ -766,7 +770,12 @@ void PyramidalBlockMatchingBridge<ImageDimension>::SetupPyramids()
 
                 std::cout << scalMatrix << " " << scalOffset << std::endl;
 
-                m_InitialTransform->SetMatrix(scalMatrix);
+                typename AffineTransformType::MatrixType itkScalMatrix;
+                for (unsigned int i = 0; i < ImageDimension; ++i)
+                    for (unsigned int j = 0; j < ImageDimension; ++j)
+                        itkScalMatrix(i, j) = scalMatrix(i, j);
+
+                m_InitialTransform->SetMatrix(itkScalMatrix);
                 m_InitialTransform->SetOffset(scalOffset);
             }
         }

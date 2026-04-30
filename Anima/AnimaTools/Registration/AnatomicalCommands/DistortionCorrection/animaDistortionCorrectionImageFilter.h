@@ -28,13 +28,13 @@ public:
     typedef typename TInputImage::InternalPixelType   PixelType;
     typedef typename TInputImage::ConstPointer InputImagePointer;
     /** Method for creation through the object factory. */
-    itkNewMacro(Self)
+    itkNewMacro(Self);
 
     /** Run-time type information (and related methods). */
-    itkTypeMacro(DistortionCorrectionFilter, itk::ImageToImageFilter)
+    itkTypeMacro(DistortionCorrectionImageFilter, itk::ImageToImageFilter);
 
-    itkSetMacro(Direction, unsigned int)
-    itkSetMacro(FieldSmoothingSigma, double)
+    itkSetMacro(Direction, unsigned int);
+    itkSetMacro(FieldSmoothingSigma, double);
 
 protected:
     DistortionCorrectionImageFilter();

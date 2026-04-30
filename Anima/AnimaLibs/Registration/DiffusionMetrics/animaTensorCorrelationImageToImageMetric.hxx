@@ -85,12 +85,16 @@ TensorCorrelationImageToImageMetric<TFixedImagePixelType,TMovingImagePixelType,I
                     anima::RotateSymmetricMatrix(tmpMat,this->m_OrientationMatrix,currentTensor);
                 else
                 {
-                    eigenComputer.ComputeEigenValuesAndVectors(tmpMat,eigVals,eigVecs);
-                    anima::ExtractPPDRotationFromJacobianMatrix(this->m_OrientationMatrix,ppdOrientationMatrix,eigVecs);
-                    anima::RotateSymmetricMatrix(tmpMat,ppdOrientationMatrix,currentTensor);
+                    EigVecMatrixType tmpMatITK;
+                    for (unsigned int ii = 0; ii < 3; ++ii)
+                        for (unsigned int jj = 0; jj < 3; ++jj)
+                            tmpMatITK(ii, jj) = tmpMat(ii, jj);
+                    eigenComputer.ComputeEigenValuesAndVectors(tmpMatITK, eigVals, eigVecs);
+                    anima::ExtractPPDRotationFromJacobianMatrix(this->m_OrientationMatrix, ppdOrientationMatrix, eigVecs);
+                    anima::RotateSymmetricMatrix(tmpMat,ppdOrientationMatrix, currentTensor);
                 }
 
-                anima::GetVectorRepresentation(currentTensor,movingValue,vectorSize,true);
+                anima::GetVectorRepresentation(currentTensor, movingValue, vectorSize, true);
             }
 
             unsigned int pos_internal = 0;

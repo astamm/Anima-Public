@@ -123,7 +123,13 @@ void computeRigidLSWFromTranslations(std::vector < itk::Point<TInput,NDimensions
 
     resultTransform = itk::AffineTransform<TScalarType,NDimensions>::New();
 
-    resultTransform->SetMatrix(rotationMatrix);
+    typename itk::AffineTransform<TScalarType, NDimensions>::MatrixType
+        itkRotationMatrix;
+    for (unsigned int i = 0; i < NDimensions; ++i)
+        for (unsigned int j = 0; j < NDimensions; ++j)
+            itkRotationMatrix(i, j) = rotationMatrix(i, j);
+
+    resultTransform->SetMatrix(itkRotationMatrix);
     resultTransform->SetOffset(translationPart);
 }
 
@@ -251,7 +257,12 @@ itk::Point <TInput, NDimensions> computeAnisotropSimLSWFromTranslations(std::vec
 
     resultTransform = itk::AffineTransform <TScalarType, NDimensions>::New();
 
-    resultTransform->SetMatrix(linearPartMatrix);
+    typename itk::AffineTransform<TScalarType, NDimensions>::MatrixType itkLinearPartMatrix;
+    for (unsigned int i = 0; i < NDimensions; ++i)
+        for (unsigned int j = 0; j < NDimensions; ++j)
+            itkLinearPartMatrix(i, j) = linearPartMatrix(i, j);
+
+    resultTransform->SetMatrix(itkLinearPartMatrix);
     resultTransform->SetOffset(translationPart);
 
     return barX;
@@ -288,7 +299,12 @@ void computeLogEuclideanAverage(std::vector < vnl_matrix <TInput> > &inputTransf
             affinePart(i,j) = resultMatrix(i,j);
     }
 
-    resultTransform->SetMatrix(affinePart);
+    typename itk::AffineTransform<TScalarType, NDimensions>::MatrixType itkAffinePart;
+      for (unsigned int i = 0; i < NDimensions; ++i)
+          for (unsigned int j = 0; j < NDimensions; ++j)
+              itkAffinePart(i, j) = affinePart(i, j);
+
+    resultTransform->SetMatrix(itkAffinePart);
     resultTransform->SetOffset(translationPart);
 }
 
@@ -340,19 +356,19 @@ itk::Point <TInput, NDimensions> computeAffineLSWFromTranslations(std::vector < 
 
     vnl_matrix <TInput> affineMatrix = SigmaYXMatrix * vnl_inverse (SigmaXXMatrix);
 
-    vnl_matrix <TScalarType> outMatrix(NDimensions,NDimensions);
-    itk::Vector <TScalarType,NDimensions> translationPart;
-    for (unsigned int i = 0;i < NDimensions;++i)
+    typename itk::AffineTransform<TScalarType, NDimensions>::MatrixType outMatrix;
+    itk::Vector <TScalarType, NDimensions> translationPart;
+    for (unsigned int i = 0; i < NDimensions; ++i)
     {
         translationPart[i] = barY[i];
-        for (unsigned int j = 0;j < NDimensions;++j)
+        for (unsigned int j = 0; j < NDimensions; ++j)
         {
-            outMatrix(i,j) = affineMatrix(i,j);
-            translationPart[i] -= affineMatrix(i,j)*barX[j];
+            outMatrix(i, j) = affineMatrix(i, j);
+            translationPart[i] -= affineMatrix(i, j) * barX[j];
         }
     }
 
-    resultTransform = itk::AffineTransform<TScalarType,NDimensions>::New();
+    resultTransform = itk::AffineTransform<TScalarType, NDimensions>::New();
 
     resultTransform->SetMatrix(outMatrix);
     resultTransform->SetOffset(translationPart);
