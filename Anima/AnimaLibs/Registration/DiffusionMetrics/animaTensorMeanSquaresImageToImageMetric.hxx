@@ -78,7 +78,11 @@ TensorMeanSquaresImageToImageMetric<TFixedImagePixelType,TMovingImagePixelType,I
                     anima::RotateSymmetricMatrix(tmpMat,this->m_OrientationMatrix,currentTensor);
                 else
                 {
-                    eigenComputer.ComputeEigenValuesAndVectors(tmpMat,eigVals,eigVecs);
+                    EigVecMatrixType tmpMatItk;
+                    for (unsigned int i = 0; i < 3; ++i)
+                        for (unsigned int j = 0; j < 3; ++j)
+                            tmpMatItk(i, j) = tmpMat(i, j);
+                    eigenComputer.ComputeEigenValuesAndVectors(tmpMatItk,eigVals,eigVecs);
                     anima::ExtractPPDRotationFromJacobianMatrix(this->m_OrientationMatrix,ppdOrientationMatrix,eigVecs);
                     anima::RotateSymmetricMatrix(tmpMat,ppdOrientationMatrix,currentTensor);
                 }

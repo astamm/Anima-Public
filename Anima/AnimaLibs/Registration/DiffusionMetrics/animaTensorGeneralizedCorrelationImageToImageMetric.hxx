@@ -89,7 +89,11 @@ TensorGeneralizedCorrelationImageToImageMetric<TFixedImagePixelType,TMovingImage
                     anima::RotateSymmetricMatrix(tmpMat,this->m_OrientationMatrix,currentTensor);
                 else
                 {
-                    eigenComputer.ComputeEigenValuesAndVectors(tmpMat,eigVals,eigVecs);
+                    EigVecMatrixType tmpMatItk;
+                    for (unsigned int row = 0; row < tensorDimension; ++row)
+                        for (unsigned int col = 0; col < tensorDimension; ++col)
+                            tmpMatItk(row, col) = tmpMat(row, col);
+                    eigenComputer.ComputeEigenValuesAndVectors(tmpMatItk,eigVals,eigVecs);
                     anima::ExtractPPDRotationFromJacobianMatrix(this->m_OrientationMatrix,ppdOrientationMatrix,eigVecs);
                     anima::RotateSymmetricMatrix(tmpMat,ppdOrientationMatrix,currentTensor);
                 }

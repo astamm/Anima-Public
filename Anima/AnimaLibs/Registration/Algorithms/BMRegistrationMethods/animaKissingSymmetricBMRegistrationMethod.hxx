@@ -180,7 +180,7 @@ KissingSymmetricBMRegistrationMethod <TInputImageType>
         affMatrix *= (m_RegistrationPointLocation - 1) / m_RegistrationPointLocation;
         affMatrix = anima::GetExponential(affMatrix);
 
-        vnl_matrix <double> affResult(NDimensions,NDimensions,0);
+        typename AffineTransformType::MatrixType affResult;
         typename AffineTransformType::OffsetType offset(NDimensions);
 
         for (unsigned int i = 0;i < NDimensions;++i)

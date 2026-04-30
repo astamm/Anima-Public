@@ -101,19 +101,23 @@ void TRKWriter::Update()
     itk::SpatialOrientationAdapter orientationAdapter;
     itk::SpatialOrientationAdapter::OrientationType orientationType = orientationAdapter.FromDirectionCosines(direction);
 
-    itk::SpatialOrientation::CoordinateTerms testOrientation = (itk::SpatialOrientation::CoordinateTerms)(orientationType >> itk::SpatialOrientation::ITK_COORDINATE_TertiaryMinor);
+    //itk::SpatialOrientation::CoordinateTerms testOrientation = (itk::SpatialOrientation::CoordinateTerms)(orientationType >> itk::SpatialOrientation::ITK_COORDINATE_TertiaryMinor);
+    itk::SpatialOrientation::CoordinateTerms testOrientation = (itk::SpatialOrientation::CoordinateTerms)(static_cast<unsigned int>(orientationType) >> static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_TertiaryMinor));
     headerStr.voxel_order[3] = '\0';
     headerStr.voxel_order[2] = m_OrientationsMap[testOrientation];
 
     itk::SpatialOrientationAdapter::OrientationType truncatedOrientationType;
-    truncatedOrientationType = (itk::SpatialOrientationAdapter::OrientationType)(orientationType - (testOrientation << itk::SpatialOrientation::ITK_COORDINATE_TertiaryMinor));
-    testOrientation = (itk::SpatialOrientation::CoordinateTerms)(truncatedOrientationType >> itk::SpatialOrientation::ITK_COORDINATE_SecondaryMinor);
+    //truncatedOrientationType = (itk::SpatialOrientationAdapter::OrientationType)(orientationType - (testOrientation << itk::SpatialOrientation::ITK_COORDINATE_TertiaryMinor));
+    truncatedOrientationType = (itk::SpatialOrientationAdapter::OrientationType)(static_cast<unsigned int>(orientationType) - (static_cast<unsigned int>(testOrientation) << static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_TertiaryMinor)));
+    //testOrientation = (itk::SpatialOrientation::CoordinateTerms)(truncatedOrientationType >> itk::SpatialOrientation::ITK_COORDINATE_SecondaryMinor);
+    testOrientation = (itk::SpatialOrientation::CoordinateTerms)(static_cast<unsigned int>(truncatedOrientationType) >>static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_SecondaryMinor));
 
     headerStr.voxel_order[1] = m_OrientationsMap[testOrientation];
 
-    truncatedOrientationType = (itk::SpatialOrientationAdapter::OrientationType)(truncatedOrientationType - (testOrientation << itk::SpatialOrientation::ITK_COORDINATE_SecondaryMinor));
-    testOrientation = (itk::SpatialOrientation::CoordinateTerms)(truncatedOrientationType >> itk::SpatialOrientation::ITK_COORDINATE_PrimaryMinor);
-
+    //truncatedOrientationType = (itk::SpatialOrientationAdapter::OrientationType)(truncatedOrientationType - (testOrientation << itk::SpatialOrientation::ITK_COORDINATE_SecondaryMinor));
+    truncatedOrientationType = (itk::SpatialOrientationAdapter::OrientationType)(static_cast<unsigned int>(truncatedOrientationType) - (static_cast<unsigned int>(testOrientation) << static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_SecondaryMinor)));
+    //testOrientation = (itk::SpatialOrientation::CoordinateTerms)(truncatedOrientationType >> itk::SpatialOrientation::ITK_COORDINATE_PrimaryMinor);
+    testOrientation = (itk::SpatialOrientation::CoordinateTerms)(static_cast<unsigned int>(truncatedOrientationType) >> static_cast<unsigned int>(itk::SpatialOrientation::ITK_COORDINATE_PrimaryMinor));
     headerStr.voxel_order[0] = m_OrientationsMap[testOrientation];
 
     headerStr.reserved[0] = '\0';
@@ -124,9 +128,9 @@ void TRKWriter::Update()
     headerStr.invert_x = '0';
     headerStr.invert_y = '0';
     headerStr.invert_z = '0';
-    headerStr.swap_xy = '0';
-    headerStr.swap_yz = '0';
-    headerStr.swap_zx = '0';
+    headerStr.swap_xy  = '0';
+    headerStr.swap_yz  = '0';
+    headerStr.swap_zx  = '0';
     for (unsigned int i = 0;i < 6;++i)
         headerStr.image_orientation_patient[i] = 0;
 
