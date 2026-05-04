@@ -42,7 +42,11 @@ GetRotationMatrixFromVectors(const VectorType &first_direction, const VectorType
     eigenSystem.SetOrderEigenValues(true);
     eigenSystem.ComputeEigenValuesAndVectors(AMatrix, eVals, eVec);
 
-    vnl_matrix <double> rotationMatrix = anima::computeRotationFromQuaternion<double,double>(eVec.get_row(0));
+    vnl_matrix <double> vnlRotationMatrix = anima::computeRotationFromQuaternion<double, double>(eVec.get_row(0));
+    itk::Matrix <double, 3, 3> rotationMatrix;
+    for (unsigned int i = 0; i < 3; ++i)
+        for (unsigned int j = 0; j < 3; ++j)
+            rotationMatrix(i, j) = vnlRotationMatrix(i, j);
 
     return rotationMatrix;
 }

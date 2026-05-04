@@ -10,6 +10,7 @@
 #include <vtkDoubleArray.h>
 #include <vtkPointData.h>
 
+#include <iostream>
 #include <fstream>
 #include <algorithm>
 
