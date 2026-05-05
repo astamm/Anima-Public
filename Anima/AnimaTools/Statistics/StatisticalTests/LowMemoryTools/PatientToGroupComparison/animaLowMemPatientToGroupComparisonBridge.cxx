@@ -109,7 +109,7 @@ void LowMemoryPatientToGroupComparisonBridge::Update(int specificSplitToDo, bool
         std::cout << "Results computed... Writing output parcel..." << std::endl;
 
         char numSplit[2048];
-        sprintf(numSplit,"_%ld_%ld_%ld.nrrd",splitIndexesToProcess[i][0],splitIndexesToProcess[i][1],splitIndexesToProcess[i][2]);
+        snprintf(numSplit, sizeof(numSplit), "_%ld_%ld_%ld.nrrd", splitIndexesToProcess[i][0], splitIndexesToProcess[i][1], splitIndexesToProcess[i][2]);
 
         //Write outputs
         std::string outputName = m_OutputName + numSplit;
@@ -140,7 +140,7 @@ void LowMemoryPatientToGroupComparisonBridge::Update(int specificSplitToDo, bool
                     {
                         OutputImageType::RegionType tmpBlRegion = m_DataLTImages->GetSpecificBlockRegion(tmpInd);
                         char numSplit[2048];
-                        sprintf(numSplit,"_%ld_%ld_%ld.nrrd",tmpInd[0],tmpInd[1],tmpInd[2]);
+                        snprintf(numSplit, sizeof(numSplit), "_%ld_%ld_%ld.nrrd", tmpInd[0], tmpInd[1], tmpInd[2]);
 
                         tmpFileOut << "<BLOCK>" << std::endl;
                         tmpFileOut << "BLOCK_FILE=" << m_OutputName + numSplit << std::endl;

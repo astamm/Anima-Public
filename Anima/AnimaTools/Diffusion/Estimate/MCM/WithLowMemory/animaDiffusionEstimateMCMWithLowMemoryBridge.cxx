@@ -232,9 +232,9 @@ void DiffusionEstimateMCMWithLowMemoryBridge::Update(int specificSplitToDo, bool
         std::cout << "Results computed in " << tmpTimer.GetTotal() << "s ... Writing output parcel..." << std::endl;
 
         char numSplitMCM[2048];
-        sprintf(numSplitMCM,"_%ld_%ld_%ld.mcm",splitIndexesToProcess[i][0],splitIndexesToProcess[i][1],splitIndexesToProcess[i][2]);
+        snprintf(numSplitMCM, sizeof(numSplitMCM), "_%ld_%ld_%ld.mcm", splitIndexesToProcess[i][0], splitIndexesToProcess[i][1], splitIndexesToProcess[i][2]);
         char numSplit[2048];
-        sprintf(numSplit,"_%ld_%ld_%ld.nrrd",splitIndexesToProcess[i][0],splitIndexesToProcess[i][1],splitIndexesToProcess[i][2]);
+        snprintf(numSplit, sizeof(numSplit), "_%ld_%ld_%ld.nrrd", splitIndexesToProcess[i][0], splitIndexesToProcess[i][1], splitIndexesToProcess[i][2]);
 
         //Write outputs
         std::string outputName = m_OutputName + numSplitMCM;
@@ -299,9 +299,9 @@ void DiffusionEstimateMCMWithLowMemoryBridge::Update(int specificSplitToDo, bool
                     {
                         OutputImageType::RegionType tmpBlRegion = m_DWIImages->GetSpecificBlockRegion(tmpInd);
                         char numSplitMCM[2048];
-                        sprintf(numSplitMCM,"_%ld_%ld_%ld.mcm",tmpInd[0],tmpInd[1],tmpInd[2]);
+                        snprintf(numSplitMCM, sizeof(numSplitMCM), "_%ld_%ld_%ld.mcm", tmpInd[0], tmpInd[1], tmpInd[2]);
                         char numSplit[2048];
-                        sprintf(numSplit,"_%ld_%ld_%ld.nrrd",tmpInd[0],tmpInd[1],tmpInd[2]);
+                        snprintf(numSplit, sizeof(numSplit), "_%ld_%ld_%ld.nrrd", tmpInd[0], tmpInd[1], tmpInd[2]);
 
                         tmpFileOut << "<BLOCK>" << std::endl;
                         tmpFileOut << "BLOCK_FILE=" << m_OutputName + numSplitMCM << std::endl;

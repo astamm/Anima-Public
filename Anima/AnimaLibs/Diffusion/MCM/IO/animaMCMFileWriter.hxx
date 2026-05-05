@@ -192,7 +192,7 @@ MCMFileWriter <PixelType, ImageDimension>
         std::string compartmentName = noPathName + "_";
 
         char tmpStr[2048];
-        sprintf(tmpStr,"%d",i);
+        snprintf(tmpStr, sizeof(tmpStr), "%d", i);
         compartmentName += tmpStr;
         compartmentName += ".nrrd";
 

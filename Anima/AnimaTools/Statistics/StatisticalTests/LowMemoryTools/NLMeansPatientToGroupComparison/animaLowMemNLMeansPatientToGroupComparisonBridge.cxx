@@ -174,7 +174,7 @@ void LowMemoryNLMeansPatientToGroupComparisonBridge::Update(int specificSplitToD
         std::cout << "Results computed... Writing output parcel..." << std::endl;
 
         char numSplit[2048];
-        sprintf(numSplit,"_%ld_%ld_%ld.nrrd",splitIndexesToProcess[i][0],splitIndexesToProcess[i][1],splitIndexesToProcess[i][2]);
+        snprintf(numSplit, sizeof(numSplit), "_%ld_%ld_%ld.nrrd", splitIndexesToProcess[i][0], splitIndexesToProcess[i][1], splitIndexesToProcess[i][2]);
 
         //Write outputs
         std::string outputScoreName = m_OutputScoreName + numSplit;
@@ -222,7 +222,7 @@ void LowMemoryNLMeansPatientToGroupComparisonBridge::Update(int specificSplitToD
                     {
                         OutputImageType::RegionType tmpBlRegion = m_DatabaseImages->GetSpecificBlockRegion(tmpInd);
                         char numSplit[2048];
-                        sprintf(numSplit,"_%ld_%ld_%ld.nrrd",tmpInd[0],tmpInd[1],tmpInd[2]);
+                        snprintf(numSplit, sizeof(numSplit), "_%ld_%ld_%ld.nrrd", tmpInd[0], tmpInd[1], tmpInd[2]);
 
                         if (tmpFileScoreOut.is_open())
                         {

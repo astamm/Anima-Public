@@ -181,7 +181,7 @@ void LowMemoryCramersTestBridge::Update(int specificSplitToDo, bool genOutputDes
         std::cout << "Results computed... Writing reference standard, bias and covariance images..." << std::endl;
 
         char numSplit[2048];
-        sprintf(numSplit,"_%ld_%ld_%ld.nrrd",splitIndexesToProcess[i][0],splitIndexesToProcess[i][1],splitIndexesToProcess[i][2]);
+        snprintf(numSplit, sizeof(numSplit), "_%ld_%ld_%ld.nrrd", splitIndexesToProcess[i][0], splitIndexesToProcess[i][1], splitIndexesToProcess[i][2]);
 
         //Write main output
         std::string outputName = m_OutputPrefix + numSplit;
@@ -207,7 +207,7 @@ void LowMemoryCramersTestBridge::Update(int specificSplitToDo, bool genOutputDes
                     {
                         OutputImageType::RegionType tmpBlRegion = m_InputImages->GetSpecificBlockRegion(tmpInd);
                         char numSplit[2048];
-                        sprintf(numSplit,"_%ld_%ld_%ld.nrrd",tmpInd[0],tmpInd[1],tmpInd[2]);
+                        snprintf(numSplit, sizeof(numSplit), "_%ld_%ld_%ld.nrrd", tmpInd[0], tmpInd[1], tmpInd[2]);
 
                         mainOutFile << "<BLOCK>" << std::endl;
                         mainOutFile << "BLOCK_FILE=" << m_OutputPrefix + numSplit << std::endl;
