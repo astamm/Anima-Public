@@ -151,7 +151,12 @@ SplitAffine3DTransform<TScalarType>
     vnl_matrix <TScalarType> secondRotationMatrix;
     anima::Get3DRotationExponential(angles,secondRotationMatrix);
 
-    MatrixType varMatrix = firstRotationMatrix * scaleMatrix * secondRotationMatrix;
+    MatrixType varMatrix;
+    varMatrix.Fill(0.0);
+    for (unsigned int i = 0;i < InputSpaceDimension;++i)
+        for (unsigned int j = 0;j < InputSpaceDimension;++j)
+            for (unsigned int k = 0;k < InputSpaceDimension;++k)
+                varMatrix(i,j) += firstRotationMatrix(i,k) * scaleMatrix(k,k) * secondRotationMatrix(k,j);
     this->SetVarMatrix (varMatrix);
 }
 

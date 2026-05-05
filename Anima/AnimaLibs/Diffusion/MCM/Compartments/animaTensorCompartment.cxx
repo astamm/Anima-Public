@@ -379,7 +379,10 @@ void TensorCompartment::Reorient(vnl_matrix <double> &orientationMatrix, bool af
         EigVecMatrixType eigVecs;
         EigValVectorType eigVals;
         
-        EigVecMatrixType workItkMatrix1 = m_WorkVnlMatrix1; //TODO Change type of m_WorkVnlMatrix1
+        EigVecMatrixType workItkMatrix1; //TODO Change type of m_WorkVnlMatrix1
+        for (unsigned int i = 0;i < m_SpaceDimension;++i)
+            for (unsigned int j = 0;j < m_SpaceDimension;++j)
+                workItkMatrix1(i,j) = m_WorkVnlMatrix1(i,j);
         eigenComputer.ComputeEigenValuesAndVectors(workItkMatrix1,eigVals,eigVecs);
         anima::ExtractPPDRotationFromJacobianMatrix(orientationMatrix,ppdOrientationMatrix,eigVecs);
         anima::RotateSymmetricMatrix(m_WorkVnlMatrix1,ppdOrientationMatrix,m_WorkVnlMatrix2);

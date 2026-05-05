@@ -45,7 +45,10 @@ TensorResampleImageFilter<TImageType, TInterpolatorPrecisionType>
         typedef itk::Matrix <double,3,3> MatrixType;
         typedef vnl_vector_fixed <double,3> VectorType;
         itk::SymmetricEigenAnalysis < MatrixType, VectorType, MatrixType> eigenComputer(3);
-        MatrixType workMats = m_WorkMats[threadId]; //TODO Change type of m_WorkMats
+        MatrixType workMats; //TODO Change type of m_WorkMats
+        for (unsigned int i = 0;i < m_TensorDimension;++i)
+            for (unsigned int j = 0;j < m_TensorDimension;++j)
+                workMats(i,j) = m_WorkMats[threadId](i,j);
         eigenComputer.ComputeEigenValuesAndVectors(workMats, m_WorkEigenValues[threadId], m_WorkEigenVectors[threadId]);
 
         anima::ExtractPPDRotationFromJacobianMatrix(modelOrientationMatrix,m_WorkPPDOrientationMatrices[threadId],m_WorkEigenVectors[threadId]);
